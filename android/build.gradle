@@ -1,0 +1,37 @@
+group 'com.dynamsoft.flutter_ocr_sdk'
+version '1.0'
+
+buildscript {
+    repositories {
+        google()
+        jcenter()
+    }
+
+    dependencies {
+        classpath 'com.android.tools.build:gradle:4.1.0'
+    }
+}
+
+rootProject.allprojects {
+    repositories {
+        maven {
+            url "http://download2.dynamsoft.com/maven/dlr/aar"
+        }
+        google()
+        jcenter()
+    }
+}
+
+apply plugin: 'com.android.library'
+
+android {
+    compileSdkVersion 30
+
+    defaultConfig {
+        minSdkVersion 16
+    }
+}
+
+dependencies {
+    implementation "com.dynamsoft:dynamsoftlabelrecognition:1.2.1@aar"
+}
