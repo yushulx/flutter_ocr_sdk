@@ -8,6 +8,7 @@ import 'package:camera/camera.dart';
 import 'package:camera_platform_interface/camera_platform_interface.dart';
 import 'package:flutter_ocr_sdk/flutter_ocr_sdk.dart';
 import 'package:flutter_ocr_sdk/mrz.dart';
+import 'package:image_picker/image_picker.dart';
 
 class Mobile extends StatefulWidget {
   final CameraDescription camera;
@@ -52,6 +53,7 @@ class MobileState extends State<Mobile> {
   CameraController _controller;
   Future<void> _initializeControllerFuture;
   FlutterOcrSdk _textRecognizer;
+  final picker = ImagePicker();
 
   @override
   void initState() {
@@ -81,6 +83,10 @@ class MobileState extends State<Mobile> {
 
   void pictureScan() async {
     final image = await _controller.takePicture();
+    // final image = await picker.pickImage(source: ImageSource.camera);
+    if (image == null) {
+      return;
+    }
     String ret = await _textRecognizer.recognizeByFile(image?.path, 'locr');
     String results = getTextResults(ret);
     Navigator.pop(context);
