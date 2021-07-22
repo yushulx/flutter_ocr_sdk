@@ -1,6 +1,4 @@
 import 'dart:convert';
-import 'dart:typed_data';
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
@@ -8,16 +6,8 @@ import 'dart:io';
 
 import 'package:camera/camera.dart';
 import 'package:camera_platform_interface/camera_platform_interface.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_ocr_sdk/flutter_ocr_sdk.dart';
-
-Future<String> loadAssetString(String path) async {
-  return await rootBundle.loadString(path);
-}
-
-Future<ByteData> loadAssetBytes(String path) async {
-  return await rootBundle.load(path);
-}
+import 'package:flutter_ocr_sdk/mrz.dart';
 
 class Mobile extends StatefulWidget {
   final CameraDescription camera;
@@ -37,6 +27,17 @@ String getTextResults(String json) {
   if (obj != null) {
     for (dynamic tmp in obj) {
       List<dynamic> area = tmp['area'];
+
+      if (area.length == 2) {
+        String line1 = area[0]['text'];
+        String line2 = area[1]['text'];
+        if (line1.length == 44 &&
+            line2.length == 44 &&
+            line1[0].compareTo("P") == 0) {
+          return MRZ.parse(line1, line2);
+        }
+      }
+
       for (dynamic line in area) {
         sb.write(line['text']);
         sb.write("\n\n");
@@ -61,7 +62,7 @@ class MobileState extends State<Mobile> {
       // Get a specific camera from the list of available cameras.
       widget.camera,
       // Define the resolution to use.
-      ResolutionPreset.high,
+      ResolutionPreset.max,
     );
 
     // Next, initialize the controller. This returns a Future.
@@ -75,38 +76,7 @@ class MobileState extends State<Mobile> {
 
   Future<void> initBarcodeSDK() async {
     _textRecognizer = FlutterOcrSdk();
-    String modelPath = 'model/';
-
-    var fileNames = [
-      "NumberUppercase",
-      "NumberUppercase_Assist_1lIJ",
-      "NumberUppercase_Assist_8B",
-      "NumberUppercase_Assist_8BHR",
-      "NumberUppercase_Assist_number",
-      "NumberUppercase_Assist_O0DQ",
-      "NumberUppercase_Assist_upcase"
-    ];
-    for (var i = 0; i < fileNames.length; i++) {
-      var fileName = fileNames[i];
-      ByteData prototxtBuffer = await loadAssetBytes(
-          modelPath + "CharacterModel/" + fileName + ".prototxt");
-
-      ByteData txtBuffer = await loadAssetBytes(
-          modelPath + "CharacterModel/" + fileName + ".txt");
-
-      ByteData characterModelBuffer = await loadAssetBytes(
-          modelPath + "CharacterModel/" + fileName + ".caffemodel");
-
-      _textRecognizer.loadModelFiles(
-          fileName,
-          prototxtBuffer.buffer.asUint8List(),
-          txtBuffer.buffer.asUint8List(),
-          characterModelBuffer.buffer.asUint8List());
-    }
-
-    String template =
-        await loadAssetString(modelPath + 'wholeImgMRZTemplate.json');
-    _textRecognizer.loadTemplate(template);
+    _textRecognizer.loadModel('model/');
   }
 
   void pictureScan() async {
@@ -156,7 +126,7 @@ class MobileState extends State<Mobile> {
         Expanded(child: getCameraWidget()),
       ]),
       floatingActionButton: FloatingActionButton(
-        child: Icon(Icons.camera_alt),
+        child: Icon(Icons.image_rounded),
         onPressed: () async {
           showDialog(
               context: context,

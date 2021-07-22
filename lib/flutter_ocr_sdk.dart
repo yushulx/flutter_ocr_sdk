@@ -58,4 +58,45 @@ class FlutterOcrSdk {
       'template': template,
     });
   }
+
+  void loadModel(String modelPath) async {
+    var fileNames = [
+      "NumberUppercase",
+      "NumberUppercase_Assist_1lIJ",
+      "NumberUppercase_Assist_8B",
+      "NumberUppercase_Assist_8BHR",
+      "NumberUppercase_Assist_number",
+      "NumberUppercase_Assist_O0DQ",
+      "NumberUppercase_Assist_upcase"
+    ];
+    for (var i = 0; i < fileNames.length; i++) {
+      var fileName = fileNames[i];
+      ByteData prototxtBuffer = await loadAssetBytes(
+          modelPath + "CharacterModel/" + fileName + ".prototxt");
+
+      ByteData txtBuffer = await loadAssetBytes(
+          modelPath + "CharacterModel/" + fileName + ".txt");
+
+      ByteData characterModelBuffer = await loadAssetBytes(
+          modelPath + "CharacterModel/" + fileName + ".caffemodel");
+
+      loadModelFiles(
+          fileName,
+          prototxtBuffer.buffer.asUint8List(),
+          txtBuffer.buffer.asUint8List(),
+          characterModelBuffer.buffer.asUint8List());
+    }
+
+    String template =
+        await loadAssetString(modelPath + 'wholeImgMRZTemplate.json');
+    loadTemplate(template);
+  }
+
+  Future<String> loadAssetString(String path) async {
+    return await rootBundle.loadString(path);
+  }
+
+  Future<ByteData> loadAssetBytes(String path) async {
+    return await rootBundle.load(path);
+  }
 }
