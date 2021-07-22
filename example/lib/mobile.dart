@@ -92,10 +92,10 @@ class MobileState extends State<Mobile> {
           modelPath + "CharacterModel/" + fileName + ".prototxt");
 
       ByteData txtBuffer = await loadAssetBytes(
-          modelPath + "CharacterModel/" + fileName + ".caffemodel");
+          modelPath + "CharacterModel/" + fileName + ".txt");
 
       ByteData characterModelBuffer = await loadAssetBytes(
-          modelPath + "CharacterModel/" + fileName + ".txt");
+          modelPath + "CharacterModel/" + fileName + ".caffemodel");
 
       _textRecognizer.loadModelFiles(
           fileName,
@@ -111,7 +111,7 @@ class MobileState extends State<Mobile> {
 
   void pictureScan() async {
     final image = await _controller.takePicture();
-    String ret = await _textRecognizer.recognizeByFile(image?.path, '');
+    String ret = await _textRecognizer.recognizeByFile(image?.path, 'locr');
     String results = getTextResults(ret);
     Navigator.pop(context);
     Navigator.push(
