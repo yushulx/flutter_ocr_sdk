@@ -128,7 +128,7 @@ class MobileState extends State<Mobile> {
     double mrzWidth = width - left * 2;
     return Scaffold(
       body: Stack(children: [
-        Expanded(child: getCameraWidget()),
+        getCameraWidget(),
         Positioned(
           left: left,
           top: height - mrzHeight * 2,
