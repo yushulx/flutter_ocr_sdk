@@ -121,9 +121,28 @@ class MobileState extends State<Mobile> {
 
   @override
   Widget build(BuildContext context) {
+    double width = MediaQuery.of(context).size.width;
+    double height = MediaQuery.of(context).size.height;
+    double left = 5;
+    double mrzHeight = 100;
+    double mrzWidth = width - left * 2;
     return Scaffold(
-      body: Column(children: [
+      body: Stack(children: [
         Expanded(child: getCameraWidget()),
+        Positioned(
+          left: left,
+          top: height - mrzHeight * 2,
+          child: Container(
+            width: mrzWidth,
+            height: mrzHeight,
+            decoration: BoxDecoration(
+              border: Border.all(
+                width: 2,
+                color: Colors.blue,
+              ),
+            ),
+          ),
+        )
       ]),
       floatingActionButton: FloatingActionButton(
         child: Icon(Icons.image_rounded),
