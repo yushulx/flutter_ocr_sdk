@@ -9,6 +9,7 @@ import 'package:camera_platform_interface/camera_platform_interface.dart';
 import 'package:flutter_ocr_sdk/flutter_ocr_sdk.dart';
 import 'package:flutter_ocr_sdk/mrz.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:image/image.dart' as ImageEx;
 
 class Mobile extends StatefulWidget {
   final CameraDescription camera;
@@ -64,7 +65,7 @@ class MobileState extends State<Mobile> {
       // Get a specific camera from the list of available cameras.
       widget.camera,
       // Define the resolution to use.
-      ResolutionPreset.max,
+      ResolutionPreset.ultraHigh,
     );
 
     // Next, initialize the controller. This returns a Future.
@@ -83,8 +84,13 @@ class MobileState extends State<Mobile> {
 
   void pictureScan() async {
     final image = await _controller.takePicture();
+    // ImageEx.Image tmp =
+    //     ImageEx.decodeImage(File(image?.path).readAsBytesSync());
+
+    // print(tmp.width.toString() + ', ' + tmp.height.toString());
     // final image = await picker.pickImage(source: ImageSource.camera);
     if (image == null) {
+      Navigator.pop(context);
       return;
     }
     String ret = await _textRecognizer.recognizeByFile(image?.path, 'locr');
@@ -130,14 +136,14 @@ class MobileState extends State<Mobile> {
     double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
     double left = 5;
-    double mrzHeight = 100;
+    double mrzHeight = 50;
     double mrzWidth = width - left * 2;
     return Scaffold(
       body: Stack(children: [
         getCameraWidget(),
         Positioned(
           left: left,
-          top: height - mrzHeight * 2,
+          top: height - mrzHeight * 4,
           child: Container(
             width: mrzWidth,
             height: mrzHeight,
@@ -151,7 +157,7 @@ class MobileState extends State<Mobile> {
         )
       ]),
       floatingActionButton: FloatingActionButton(
-        child: Icon(Icons.image_rounded),
+        child: Icon(Icons.camera),
         onPressed: () async {
           showDialog(
               context: context,
