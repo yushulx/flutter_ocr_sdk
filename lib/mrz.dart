@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'flutter_ocr_sdk.dart';
 
 class MRZ {
+  /// Parsing MRZ string to get detailed information.
   static String parse(String line1, String line2) {
     // https://en.wikipedia.org/wiki/Machine-readable_passport
     String result = "";

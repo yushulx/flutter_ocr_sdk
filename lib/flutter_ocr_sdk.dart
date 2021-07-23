@@ -34,6 +34,7 @@ class FlutterOcrSdk {
   }
 
   /// Do OCR by file.
+  /// Returns a [String] containing the OCR results.
   Future<String> recognizeByFile(String filename, String template) async {
     return await _channel.invokeMethod('recognizeByFile', {
       'filename': filename,
@@ -42,7 +43,8 @@ class FlutterOcrSdk {
   }
 
   /// Load custom model files.
-  Future<String> loadModelFiles(String name, Uint8List prototxtBuffer,
+  /// Returns a [String] containing the OCR results.
+  Future<void> loadModelFiles(String name, Uint8List prototxtBuffer,
       Uint8List txtBuffer, Uint8List characterModelBuffer) async {
     return await _channel.invokeMethod('loadModelFiles', {
       'name': name,
@@ -52,13 +54,14 @@ class FlutterOcrSdk {
     });
   }
 
-  /// Load template file.
-  Future<String> loadTemplate(String template) async {
+  /// Load s template file.
+  Future<void> loadTemplate(String template) async {
     return await _channel.invokeMethod('loadTemplate', {
       'template': template,
     });
   }
 
+  /// Load the whole model by folder.
   void loadModel(String modelPath) async {
     var fileNames = [
       "NumberUppercase",
@@ -92,10 +95,12 @@ class FlutterOcrSdk {
     loadTemplate(template);
   }
 
+  /// Retrieve a string from the asset bundle.
   Future<String> loadAssetString(String path) async {
     return await rootBundle.loadString(path);
   }
 
+  /// Retrieve a binary resource from the asset bundle as a data stream.
   Future<ByteData> loadAssetBytes(String path) async {
     return await rootBundle.load(path);
   }
