@@ -13,7 +13,7 @@ class FlutterOcrSdk {
   }
 
   /// Set an organization ID.
-  /// Register a Dynamsoft account: https://www.dynamsoft.com/customer/license/trialLicense?product=dlr
+  /// Register a Dynamsoft account to get the ID: https://www.dynamsoft.com/customer/license/trialLicense?product=dlr
   Future<void> setOrganizationID(String id) async {
     await _channel.invokeMethod('setOrganizationID', {'id': id});
   }
