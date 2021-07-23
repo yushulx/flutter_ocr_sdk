@@ -2,10 +2,19 @@
 
 A wrapper for [Dynamsoft OCR SDK](https://www.dynamsoft.com/label-recognition/overview/), focusing on [Passport MRZ](https://en.wikipedia.org/wiki/Passport_MRZ) recognition.
 
+
+
+## Try Passport MRZ Example
+
+```bash
+cd example
+flutter run -d <device>
+```
+
 ![Flutter Passport MRZ recognition](https://www.dynamsoft.com/blog/wp-content/uploads/2021/07/flutter-passport-mrz-recognition.jpg)
 
 ## Usage
-- Download the [model package](). Unzip model files to `model/` folder, and configure `assets` in `pubspec.yaml`:
+- Download the [model package](https://github.com/yushulx/flutter_ocr_sdk/releases/download/v0.0.1/model.zip). Unzip model files to `model/` folder, and configure `assets` in `pubspec.yaml`:
 
     ```yml
     assets:
