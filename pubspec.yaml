@@ -1,5 +1,5 @@
 name: flutter_ocr_sdk
-description: A new flutter plugin project.
+description: A wrapper for Dynamsoft OCR SDK, focusing on Passport MRZ recognition.
 version: 0.0.1
 homepage: https://github.com/yushulx/flutter_ocr_sdk
 repository: https://github.com/yushulx/flutter_ocr_sdk
