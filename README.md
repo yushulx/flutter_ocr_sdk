@@ -50,4 +50,5 @@ flutter run -d <device>
     await _textRecognizer.setOrganizationID('YOUR-ID');
     ```
 
-
+## Blog
+[Flutter OCR Recognition for Passport MRZ](https://www.dynamsoft.com/codepool/flutter-ocr-recognition-passport-mrz.html)
