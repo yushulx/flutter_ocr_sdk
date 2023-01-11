@@ -12,7 +12,7 @@ flutter run -d <device>
 ![Flutter Passport MRZ recognition](https://www.dynamsoft.com/blog/wp-content/uploads/2021/07/flutter-passport-mrz-recognition.jpg)
 
 ## Usage
-- Download the [model package](https://github.com/yushulx/flutter_ocr_sdk/releases/download/v0.0.1/model.zip). Unzip model files to `model/` folder, and configure `assets` in `pubspec.yaml`:
+- Download the [model folder](https://github.com/yushulx/flutter_ocr_sdk/tree/main/example/model) to your project, and configure `assets` in `pubspec.yaml`:
 
     ```yml
     assets:
