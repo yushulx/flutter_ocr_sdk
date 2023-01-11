@@ -1,31 +1,20 @@
 import 'dart:convert';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'dart:io';
 
-import 'package:camera/camera.dart';
-import 'package:camera_platform_interface/camera_platform_interface.dart';
 import 'package:flutter_ocr_sdk/flutter_ocr_sdk.dart';
-import 'package:flutter_ocr_sdk/mrz.dart';
+import 'package:flutter_ocr_sdk/mrz_parser.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:image/image.dart' as ImageEx;
 
 class Mobile extends StatefulWidget {
-  final CameraDescription camera;
-
-  const Mobile({
-    Key key,
-    @required this.camera,
-  }) : super(key: key);
-
   @override
   MobileState createState() => MobileState();
 }
 
 String getTextResults(String json) {
-  StringBuffer sb = new StringBuffer();
-  List<dynamic> obj = jsonDecode(json)['results'];
+  StringBuffer sb = StringBuffer();
+  List<dynamic>? obj = jsonDecode(json)['results'];
   if (obj != null) {
     for (dynamic tmp in obj) {
       List<dynamic> area = tmp['area'];
@@ -33,102 +22,68 @@ String getTextResults(String json) {
       if (area.length == 2) {
         String line1 = area[0]['text'];
         String line2 = area[1]['text'];
-        if (line1.length == 44 &&
-            line2.length == 44 &&
-            line1[0].compareTo("P") == 0) {
-          return MRZ.parse(line1, line2);
-        }
-      }
-
-      for (dynamic line in area) {
-        sb.write(line['text']);
-        sb.write("\n\n");
+        return MRZ.parseTwoLines(line1, line2).toString();
+      } else if (area.length == 3) {
+        String line1 = area[0]['text'];
+        String line2 = area[1]['text'];
+        String line3 = area[2]['text'];
+        return MRZ.parseThreeLines(line1, line2, line3).toString();
       }
     }
   }
 
-  return sb.toString();
+  return 'No results';
 }
 
 class MobileState extends State<Mobile> {
-  CameraController _controller;
-  Future<void> _initializeControllerFuture;
-  FlutterOcrSdk _textRecognizer;
+  late FlutterOcrSdk _mrzDetector;
   final picker = ImagePicker();
 
   @override
   void initState() {
     super.initState();
-    // To display the current output from the Camera,
-    // create a CameraController.
-    _controller = CameraController(
-      // Get a specific camera from the list of available cameras.
-      widget.camera,
-      // Define the resolution to use.
-      ResolutionPreset.ultraHigh,
-    );
 
-    // Next, initialize the controller. This returns a Future.
-    _initializeControllerFuture = _controller.initialize();
-    _initializeControllerFuture.then((_) {
-      setState(() {});
-    });
-    // Initialize Dynamsoft Barcode Reader
-    initBarcodeSDK();
+    initSDK();
   }
 
-  Future<void> initBarcodeSDK() async {
-    _textRecognizer = FlutterOcrSdk();
-    _textRecognizer.loadModel('model/');
+  Future<void> initSDK() async {
+    _mrzDetector = FlutterOcrSdk();
+    int? ret = await _mrzDetector.init("",
+        "DLS2eyJoYW5kc2hha2VDb2RlIjoiMjAwMDAxLTE2NDk4Mjk3OTI2MzUiLCJvcmdhbml6YXRpb25JRCI6IjIwMDAwMSIsInNlc3Npb25QYXNzd29yZCI6IndTcGR6Vm05WDJrcEQ5YUoifQ==");
+    await _mrzDetector.loadModel('model/');
   }
 
-  void pictureScan() async {
-    final image = await _controller.takePicture();
-    // ImageEx.Image tmp =
-    //     ImageEx.decodeImage(File(image?.path).readAsBytesSync());
+  void pictureScan(String source) async {
+    XFile? photo;
+    if (source == 'camera') {
+      photo = await picker.pickImage(source: ImageSource.camera);
+    } else {
+      photo = await picker.pickImage(source: ImageSource.gallery);
+    }
 
-    // print(tmp.width.toString() + ', ' + tmp.height.toString());
-    // final image = await picker.pickImage(source: ImageSource.camera);
-    if (image == null) {
+    if (photo == null) {
+      if (!mounted) return;
       Navigator.pop(context);
       return;
     }
-    String ret = await _textRecognizer.recognizeByFile(image?.path, 'locr');
-    String results = getTextResults(ret);
-    Navigator.pop(context);
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => DisplayPictureScreen(
-            imagePath: image?.path, barcodeResults: results),
-      ),
-    );
+    String? json = await _mrzDetector.recognizeByFile(photo.path);
+    if (json != null) {
+      String results = getTextResults(json);
+      if (!mounted) return;
+      Navigator.pop(context);
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => DisplayPictureScreen(
+              imagePath: photo!.path, barcodeResults: results),
+        ),
+      );
+    }
   }
 
   @override
   void dispose() {
-    // Dispose of the controller when the widget is disposed.
-    _controller?.dispose();
     super.dispose();
-  }
-
-  Widget getCameraWidget() {
-    if (!_controller.value.isInitialized) {
-      return Center(child: CircularProgressIndicator());
-    } else {
-      // https://stackoverflow.com/questions/49946153/flutter-camera-appears-stretched
-      final size = MediaQuery.of(context).size;
-      var scale = size.aspectRatio * _controller.value.aspectRatio;
-
-      if (scale < 1) scale = 1 / scale;
-
-      return Transform.scale(
-        scale: scale,
-        child: Center(
-          child: CameraPreview(_controller),
-        ),
-      );
-    }
   }
 
   @override
@@ -140,35 +95,43 @@ class MobileState extends State<Mobile> {
     double mrzWidth = width - left * 2;
     return Scaffold(
       body: Stack(children: [
-        getCameraWidget(),
-        Positioned(
-          left: left,
-          top: height - mrzHeight * 4,
-          child: Container(
-            width: mrzWidth,
-            height: mrzHeight,
-            decoration: BoxDecoration(
-              border: Border.all(
-                width: 2,
-                color: Colors.blue,
-              ),
-            ),
-          ),
+        Center(
+          child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                MaterialButton(
+                  textColor: Colors.white,
+                  color: Colors.blue,
+                  onPressed: () async {
+                    showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return const Center(
+                            child: CircularProgressIndicator(),
+                          );
+                        });
+                    pictureScan('gallery');
+                  },
+                  child: const Text('Pick gallery image'),
+                ),
+                MaterialButton(
+                  textColor: Colors.white,
+                  color: Colors.blue,
+                  onPressed: () async {
+                    showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return const Center(
+                            child: CircularProgressIndicator(),
+                          );
+                        });
+                    pictureScan('camera');
+                  },
+                  child: const Text('Pick camera image'),
+                ),
+              ]),
         )
       ]),
-      floatingActionButton: FloatingActionButton(
-        child: Icon(Icons.camera),
-        onPressed: () async {
-          showDialog(
-              context: context,
-              builder: (BuildContext context) {
-                return Center(
-                  child: CircularProgressIndicator(),
-                );
-              });
-          pictureScan();
-        },
-      ),
     );
   }
 }
@@ -178,33 +141,32 @@ class DisplayPictureScreen extends StatelessWidget {
   final String imagePath;
   final String barcodeResults;
 
-  const DisplayPictureScreen({Key key, this.imagePath, this.barcodeResults})
+  const DisplayPictureScreen(
+      {Key? key, required this.imagePath, required this.barcodeResults})
       : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('OCR')),
-      // The image is stored as a file on the device. Use the `Image.file`
-      // constructor with the given path to display the image.
+      appBar: AppBar(title: const Text('MRZ OCR')),
       body: Stack(
         alignment: const Alignment(0.0, 0.0),
         children: [
           // Show full screen image: https://stackoverflow.com/questions/48716067/show-fullscreen-image-at-flutter
           Image.file(
             File(imagePath),
-            fit: BoxFit.cover,
+            fit: BoxFit.contain,
             height: double.infinity,
             width: double.infinity,
             alignment: Alignment.center,
           ),
           Container(
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               color: Colors.black45,
             ),
             child: Text(
               barcodeResults,
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 14,
                 color: Colors.white,
               ),

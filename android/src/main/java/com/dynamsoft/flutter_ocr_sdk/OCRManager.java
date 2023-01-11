@@ -2,80 +2,77 @@ package com.dynamsoft.flutter_ocr_sdk;
 
 import android.util.Log;
 
-import com.dynamsoft.dlr.DLRImageData;
-import com.dynamsoft.dlr.DLRLTSLicenseVerificationListener;
-import com.dynamsoft.dlr.DLRLineResult;
+import com.dynamsoft.core.ImageData;
+import com.dynamsoft.core.CoreException;
+import com.dynamsoft.core.LicenseManager;
+import com.dynamsoft.core.LicenseVerificationListener;
+import com.dynamsoft.dlr.LabelRecognizer;
 import com.dynamsoft.dlr.DLRResult;
-import com.dynamsoft.dlr.LabelRecognition;
-import com.dynamsoft.dlr.LabelRecognitionException;
-import com.dynamsoft.dlr.DMLTSConnectionParameters;
+import com.dynamsoft.dlr.DLRLineResult;
+
+import android.content.Context;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import io.flutter.plugin.common.MethodChannel.Result;
+
 public class OCRManager {
     private static String TAG = "OCR";
-    private LabelRecognition mLabelRecognition;
+    private LabelRecognizer mLabelRecognizer;
 
     public OCRManager() {
         try {
-            mLabelRecognition = new LabelRecognition();
-            DMLTSConnectionParameters ltspar = new DMLTSConnectionParameters();
-            ltspar.organizationID = "200001";
-            mLabelRecognition.initLicenseFromLTS(ltspar, new DLRLTSLicenseVerificationListener() {
-                @Override
-                public void LTSLicenseVerificationCallback(boolean b, Exception e) {
-                    if (e != null) {
-                        Log.e("lts error: ", e.getMessage());
-                    }
-                }
-            });
+            mLabelRecognizer = new LabelRecognizer();
         } catch (Exception e) {
             e.printStackTrace();
         }
 
     }
 
-    public void setOrganizationID(String id) {
-        DMLTSConnectionParameters ltspar = new DMLTSConnectionParameters();
-        ltspar.organizationID = id;
-        mLabelRecognition.initLicenseFromLTS(ltspar, new DLRLTSLicenseVerificationListener() {
-            @Override
-            public void LTSLicenseVerificationCallback(boolean b, Exception e) {
-                if (e != null) {
-                    Log.e("lts error: ", e.getMessage());
-                }
-            }
-        });
+    public void init(String license, Context context, final Result result) {
+        LicenseManager.initLicense(
+            license, context,
+                new LicenseVerificationListener() {
+                    @Override
+                    public void licenseVerificationCallback(boolean isSuccessful, CoreException e) {
+                        if (isSuccessful)
+                        {
+                            result.success(0);
+                        }
+                        else {
+                            result.success(-1);
+                        }
+                    }
+                });
     }
 
-    public String recognizeByFile(String fileName, String templateName) {
+    public String recognizeByFile(String fileName) {
         JSONObject ret = new JSONObject();
         DLRResult[] results = null;
         try {
-            results = mLabelRecognition.recognizeByFile(fileName, templateName);
+            results = mLabelRecognizer.recognizeFile(fileName);
             ret = wrapResults(results);
-        } catch (LabelRecognitionException e) {
+        } catch (Exception e) {
 //            e.printStackTrace();
             Log.e(TAG, e.toString());
         }
         return ret.toString();
     }
 
-    public String recognizeByBuffer(byte[] bytes, int width, int height, int stride, int format, String templateName) {
+    public String recognizeByBuffer(byte[] bytes, int width, int height, int stride, int format) {
         JSONObject ret = new JSONObject();
         DLRResult[] results = null;
-        DLRImageData data = new DLRImageData();
+        ImageData data = new ImageData();
         data.bytes = bytes;
         data.width = width;
         data.height = height;
         data.stride = stride;
         data.format = format;
         try {
-            results = mLabelRecognition.recognizeByBuffer(data, templateName);
+            results = mLabelRecognizer.recognizeBuffer(data);
             ret = wrapResults(results);
-        } catch (LabelRecognitionException e) {
-//            e.printStackTrace();
+        } catch (Exception e) {
             Log.e(TAG, e.toString());
         }
         return ret.toString();
@@ -125,7 +122,7 @@ public class OCRManager {
 
     public void loadModelFiles(String name, byte[] prototxtBuffer, byte[] txtBuffer, byte[] characterModelBuffer) {
         try {
-            mLabelRecognition.appendCharacterModelBuffer(name, prototxtBuffer, txtBuffer, characterModelBuffer);
+            mLabelRecognizer.appendCharacterModelBuffer(name, prototxtBuffer, txtBuffer, characterModelBuffer);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -133,15 +130,9 @@ public class OCRManager {
 
     public void loadTemplate(String content) {
         try {
-            mLabelRecognition.appendSettingsFromString(content);
+            mLabelRecognizer.initRuntimeSettings(content);
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
-
-    @Override
-    protected void finalize() throws Throwable {
-        super.finalize();
-        mLabelRecognition.destroy();
     }
 }

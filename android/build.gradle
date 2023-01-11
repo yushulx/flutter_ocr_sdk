@@ -4,34 +4,39 @@ version '1.0'
 buildscript {
     repositories {
         google()
-        jcenter()
+        mavenCentral()
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:4.1.0'
+        classpath 'com.android.tools.build:gradle:7.1.2'
     }
 }
 
 rootProject.allprojects {
     repositories {
         maven {
-            url "http://download2.dynamsoft.com/maven/dlr/aar"
+            url "https://download2.dynamsoft.com/maven/aar"
         }
         google()
-        jcenter()
+        mavenCentral()
     }
 }
 
 apply plugin: 'com.android.library'
 
 android {
-    compileSdkVersion 30
+    compileSdkVersion 31
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
 
     defaultConfig {
-        minSdkVersion 16
+        minSdkVersion 21
     }
 }
 
 dependencies {
-    implementation "com.dynamsoft:dynamsoftlabelrecognition:1.2.1@aar"
+    implementation "com.dynamsoft:dynamsoftlabelrecognizer:2.2.20"
 }

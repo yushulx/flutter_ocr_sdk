@@ -5,20 +5,20 @@ import androidx.annotation.NonNull;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Looper;
-
-import io.flutter.embedding.engine.loader.FlutterLoader;
 import io.flutter.embedding.engine.plugins.FlutterPlugin;
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
 import io.flutter.plugin.common.MethodChannel.Result;
-import io.flutter.plugin.common.PluginRegistry.Registrar;
+
+import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding;
+import io.flutter.embedding.engine.plugins.activity.ActivityAware;
+import android.app.Activity;
 
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
-
 /** FlutterOcrSdkPlugin */
-public class FlutterOcrSdkPlugin implements FlutterPlugin, MethodCallHandler {
+public class FlutterOcrSdkPlugin implements FlutterPlugin, MethodCallHandler, ActivityAware {
   /// The MethodChannel that will the communication between Flutter and native Android
   ///
   /// This local reference serves to register the plugin with the Flutter Engine and unregister it
@@ -28,6 +28,8 @@ public class FlutterOcrSdkPlugin implements FlutterPlugin, MethodCallHandler {
   private HandlerThread mHandlerThread;
   private Handler mHandler;
   private final Executor mExecutor;
+  private FlutterPluginBinding flutterPluginBinding;
+  private Activity activity;
 
   public FlutterOcrSdkPlugin() {
     mOCRManager = new OCRManager();
@@ -39,6 +41,7 @@ public class FlutterOcrSdkPlugin implements FlutterPlugin, MethodCallHandler {
   public void onAttachedToEngine(@NonNull FlutterPluginBinding flutterPluginBinding) {
     channel = new MethodChannel(flutterPluginBinding.getBinaryMessenger(), "flutter_ocr_sdk");
     channel.setMethodCallHandler(this);
+    this.flutterPluginBinding = flutterPluginBinding;
   }
 
   @Override
@@ -47,12 +50,11 @@ public class FlutterOcrSdkPlugin implements FlutterPlugin, MethodCallHandler {
       case "getPlatformVersion":
         result.success("Android " + android.os.Build.VERSION.RELEASE);
         break;
-      case "setOrganizationID": {
-        final String id = call.argument("id");
-        mOCRManager.setOrganizationID(id);
-        result.success("");
+      case "init": {
+        final String license = call.argument("key");
+        mOCRManager.init(license, activity, result);
+        break;
       }
-      break;
       case "recognizeByFile": {
         final String filename = call.argument("filename");
         final String template = call.argument("template");
@@ -60,7 +62,7 @@ public class FlutterOcrSdkPlugin implements FlutterPlugin, MethodCallHandler {
         mExecutor.execute(new Runnable() {
           @Override
           public void run() {
-            final String results = mOCRManager.recognizeByFile(filename, template);
+            final String results = mOCRManager.recognizeByFile(filename);
             mHandler.post(new Runnable() {
               @Override
               public void run() {
@@ -83,7 +85,7 @@ public class FlutterOcrSdkPlugin implements FlutterPlugin, MethodCallHandler {
         mExecutor.execute(new Runnable() {
           @Override
           public void run() {
-            final String results = mOCRManager.recognizeByBuffer(bytes, width, height, stride, format, template);
+            final String results = mOCRManager.recognizeByBuffer(bytes, width, height, stride, format);
             mHandler.post(new Runnable() {
               @Override
               public void run() {
@@ -101,13 +103,13 @@ public class FlutterOcrSdkPlugin implements FlutterPlugin, MethodCallHandler {
         final byte[] txtBuffer = call.argument("txtBuffer");
         final byte[] characterModelBuffer = call.argument("characterModelBuffer");
         mOCRManager.loadModelFiles(name, prototxtBuffer, txtBuffer, characterModelBuffer);
-        result.success("");
+        result.success(0);
       }
       break;
       case "loadTemplate": {
         final String template = call.argument("template");
         mOCRManager.loadTemplate(template);
-        result.success("");
+        result.success(0);
       }
       break;
       default:
@@ -118,5 +120,30 @@ public class FlutterOcrSdkPlugin implements FlutterPlugin, MethodCallHandler {
   @Override
   public void onDetachedFromEngine(@NonNull FlutterPluginBinding binding) {
     channel.setMethodCallHandler(null);
+    flutterPluginBinding = null;
+  }
+
+  private void bind(ActivityPluginBinding activityPluginBinding) {
+    activity = activityPluginBinding.getActivity();
+  }
+
+  @Override
+  public void onAttachedToActivity(ActivityPluginBinding activityPluginBinding) {
+    bind(activityPluginBinding);
+  }
+
+  @Override
+  public void onReattachedToActivityForConfigChanges(ActivityPluginBinding activityPluginBinding) {
+    bind(activityPluginBinding);
+  }
+
+  @Override
+  public void onDetachedFromActivityForConfigChanges() {
+    activity = null;
+  }
+
+  @Override
+  public void onDetachedFromActivity() {
+    activity = null;
   }
 }
