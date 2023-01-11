@@ -9,7 +9,7 @@ cd example
 flutter run -d <device>
 ```
 
-![Flutter Passport MRZ recognition](https://www.dynamsoft.com/blog/wp-content/uploads/2021/07/flutter-passport-mrz-recognition.jpg)
+![Flutter Passport MRZ recognition](https://www.dynamsoft.com/codepool/img/2021/07/flutter-passport-mrz-recognition.jpg)
 
 ## Usage
 - Download the [model folder](https://github.com/yushulx/flutter_ocr_sdk/tree/main/example/model) to your project, and configure `assets` in `pubspec.yaml`:
