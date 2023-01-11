@@ -22,7 +22,7 @@ flutter run -d <device>
 - Initialize the MRZ detector with a [valid license key](https://www.dynamsoft.com/customer/license/trialLicense/?product=dlr):
 
     ```dart
-    _mrzDetector = FlutterOcrSdk();
+    FlutterOcrSdk _mrzDetector = FlutterOcrSdk();
     int? ret = await _mrzDetector.init("",
         "DLS2eyJoYW5kc2hha2VDb2RlIjoiMjAwMDAxLTE2NDk4Mjk3OTI2MzUiLCJvcmdhbml6YXRpb25JRCI6IjIwMDAwMSIsInNlc3Npb25QYXNzd29yZCI6IndTcGR6Vm05WDJrcEQ5YUoifQ==");
     ```
@@ -37,8 +37,8 @@ flutter run -d <device>
     String results = getTextResults(json);
 
     String getTextResults(String json) {
-    StringBuffer sb = StringBuffer();
-    List<dynamic>? obj = jsonDecode(json)['results'];
+        StringBuffer sb = StringBuffer();
+        List<dynamic>? obj = jsonDecode(json)['results'];
         if (obj != null) {
             for (dynamic tmp in obj) {
                 List<dynamic> area = tmp['area'];
