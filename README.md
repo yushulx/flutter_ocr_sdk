@@ -22,6 +22,7 @@ flutter run -d chrome
 
 ## Supported Platforms
 - Android
+- Web
 
 **TODO: Windows, Linux, iOS**
 
