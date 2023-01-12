@@ -1,6 +1,6 @@
 name: flutter_ocr_sdk
 description: A wrapper for Dynamsoft OCR SDK, detecting MRZ in passports, travel documents, and ID cards.
-version: 0.2.0
+version: 0.3.0
 homepage: https://github.com/yushulx/flutter_ocr_sdk
 repository: https://github.com/yushulx/flutter_ocr_sdk
 
@@ -11,7 +11,10 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  flutter_web_plugins:
+    sdk: flutter
   plugin_platform_interface: ^2.0.2
+  js: ^0.6.3
 
 dev_dependencies:
   flutter_test:
@@ -24,4 +27,7 @@ flutter:
       android:
         package: com.dynamsoft.flutter_ocr_sdk
         pluginClass: FlutterOcrSdkPlugin
+      web: 
+        pluginClass: FlutterOcrSdkWeb
+        fileName: flutter_ocr_sdk_web.dart
 

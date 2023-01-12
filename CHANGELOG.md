@@ -1,3 +1,6 @@
+## 0.3.0
+- Supported web development.
+
 ## 0.2.0
 - Added `MrzLine` class.
 - Added image pixel format enum.

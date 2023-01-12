@@ -23,7 +23,7 @@ class FlutterOcrSdk {
     return FlutterOcrSdkPlatform.instance.recognizeByFile(filename);
   }
 
-  Future<int?> loadModel(String modelPath) async {
-    return FlutterOcrSdkPlatform.instance.loadModel(modelPath);
+  Future<int?> loadModel() async {
+    return FlutterOcrSdkPlatform.instance.loadModel();
   }
 }

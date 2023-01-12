@@ -63,68 +63,20 @@ class MethodChannelFlutterOcrSdk extends FlutterOcrSdkPlatform {
       for (dynamic tmp in obj) {
         List<dynamic> area = tmp['area'];
         List<MrzLine> lines = [];
-        if (area.length == 2) {
-          MrzLine line1 = MrzLine();
-          line1.text = area[0]['text'];
-          line1.x1 = area[0]['x1'];
-          line1.y1 = area[0]['y1'];
-          line1.x2 = area[0]['x2'];
-          line1.y2 = area[0]['y2'];
-          line1.x3 = area[0]['x3'];
-          line1.y3 = area[0]['y3'];
-          line1.x4 = area[0]['x4'];
-          line1.y4 = area[0]['y4'];
-
-          MrzLine line2 = MrzLine();
-          line2.text = area[1]['text'];
-          line2.x1 = area[1]['x1'];
-          line2.y1 = area[1]['y1'];
-          line2.x2 = area[1]['x2'];
-          line2.y2 = area[1]['y2'];
-          line2.x3 = area[1]['x3'];
-          line2.y3 = area[1]['y3'];
-          line2.x4 = area[1]['x4'];
-          line2.y4 = area[1]['y4'];
-
-          lines.add(line1);
-          lines.add(line2);
-        } else if (area.length == 3) {
-          MrzLine line1 = MrzLine();
-          line1.text = area[0]['text'];
-          line1.x1 = area[0]['x1'];
-          line1.y1 = area[0]['y1'];
-          line1.x2 = area[0]['x2'];
-          line1.y2 = area[0]['y2'];
-          line1.x3 = area[0]['x3'];
-          line1.y3 = area[0]['y3'];
-          line1.x4 = area[0]['x4'];
-          line1.y4 = area[0]['y4'];
-
-          MrzLine line2 = MrzLine();
-          line2.text = area[1]['text'];
-          line2.x1 = area[1]['x1'];
-          line2.y1 = area[1]['y1'];
-          line2.x2 = area[1]['x2'];
-          line2.y2 = area[1]['y2'];
-          line2.x3 = area[1]['x3'];
-          line2.y3 = area[1]['y3'];
-          line2.x4 = area[1]['x4'];
-          line2.y4 = area[1]['y4'];
-
-          MrzLine line3 = MrzLine();
-          line3.text = area[2]['text'];
-          line3.x1 = area[2]['x1'];
-          line3.y1 = area[2]['y1'];
-          line3.x2 = area[2]['x2'];
-          line3.y2 = area[2]['y2'];
-          line3.x3 = area[2]['x3'];
-          line3.y3 = area[2]['y3'];
-          line3.x4 = area[2]['x4'];
-          line3.y4 = area[2]['y4'];
-
-          lines.add(line1);
-          lines.add(line2);
-          lines.add(line3);
+        if (area.length == 2 || area.length == 3) {
+          for (int i = 0; i < area.length; i++) {
+            MrzLine line = MrzLine();
+            line.text = area[i]['text'];
+            line.x1 = area[i]['x1'];
+            line.y1 = area[i]['y1'];
+            line.x2 = area[i]['x2'];
+            line.y2 = area[i]['y2'];
+            line.x3 = area[i]['x3'];
+            line.y3 = area[i]['y3'];
+            line.x4 = area[i]['x4'];
+            line.y4 = area[i]['y4'];
+            lines.add(line);
+          }
         }
 
         results.add(lines);
@@ -154,7 +106,9 @@ class MethodChannelFlutterOcrSdk extends FlutterOcrSdkPlatform {
   }
 
   /// Load the whole model by folder.
-  Future<int?> loadModel(String modelPath) async {
+  @override
+  Future<int?> loadModel() async {
+    String modelPath = 'model/';
     int? ret = 0;
     var fileNames = ["MRZ"];
     for (var i = 0; i < fileNames.length; i++) {

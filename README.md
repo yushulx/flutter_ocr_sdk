@@ -12,10 +12,18 @@ flutter run -d <device>
 
 ![Flutter Passport MRZ recognition](https://www.dynamsoft.com/codepool/img/2021/07/flutter-passport-mrz-recognition.jpg)
 
+### Web
+```bash
+cd example
+flutter run -d chrome
+```
+
+![Flutter MRZ recognition in web](https://www.dynamsoft.com/codepool/img/2023/01/flutter_mrz_ocr_web.png)
+
 ## Supported Platforms
 - Android
 
-**TODO: Web, Windows, Linux, iOS**
+**TODO: Windows, Linux, iOS**
 
 ## Installation
 Add `flutter_ocr_sdk` as a dependency in your `pubspec.yaml` file.
@@ -26,6 +34,13 @@ dependencies:
     flutter_ocr_sdk:
 ```
 
+### One More Step for Web
+Include the JavaScript library of Dynamsoft Label Recognizer in your `index.html` file:
+
+```html
+<script src="https://cdn.jsdelivr.net/npm/dynamsoft-label-recognizer@2.2.11/dist/dlr.js"></script>
+```
+
 ## Usage
 - Download the [model folder](https://github.com/yushulx/flutter_ocr_sdk/tree/main/example/model) to your project, and configure `assets` in `pubspec.yaml`:
 
@@ -34,15 +49,15 @@ dependencies:
         - model/
     ```
 
-- Initialize the MRZ detector with a [valid license key](https://www.dynamsoft.com/customer/license/trialLicense/?product=dlr):
+- Initialize the MRZ detector with the SDK path (**Web Only**) and a [valid license key](https://www.dynamsoft.com/customer/license/trialLicense/?product=dlr):
 
     ```dart
     FlutterOcrSdk _mrzDetector = FlutterOcrSdk();
-    int? ret = await _mrzDetector.init("", "DLS2eyJoYW5kc2hha2VDb2RlIjoiMjAwMDAxLTE2NDk4Mjk3OTI2MzUiLCJvcmdhbml6YXRpb25JRCI6IjIwMDAwMSIsInNlc3Npb25QYXNzd29yZCI6IndTcGR6Vm05WDJrcEQ5YUoifQ==");
+    int? ret = await _mrzDetector.init("https://cdn.jsdelivr.net/npm/dynamsoft-label-recognizer@2.2.11/dist/", "DLS2eyJoYW5kc2hha2VDb2RlIjoiMjAwMDAxLTE2NDk4Mjk3OTI2MzUiLCJvcmdhbml6YXRpb25JRCI6IjIwMDAwMSIsInNlc3Npb25QYXNzd29yZCI6IndTcGR6Vm05WDJrcEQ5YUoifQ==");
     ```
 - Load the MRZ detection model:
     ```dart
-    await _mrzDetector.loadModel('model/');
+    await _mrzDetector.loadModel();
     ```
 - Recognize MRZ from an image file:
 
@@ -67,7 +82,7 @@ dependencies:
 - Parse MRZ information:
 
     ```dart
-     String information = '';
+    String information = '';
     if (results != null && results.isNotEmpty) {
         for (List<MrzLine> area in results) {
             if (area.length == 2) {
