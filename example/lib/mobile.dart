@@ -1,38 +1,19 @@
-import 'dart:convert';
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter_ocr_sdk/flutter_ocr_sdk.dart';
+import 'package:flutter_ocr_sdk/flutter_ocr_sdk_platform_interface.dart';
+import 'package:flutter_ocr_sdk/mrz_line.dart';
 import 'package:flutter_ocr_sdk/mrz_parser.dart';
 import 'package:image_picker/image_picker.dart';
+
+import 'dart:ui' as ui;
 
 class Mobile extends StatefulWidget {
   @override
   MobileState createState() => MobileState();
-}
-
-String getTextResults(String json) {
-  StringBuffer sb = StringBuffer();
-  List<dynamic>? obj = jsonDecode(json)['results'];
-  if (obj != null) {
-    for (dynamic tmp in obj) {
-      List<dynamic> area = tmp['area'];
-
-      if (area.length == 2) {
-        String line1 = area[0]['text'];
-        String line2 = area[1]['text'];
-        return MRZ.parseTwoLines(line1, line2).toString();
-      } else if (area.length == 3) {
-        String line1 = area[0]['text'];
-        String line2 = area[1]['text'];
-        String line3 = area[2]['text'];
-        return MRZ.parseThreeLines(line1, line2, line3).toString();
-      }
-    }
-  }
-
-  return 'No results';
 }
 
 class MobileState extends State<Mobile> {
@@ -66,19 +47,61 @@ class MobileState extends State<Mobile> {
       Navigator.pop(context);
       return;
     }
-    String? json = await _mrzDetector.recognizeByFile(photo.path);
-    if (json != null) {
-      String results = getTextResults(json);
-      if (!mounted) return;
-      Navigator.pop(context);
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => DisplayPictureScreen(
-              imagePath: photo!.path, barcodeResults: results),
-        ),
-      );
+
+    String information = 'No results';
+
+    List<List<MrzLine>>? results =
+        await _mrzDetector.recognizeByFile(photo.path);
+    if (results != null && results.isNotEmpty) {
+      for (List<MrzLine> area in results) {
+        if (area.length == 2) {
+          information =
+              MRZ.parseTwoLines(area[0].text, area[1].text).toString();
+        } else if (area.length == 3) {
+          information = MRZ
+              .parseThreeLines(area[0].text, area[1].text, area[2].text)
+              .toString();
+        }
+      }
     }
+
+    // Uint8List fileBytes = await photo.readAsBytes();
+
+    // ui.Image image = await decodeImageFromList(fileBytes);
+
+    // ByteData? byteData =
+    //     await image.toByteData(format: ui.ImageByteFormat.rawRgba);
+    // if (byteData != null) {
+    //   List<List<MrzLine>>? results = await _mrzDetector.recognizeByBuffer(
+    //       byteData.buffer.asUint8List(),
+    //       image.width,
+    //       image.height,
+    //       byteData.lengthInBytes ~/ image.height,
+    //       ImagePixelFormat.IPF_ARGB_8888.index);
+
+    //   if (results != null && results.isNotEmpty) {
+    //     for (List<MrzLine> area in results) {
+    //       if (area.length == 2) {
+    //         information =
+    //             MRZ.parseTwoLines(area[0].text, area[1].text).toString();
+    //       } else if (area.length == 3) {
+    //         information = MRZ
+    //             .parseThreeLines(area[0].text, area[1].text, area[2].text)
+    //             .toString();
+    //       }
+    //     }
+    //   }
+    // }
+
+    if (!mounted) return;
+    Navigator.pop(context);
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => DisplayPictureScreen(
+            imagePath: photo!.path, mrzInformation: information),
+      ),
+    );
   }
 
   @override
@@ -139,10 +162,10 @@ class MobileState extends State<Mobile> {
 // A widget that displays the picture taken by the user.
 class DisplayPictureScreen extends StatelessWidget {
   final String imagePath;
-  final String barcodeResults;
+  final String mrzInformation;
 
   const DisplayPictureScreen(
-      {Key? key, required this.imagePath, required this.barcodeResults})
+      {Key? key, required this.imagePath, required this.mrzInformation})
       : super(key: key);
 
   @override
@@ -165,7 +188,7 @@ class DisplayPictureScreen extends StatelessWidget {
               color: Colors.black45,
             ),
             child: Text(
-              barcodeResults,
+              mrzInformation,
               style: const TextStyle(
                 fontSize: 14,
                 color: Colors.white,

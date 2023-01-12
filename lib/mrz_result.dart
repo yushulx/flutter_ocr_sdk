@@ -29,6 +29,8 @@ class MrzResult {
 
   @override
   String toString() {
+    if (type.isEmpty) return "No results";
+
     String result = '';
 
     result += 'Type: $type\n\n';
