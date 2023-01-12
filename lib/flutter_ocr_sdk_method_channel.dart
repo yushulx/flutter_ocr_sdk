@@ -108,7 +108,7 @@ class MethodChannelFlutterOcrSdk extends FlutterOcrSdkPlatform {
   /// Load the whole model by folder.
   @override
   Future<int?> loadModel() async {
-    String modelPath = 'model/';
+    String modelPath = 'packages/flutter_ocr_sdk/lib/model/';
     int? ret = 0;
     var fileNames = ["MRZ"];
     for (var i = 0; i < fileNames.length; i++) {

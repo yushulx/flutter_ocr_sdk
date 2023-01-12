@@ -1,3 +1,6 @@
+## 0.3.1
+- Moved MRZ model to plugin assets.
+ 
 ## 0.3.0
 - Supported web development.
 

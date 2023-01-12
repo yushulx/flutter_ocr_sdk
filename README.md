@@ -43,13 +43,6 @@ Include the JavaScript library of Dynamsoft Label Recognizer in your `index.html
 ```
 
 ## Usage
-- Download the [model folder](https://github.com/yushulx/flutter_ocr_sdk/tree/main/example/model) to your project, and configure `assets` in `pubspec.yaml`:
-
-    ```yml
-    assets:
-        - model/
-    ```
-
 - Initialize the MRZ detector with the SDK path (**Web Only**) and a [valid license key](https://www.dynamsoft.com/customer/license/trialLicense/?product=dlr):
 
     ```dart
