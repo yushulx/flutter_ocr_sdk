@@ -1,3 +1,6 @@
+## 0.4.0
+- Supported Windows development.
+
 ## 0.3.1
 - Moved MRZ model to plugin assets.
  

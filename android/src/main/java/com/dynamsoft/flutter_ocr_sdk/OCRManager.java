@@ -12,8 +12,10 @@ import com.dynamsoft.dlr.DLRLineResult;
 
 import android.content.Context;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import io.flutter.plugin.common.MethodChannel.Result;
 
@@ -47,21 +49,20 @@ public class OCRManager {
                 });
     }
 
-    public String recognizeByFile(String fileName) {
-        JSONObject ret = new JSONObject();
+    public ArrayList<ArrayList<HashMap<String, Object>>> recognizeByFile(String fileName) {
+        ArrayList<ArrayList<HashMap<String, Object>>> ret = new ArrayList<ArrayList<HashMap<String, Object>>>();
         DLRResult[] results = null;
         try {
             results = mLabelRecognizer.recognizeFile(fileName);
             ret = wrapResults(results);
         } catch (Exception e) {
-//            e.printStackTrace();
             Log.e(TAG, e.toString());
         }
-        return ret.toString();
+        return ret;
     }
 
-    public String recognizeByBuffer(byte[] bytes, int width, int height, int stride, int format) {
-        JSONObject ret = new JSONObject();
+    public ArrayList<ArrayList<HashMap<String, Object>>> recognizeByBuffer(byte[] bytes, int width, int height, int stride, int format) {
+        ArrayList<ArrayList<HashMap<String, Object>>> ret = new ArrayList<ArrayList<HashMap<String, Object>>>();
         DLRResult[] results = null;
         ImageData data = new ImageData();
         data.bytes = bytes;
@@ -75,49 +76,41 @@ public class OCRManager {
         } catch (Exception e) {
             Log.e(TAG, e.toString());
         }
-        return ret.toString();
+        return ret;
     }
 
-    private JSONObject wrapResults(DLRResult[] results) {
-        JSONObject jsonObject = new JSONObject();
+    private ArrayList<ArrayList<HashMap<String, Object>>> wrapResults(DLRResult[] results) {
+        ArrayList<ArrayList<HashMap<String, Object>>> objectList = new ArrayList<ArrayList<HashMap<String, Object>>>();
         if (results != null) {
             try {
-                JSONArray jsonArray = new JSONArray();
-                jsonObject.put("results", jsonArray);
                 for (DLRResult result : results) {
+                    ArrayList<HashMap<String, Object>> area = new ArrayList<HashMap<String, Object>>();
+                    
                     DLRLineResult[] lineResults = result.lineResults;
-                    JSONObject tmpObject = new JSONObject();
-                    tmpObject.put("x1", result.location.points[0].x);
-                    tmpObject.put("y1", result.location.points[0].y);
-                    tmpObject.put("x2", result.location.points[1].x);
-                    tmpObject.put("y2", result.location.points[1].y);
-                    tmpObject.put("x3", result.location.points[2].x);
-                    tmpObject.put("y3", result.location.points[2].y);
-                    tmpObject.put("x4", result.location.points[3].x);
-                    tmpObject.put("y4", result.location.points[3].y);
-                    JSONArray tmpArray = new JSONArray();
-                    tmpObject.put("area", tmpArray);
-                    for (DLRLineResult line : lineResults) {
-                        JSONObject lineObject = new JSONObject();
-                        lineObject.put("text", line.text);
-                        lineObject.put("x1", line.location.points[0].x);
-                        lineObject.put("y1", line.location.points[0].y);
-                        lineObject.put("x2", line.location.points[1].x);
-                        lineObject.put("y2", line.location.points[1].y);
-                        lineObject.put("x3", line.location.points[2].x);
-                        lineObject.put("y3", line.location.points[2].y);
-                        lineObject.put("x4", line.location.points[3].x);
-                        lineObject.put("y4", line.location.points[3].y);
-                        tmpArray.put(lineObject);
+                    for (DLRLineResult lineResult : lineResults) {
+                        HashMap<String, Object> line = new HashMap<>();
+
+                        line.put("confidence", lineResult.confidence);
+                        line.put("text", lineResult.text);
+                        line.put("x1", lineResult.location.points[0].x);
+                        line.put("y1", lineResult.location.points[0].y);
+                        line.put("x2", lineResult.location.points[1].x);
+                        line.put("y2", lineResult.location.points[1].y);
+                        line.put("x3", lineResult.location.points[2].x);
+                        line.put("y3", lineResult.location.points[2].y);
+                        line.put("x4", lineResult.location.points[3].x);
+                        line.put("y4", lineResult.location.points[3].y);
+                        
+                        area.add(line);
                     }
 
-                    jsonArray.put(tmpObject);
+                    objectList.add(area);
                 }
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
-        return jsonObject;
+        return objectList;
     }
 
     public void loadModelFiles(String name, byte[] prototxtBuffer, byte[] txtBuffer, byte[] characterModelBuffer) {

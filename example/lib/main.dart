@@ -1,16 +1,20 @@
+import 'dart:typed_data';
+
+import 'package:file_selector/file_selector.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
 
 import 'dart:io';
 
 import 'package:flutter_ocr_sdk/flutter_ocr_sdk.dart';
+import 'package:flutter_ocr_sdk/flutter_ocr_sdk_platform_interface.dart';
 import 'package:flutter_ocr_sdk/mrz_line.dart';
 import 'package:flutter_ocr_sdk/mrz_parser.dart';
 import 'package:image_picker/image_picker.dart';
 
 import 'package:flutter/foundation.dart' show kIsWeb;
 
-// import 'dart:ui' as ui;
+import 'dart:ui' as ui;
 
 Future<void> main() async {
   runApp(
@@ -52,10 +56,18 @@ class MobileState extends State<MRZApp> {
 
   void pictureScan(String source) async {
     XFile? photo;
-    if (source == 'camera') {
-      photo = await picker.pickImage(source: ImageSource.camera);
-    } else {
-      photo = await picker.pickImage(source: ImageSource.gallery);
+    if (kIsWeb || Platform.isAndroid || Platform.isIOS) {
+      if (source == 'camera') {
+        photo = await picker.pickImage(source: ImageSource.camera);
+      } else {
+        photo = await picker.pickImage(source: ImageSource.gallery);
+      }
+    } else if (Platform.isWindows || Platform.isLinux) {
+      const XTypeGroup typeGroup = XTypeGroup(
+        label: 'images',
+        extensions: <String>['jpg', 'png', 'bmp', 'tiff', 'pdf', 'gif'],
+      );
+      photo = await openFile(acceptedTypeGroups: <XTypeGroup>[typeGroup]);
     }
 
     if (photo == null) {

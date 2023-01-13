@@ -17,6 +17,12 @@ import android.app.Activity;
 
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 /** FlutterOcrSdkPlugin */
 public class FlutterOcrSdkPlugin implements FlutterPlugin, MethodCallHandler, ActivityAware {
   /// The MethodChannel that will the communication between Flutter and native Android
@@ -62,7 +68,7 @@ public class FlutterOcrSdkPlugin implements FlutterPlugin, MethodCallHandler, Ac
         mExecutor.execute(new Runnable() {
           @Override
           public void run() {
-            final String results = mOCRManager.recognizeByFile(filename);
+            final ArrayList<ArrayList<HashMap<String, Object>>> results = mOCRManager.recognizeByFile(filename);
             mHandler.post(new Runnable() {
               @Override
               public void run() {
@@ -85,7 +91,7 @@ public class FlutterOcrSdkPlugin implements FlutterPlugin, MethodCallHandler, Ac
         mExecutor.execute(new Runnable() {
           @Override
           public void run() {
-            final String results = mOCRManager.recognizeByBuffer(bytes, width, height, stride, format);
+            final ArrayList<ArrayList<HashMap<String, Object>>> results = mOCRManager.recognizeByBuffer(bytes, width, height, stride, format);
             mHandler.post(new Runnable() {
               @Override
               public void run() {

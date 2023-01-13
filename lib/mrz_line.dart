@@ -1,5 +1,6 @@
 /// MrzLine class.
 class MrzLine {
+  int confidence = 0;
   String text = '';
 
   int x1 = 0, y1 = 0, x2 = 0, y2 = 0, x3 = 0, y3 = 0, x4 = 0, y4 = 0;
@@ -7,7 +8,7 @@ class MrzLine {
   @override
   String toString() {
     String result = '';
-
+    result += 'Confidence: $confidence\n';
     result += 'Text: $text\n';
     result += 'x1: $x1\n';
     result += 'y1: $y1\n';

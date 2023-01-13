@@ -20,11 +20,20 @@ flutter run -d chrome
 
 ![Flutter MRZ recognition in web](https://www.dynamsoft.com/codepool/img/2023/01/flutter_mrz_ocr_web.png)
 
+### Windows
+```bash
+cd example
+flutter run -d windows
+```
+
+![Flutter MRZ OCR in Windows](https://www.dynamsoft.com/codepool/img/2023/01/flutter-mrz-ocr-windows.png)
+
 ## Supported Platforms
 - Android
 - Web
+- Windows
 
-**TODO: Windows, Linux, iOS**
+**TODO: Linux, iOS**
 
 ## Installation
 Add `flutter_ocr_sdk` as a dependency in your `pubspec.yaml` file.
