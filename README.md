@@ -20,10 +20,12 @@ flutter run -d chrome
 
 ![Flutter MRZ recognition in web](https://www.dynamsoft.com/codepool/img/2023/01/flutter_mrz_ocr_web.png)
 
-### Windows
+### Desktop: Windows & Linux
 ```bash
 cd example
 flutter run -d windows
+
+# flutter run -d linux
 ```
 
 ![Flutter MRZ OCR in Windows](https://www.dynamsoft.com/codepool/img/2023/01/flutter-mrz-ocr-windows.png)
@@ -32,8 +34,10 @@ flutter run -d windows
 - Android
 - Web
 - Windows
+- Linux
 
-**TODO: Linux, iOS**
+### TODO
+- iOS
 
 ## Installation
 Add `flutter_ocr_sdk` as a dependency in your `pubspec.yaml` file.
@@ -50,6 +54,16 @@ Include the JavaScript library of Dynamsoft Label Recognizer in your `index.html
 ```html
 <script src="https://cdn.jsdelivr.net/npm/dynamsoft-label-recognizer@2.2.11/dist/dlr.js"></script>
 ```
+
+
+## API Compatibility
+| Methods      | Android |    iOS | Windows | Linux | macOS | Web|
+| ----------- | ----------- | ----------- | ----------- |----------- |----------- |----------- |
+| `Future<int?> init(String path, String key)`     | :heavy_check_mark:       | :x:   | :heavy_check_mark:      | :heavy_check_mark:      |:heavy_check_mark:      | :heavy_check_mark:    |
+| `Future<int?> loadModel()`     | :heavy_check_mark:      | :x:   | :heavy_check_mark:      |:heavy_check_mark:      | :heavy_check_mark:     |:heavy_check_mark:      |
+| `Future<List<List<MrzLine>>?> recognizeByFile(String filename)`     | :heavy_check_mark:      | :x:   | :heavy_check_mark:      |:heavy_check_mark:      | :heavy_check_mark:     |:heavy_check_mark:    |
+| `Future<List<List<MrzLine>>?> recognizeByBuffer(Uint8List bytes, int width, int height, int stride, int format)`     | :heavy_check_mark:       | :x:   | :heavy_check_mark:       | :heavy_check_mark:       |:heavy_check_mark:      | :heavy_check_mark:     |
+
 
 ## Usage
 - Initialize the MRZ detector with the SDK path (**Web Only**) and a [valid license key](https://www.dynamsoft.com/customer/license/trialLicense/?product=dlr):

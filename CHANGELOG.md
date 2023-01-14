@@ -1,3 +1,6 @@
+## 0.5.0
+- Supported Linux development.
+
 ## 0.4.0
 - Supported Windows development.
 
