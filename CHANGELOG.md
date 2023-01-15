@@ -1,3 +1,6 @@
+## 1.0.0
+- Supported iOS development.
+
 ## 0.5.0
 - Supported Linux development.
 

@@ -63,7 +63,6 @@ public class FlutterOcrSdkPlugin implements FlutterPlugin, MethodCallHandler, Ac
       }
       case "recognizeByFile": {
         final String filename = call.argument("filename");
-        final String template = call.argument("template");
         final Result r = result;
         mExecutor.execute(new Runnable() {
           @Override
@@ -86,7 +85,6 @@ public class FlutterOcrSdkPlugin implements FlutterPlugin, MethodCallHandler, Ac
         final int height = call.argument("height");
         final int stride = call.argument("stride");
         final int format = call.argument("format");
-        final String template = call.argument("template");
         final Result r = result;
         mExecutor.execute(new Runnable() {
           @Override

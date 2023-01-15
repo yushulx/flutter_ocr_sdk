@@ -4,10 +4,10 @@ A wrapper for [Dynamsoft OCR SDK](https://www.dynamsoft.com/label-recognition/ov
 
 ## Try MRZ Detection Example
 
-### Android
+### Mobile: Android and iOS
 ```bash
 cd example
-flutter run -d <device>
+flutter run 
 ```
 
 ![Flutter Passport MRZ recognition](https://www.dynamsoft.com/codepool/img/2021/07/flutter-passport-mrz-recognition.jpg)
@@ -20,7 +20,7 @@ flutter run -d chrome
 
 ![Flutter MRZ recognition in web](https://www.dynamsoft.com/codepool/img/2023/01/flutter_mrz_ocr_web.png)
 
-### Desktop: Windows & Linux
+### Desktop: Windows and Linux
 ```bash
 cd example
 flutter run -d windows
@@ -35,8 +35,6 @@ flutter run -d windows
 - Web
 - Windows
 - Linux
-
-### TODO
 - iOS
 
 ## Installation
@@ -59,10 +57,10 @@ Include the JavaScript library of Dynamsoft Label Recognizer in your `index.html
 ## API Compatibility
 | Methods      | Android |    iOS | Windows | Linux | macOS | Web|
 | ----------- | ----------- | ----------- | ----------- |----------- |----------- |----------- |
-| `Future<int?> init(String path, String key)`     | :heavy_check_mark:       | :x:   | :heavy_check_mark:      | :heavy_check_mark:      |:heavy_check_mark:      | :heavy_check_mark:    |
-| `Future<int?> loadModel()`     | :heavy_check_mark:      | :x:   | :heavy_check_mark:      |:heavy_check_mark:      | :heavy_check_mark:     |:heavy_check_mark:      |
-| `Future<List<List<MrzLine>>?> recognizeByFile(String filename)`     | :heavy_check_mark:      | :x:   | :heavy_check_mark:      |:heavy_check_mark:      | :heavy_check_mark:     |:heavy_check_mark:    |
-| `Future<List<List<MrzLine>>?> recognizeByBuffer(Uint8List bytes, int width, int height, int stride, int format)`     | :heavy_check_mark:       | :x:   | :heavy_check_mark:       | :heavy_check_mark:       |:heavy_check_mark:      | :heavy_check_mark:     |
+| `Future<int?> init(String path, String key)`     | :heavy_check_mark:       | :heavy_check_mark:   | :heavy_check_mark:      | :heavy_check_mark:      |:heavy_check_mark:      | :heavy_check_mark:    |
+| `Future<int?> loadModel()`     | :heavy_check_mark:      | :heavy_check_mark:   | :heavy_check_mark:      |:heavy_check_mark:      | :heavy_check_mark:     |:heavy_check_mark:      |
+| `Future<List<List<MrzLine>>?> recognizeByFile(String filename)`     | :heavy_check_mark:      | :heavy_check_mark:   | :heavy_check_mark:      |:heavy_check_mark:      | :heavy_check_mark:     |:heavy_check_mark:    |
+| `Future<List<List<MrzLine>>?> recognizeByBuffer(Uint8List bytes, int width, int height, int stride, int format)`     | :heavy_check_mark:       | :heavy_check_mark:   | :heavy_check_mark:       | :heavy_check_mark:       |:heavy_check_mark:      | :heavy_check_mark:     |
 
 
 ## Usage

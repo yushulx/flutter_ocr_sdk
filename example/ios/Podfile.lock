@@ -1,0 +1,51 @@
+PODS:
+  - DynamsoftCore (2.0.1)
+  - DynamsoftLabelRecognizer (2.2.20):
+    - DynamsoftCore
+  - file_selector_ios (0.0.1):
+    - Flutter
+  - Flutter (1.0.0)
+  - flutter_ocr_sdk (0.6.0):
+    - DynamsoftLabelRecognizer (= 2.2.20)
+    - Flutter
+  - image_picker_ios (0.0.1):
+    - Flutter
+  - path_provider_ios (0.0.1):
+    - Flutter
+
+DEPENDENCIES:
+  - file_selector_ios (from `.symlinks/plugins/file_selector_ios/ios`)
+  - Flutter (from `Flutter`)
+  - flutter_ocr_sdk (from `.symlinks/plugins/flutter_ocr_sdk/ios`)
+  - image_picker_ios (from `.symlinks/plugins/image_picker_ios/ios`)
+  - path_provider_ios (from `.symlinks/plugins/path_provider_ios/ios`)
+
+SPEC REPOS:
+  https://github.com/CocoaPods/Specs.git:
+    - DynamsoftCore
+    - DynamsoftLabelRecognizer
+
+EXTERNAL SOURCES:
+  file_selector_ios:
+    :path: ".symlinks/plugins/file_selector_ios/ios"
+  Flutter:
+    :path: Flutter
+  flutter_ocr_sdk:
+    :path: ".symlinks/plugins/flutter_ocr_sdk/ios"
+  image_picker_ios:
+    :path: ".symlinks/plugins/image_picker_ios/ios"
+  path_provider_ios:
+    :path: ".symlinks/plugins/path_provider_ios/ios"
+
+SPEC CHECKSUMS:
+  DynamsoftCore: a39ffde3c0dc1cbc8279d92950abb0b69e86e999
+  DynamsoftLabelRecognizer: 50365d635771e449904ec091d49e9729cd2f03d9
+  file_selector_ios: 6e9b6d7300556c730f224905726f0a2d5d874e51
+  Flutter: f04841e97a9d0b0a8025694d0796dd46242b2854
+  flutter_ocr_sdk: d3d6c720ded4b3de3a39d62d9795532164479825
+  image_picker_ios: b786a5dcf033a8336a657191401bfdf12017dabb
+  path_provider_ios: 14f3d2fd28c4fdb42f44e0f751d12861c43cee02
+
+PODFILE CHECKSUM: ce9c09e4a374857a6b96c58a0b650208a9426b06
+
+COCOAPODS: 1.11.2

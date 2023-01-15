@@ -4,19 +4,19 @@
 #
 Pod::Spec.new do |s|
   s.name             = 'flutter_ocr_sdk'
-  s.version          = '0.0.1'
-  s.summary          = 'A new Flutter plugin project.'
+  s.version          = '1.0.0'
+  s.summary          = 'A wrapper for Dynamsoft OCR SDK, detecting MRZ in passports, travel documents, and ID cards.'
   s.description      = <<-DESC
-A new Flutter plugin project.
+A wrapper for Dynamsoft OCR SDK, detecting MRZ in passports, travel documents, and ID cards.
                        DESC
-  s.homepage         = 'http://example.com'
+  s.homepage         = 'https://github.com/yushulx/flutter_ocr_sdk'
   s.license          = { :file => '../LICENSE' }
-  s.author           = { 'Your Company' => 'email@example.com' }
+  s.author           = { 'yushulx' => 'lingxiao1002@gmail.com' }
   s.source           = { :path => '.' }
   s.source_files = 'Classes/**/*'
   s.dependency 'Flutter'
   s.platform = :ios, '9.0'
-
+  s.dependency 'DynamsoftLabelRecognizer', '2.2.20'
   # Flutter.framework does not contain a i386 slice.
   s.pod_target_xcconfig = { 'DEFINES_MODULE' => 'YES', 'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'i386' }
   s.swift_version = '5.0'
