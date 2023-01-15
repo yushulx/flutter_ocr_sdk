@@ -50,7 +50,7 @@ public class SwiftFlutterOcrSdkPlugin: NSObject, FlutterPlugin, LicenseVerificat
             DispatchQueue.global().async {
                 let filename: String = arguments.value(forKey: "filename") as! String
                 let res = try? self.recognizer!.recognizeFile(filename)
-                result(res)
+                result(self.wrapResults(results: res))
             }
         case "recognizeByBuffer":
             if self.recognizer == nil {
@@ -72,7 +72,7 @@ public class SwiftFlutterOcrSdkPlugin: NSObject, FlutterPlugin, LicenseVerificat
                 imageData.stride = stride
                 imageData.format = enumImagePixelFormat!
                 let res = try? self.recognizer!.recognizeBuffer(imageData)
-                result(res)
+                result(self.wrapResults(results: res))
             }
         default:
             result(.none)
@@ -80,10 +80,41 @@ public class SwiftFlutterOcrSdkPlugin: NSObject, FlutterPlugin, LicenseVerificat
   }
 
   public func licenseVerificationCallback(_ isSuccess: Bool, error: Error?) {
-        if isSuccess {
-            completionHandlers.first?(0)
-        } else{
-            completionHandlers.first?(-1)
+    if isSuccess {
+        completionHandlers.first?(0)
+    } else{
+        completionHandlers.first?(-1)
+    }
+  }
+    
+    func wrapResults(results:[iDLRResult]?) -> NSArray {
+        let outResults = NSMutableArray()
+        if results == nil {
+            return outResults
         }
+        for item in results! {
+            let area = NSMutableArray()
+            
+            for line in item.lineResults! {
+                let dictionary = NSMutableDictionary()
+                dictionary.setObject(line.confidence, forKey: "confidence" as NSCopying)
+                dictionary.setObject(line.text ?? "", forKey: "text" as NSCopying)
+                
+                let points = line.location!.points as! [CGPoint]
+                dictionary.setObject(Int(points[0].x), forKey: "x1" as NSCopying)
+                dictionary.setObject(Int(points[0].y), forKey: "y1" as NSCopying)
+                dictionary.setObject(Int(points[1].x), forKey: "x2" as NSCopying)
+                dictionary.setObject(Int(points[1].y), forKey: "y2" as NSCopying)
+                dictionary.setObject(Int(points[2].x), forKey: "x3" as NSCopying)
+                dictionary.setObject(Int(points[2].y), forKey: "y3" as NSCopying)
+                dictionary.setObject(Int(points[3].x), forKey: "x4" as NSCopying)
+                dictionary.setObject(Int(points[3].y), forKey: "y4" as NSCopying)
+                
+                area.add(dictionary)
+            }
+            outResults.add(area)
+        }
+
+        return outResults
     }
 }
