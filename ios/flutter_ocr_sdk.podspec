@@ -4,7 +4,7 @@
 #
 Pod::Spec.new do |s|
   s.name             = 'flutter_ocr_sdk'
-  s.version          = '0.6.0'
+  s.version          = '1.0.0'
   s.summary          = 'A wrapper for Dynamsoft OCR SDK, detecting MRZ in passports, travel documents, and ID cards.'
   s.description      = <<-DESC
 A wrapper for Dynamsoft OCR SDK, detecting MRZ in passports, travel documents, and ID cards.
