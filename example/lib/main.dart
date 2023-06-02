@@ -49,7 +49,6 @@ class MobileState extends State<MRZApp> {
   Future<void> initSDK() async {
     _mrzDetector = FlutterOcrSdk();
     int? ret = await _mrzDetector.init(
-        "https://cdn.jsdelivr.net/npm/dynamsoft-label-recognizer@2.2.11/dist/",
         "DLS2eyJoYW5kc2hha2VDb2RlIjoiMjAwMDAxLTE2NDk4Mjk3OTI2MzUiLCJvcmdhbml6YXRpb25JRCI6IjIwMDAwMSIsInNlc3Npb25QYXNzd29yZCI6IndTcGR6Vm05WDJrcEQ5YUoifQ==");
     await _mrzDetector.loadModel();
   }
@@ -78,48 +77,49 @@ class MobileState extends State<MRZApp> {
 
     String information = 'No results';
 
-    List<List<MrzLine>>? results =
-        await _mrzDetector.recognizeByFile(photo.path);
-    if (results != null && results.isNotEmpty) {
-      for (List<MrzLine> area in results) {
-        if (area.length == 2) {
-          information =
-              MRZ.parseTwoLines(area[0].text, area[1].text).toString();
-        } else if (area.length == 3) {
-          information = MRZ
-              .parseThreeLines(area[0].text, area[1].text, area[2].text)
-              .toString();
-        }
-      }
-    }
-
-    // Uint8List fileBytes = await photo.readAsBytes();
-
-    // ui.Image image = await decodeImageFromList(fileBytes);
-
-    // ByteData? byteData =
-    //     await image.toByteData(format: ui.ImageByteFormat.rawRgba);
-    // if (byteData != null) {
-    //   List<List<MrzLine>>? results = await _mrzDetector.recognizeByBuffer(
-    //       byteData.buffer.asUint8List(),
-    //       image.width,
-    //       image.height,
-    //       byteData.lengthInBytes ~/ image.height,
-    //       ImagePixelFormat.IPF_ARGB_8888.index);
-
-    //   if (results != null && results.isNotEmpty) {
-    //     for (List<MrzLine> area in results) {
-    //       if (area.length == 2) {
-    //         information =
-    //             MRZ.parseTwoLines(area[0].text, area[1].text).toString();
-    //       } else if (area.length == 3) {
-    //         information = MRZ
-    //             .parseThreeLines(area[0].text, area[1].text, area[2].text)
-    //             .toString();
-    //       }
+    // List<List<MrzLine>>? results =
+    //     await _mrzDetector.recognizeByFile(photo.path);
+    // print(results);
+    // if (results != null && results.isNotEmpty) {
+    //   for (List<MrzLine> area in results) {
+    //     if (area.length == 2) {
+    //       information =
+    //           MRZ.parseTwoLines(area[0].text, area[1].text).toString();
+    //     } else if (area.length == 3) {
+    //       information = MRZ
+    //           .parseThreeLines(area[0].text, area[1].text, area[2].text)
+    //           .toString();
     //     }
     //   }
     // }
+
+    Uint8List fileBytes = await photo.readAsBytes();
+
+    ui.Image image = await decodeImageFromList(fileBytes);
+
+    ByteData? byteData =
+        await image.toByteData(format: ui.ImageByteFormat.rawRgba);
+    if (byteData != null) {
+      List<List<MrzLine>>? results = await _mrzDetector.recognizeByBuffer(
+          byteData.buffer.asUint8List(),
+          image.width,
+          image.height,
+          byteData.lengthInBytes ~/ image.height,
+          ImagePixelFormat.IPF_ARGB_8888.index);
+
+      if (results != null && results.isNotEmpty) {
+        for (List<MrzLine> area in results) {
+          if (area.length == 2) {
+            information =
+                MRZ.parseTwoLines(area[0].text, area[1].text).toString();
+          } else if (area.length == 3) {
+            information = MRZ
+                .parseThreeLines(area[0].text, area[1].text, area[2].text)
+                .toString();
+          }
+        }
+      }
+    }
 
     if (!mounted) return;
     Navigator.pop(context);

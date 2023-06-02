@@ -57,18 +57,18 @@ Include the JavaScript library of Dynamsoft Label Recognizer in your `index.html
 ## API Compatibility
 | Methods      | Android |    iOS | Windows | Linux | macOS | Web|
 | ----------- | ----------- | ----------- | ----------- |----------- |----------- |----------- |
-| `Future<int?> init(String path, String key)`     | :heavy_check_mark:       | :heavy_check_mark:   | :heavy_check_mark:      | :heavy_check_mark:      |:heavy_check_mark:      | :heavy_check_mark:    |
+| `Future<int?> init(String key)`     | :heavy_check_mark:       | :heavy_check_mark:   | :heavy_check_mark:      | :heavy_check_mark:      |:heavy_check_mark:      | :heavy_check_mark:    |
 | `Future<int?> loadModel()`     | :heavy_check_mark:      | :heavy_check_mark:   | :heavy_check_mark:      |:heavy_check_mark:      | :heavy_check_mark:     |:heavy_check_mark:      |
 | `Future<List<List<MrzLine>>?> recognizeByFile(String filename)`     | :heavy_check_mark:      | :heavy_check_mark:   | :heavy_check_mark:      |:heavy_check_mark:      | :heavy_check_mark:     |:heavy_check_mark:    |
 | `Future<List<List<MrzLine>>?> recognizeByBuffer(Uint8List bytes, int width, int height, int stride, int format)`     | :heavy_check_mark:       | :heavy_check_mark:   | :heavy_check_mark:       | :heavy_check_mark:       |:heavy_check_mark:      | :heavy_check_mark:     |
 
 
 ## Usage
-- Initialize the MRZ detector with the SDK path (**Web Only**) and a [valid license key](https://www.dynamsoft.com/customer/license/trialLicense/?product=dlr):
+- Initialize the MRZ detector with a [valid license key](https://www.dynamsoft.com/customer/license/trialLicense/?product=dlr):
 
     ```dart
     FlutterOcrSdk _mrzDetector = FlutterOcrSdk();
-    int? ret = await _mrzDetector.init("https://cdn.jsdelivr.net/npm/dynamsoft-label-recognizer@2.2.11/dist/", "DLS2eyJoYW5kc2hha2VDb2RlIjoiMjAwMDAxLTE2NDk4Mjk3OTI2MzUiLCJvcmdhbml6YXRpb25JRCI6IjIwMDAwMSIsInNlc3Npb25QYXNzd29yZCI6IndTcGR6Vm05WDJrcEQ5YUoifQ==");
+    int? ret = await _mrzDetector.init( "DLS2eyJoYW5kc2hha2VDb2RlIjoiMjAwMDAxLTE2NDk4Mjk3OTI2MzUiLCJvcmdhbml6YXRpb25JRCI6IjIwMDAwMSIsInNlc3Npb25QYXNzd29yZCI6IndTcGR6Vm05WDJrcEQ5YUoifQ==");
     ```
 - Load the MRZ detection model:
     ```dart

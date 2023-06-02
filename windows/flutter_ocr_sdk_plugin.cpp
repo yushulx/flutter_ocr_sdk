@@ -165,10 +165,8 @@ namespace flutter_ocr_sdk
         {
           format = std::get<int>(format_it->second);
         }
-        results = manager->RecognizeBuffer(reinterpret_cast<unsigned char*>(bytes.data()), width, height, stride, format, (int)bytes.size());
+        manager->RecognizeBuffer(result, reinterpret_cast<unsigned char*>(bytes.data()), width, height, stride, format);
       }
-
-      result->Success(results);
     }
     else
     {

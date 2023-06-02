@@ -9,8 +9,8 @@ class FlutterOcrSdk {
   }
 
   /// Initialize the SDK: https://www.dynamsoft.com/customer/license/trialLicense?product=dlr
-  Future<int?> init(String path, String key) {
-    return FlutterOcrSdkPlatform.instance.init(path, key);
+  Future<int?> init(String key) {
+    return FlutterOcrSdkPlatform.instance.init(key);
   }
 
   Future<List<List<MrzLine>>?> recognizeByBuffer(

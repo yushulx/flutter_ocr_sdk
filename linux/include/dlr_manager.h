@@ -44,7 +44,6 @@ public:
         char errorMessage[256];
 
         int ret = DLR_AppendSettingsFromString(recognizer, params, errorMessage, 256);
-        printf("DLR_InitRuntimeSettings: %s, model path: %s\n", errorMessage, modelPath);
         
         return ret;
     }

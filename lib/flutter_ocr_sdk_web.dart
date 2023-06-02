@@ -31,8 +31,8 @@ class FlutterOcrSdkWeb extends FlutterOcrSdkPlatform {
 
   /// Initialize the SDK: https://www.dynamsoft.com/customer/license/trialLicense?product=dlr
   @override
-  Future<int?> init(String path, String key) {
-    return _dlrManager.init(path, key);
+  Future<int?> init(String key) {
+    return _dlrManager.init(key);
   }
 
   /// Recognize MRZ from a buffer

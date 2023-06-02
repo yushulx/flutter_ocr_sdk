@@ -27,8 +27,7 @@ class DLRManager {
 
   /// Configure Dynamsoft Label Recognizer.
   /// Returns 0 if successful.
-  Future<int> init(String path, String key) async {
-    LabelRecognizer.engineResourcePath = path;
+  Future<int> init(String key) async {
     LabelRecognizer.license = key;
 
     _recognizer = await handleThenable(LabelRecognizer.createInstance());

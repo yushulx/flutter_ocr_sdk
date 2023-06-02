@@ -1,3 +1,7 @@
+## 1.1.0
+- Updated `init()` method.
+- Implemented `recognizeByBuffer()` method asynchronously for Windows.
+
 ## 1.0.0
 - Supported iOS development.
 
