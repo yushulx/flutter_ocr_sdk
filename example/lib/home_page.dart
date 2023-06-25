@@ -1,4 +1,18 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_ocr_sdk/flutter_ocr_sdk_platform_interface.dart';
+import 'package:flutter_ocr_sdk/mrz_line.dart';
+import 'package:flutter_ocr_sdk/mrz_parser.dart';
+import 'package:flutter_ocr_sdk_example/utils.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:image_picker/image_picker.dart';
+import 'package:file_selector/file_selector.dart';
+import 'dart:ui' as ui;
+import 'dart:typed_data';
+
+import 'camera_page.dart';
+import 'global.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -8,6 +22,8 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  final picker = ImagePicker();
+
   @override
   Widget build(BuildContext context) {
     final title = Row(
@@ -41,12 +57,95 @@ class _HomePageState extends State<HomePage> {
       ],
     );
 
+    void scanImage() async {
+      XFile? photo;
+      if (kIsWeb || Platform.isAndroid || Platform.isIOS) {
+        photo = await picker.pickImage(source: ImageSource.gallery);
+      } else if (Platform.isWindows || Platform.isLinux) {
+        const XTypeGroup typeGroup = XTypeGroup(
+          label: 'images',
+          extensions: <String>['jpg', 'png', 'bmp', 'tiff', 'pdf', 'gif'],
+        );
+        photo = await openFile(acceptedTypeGroups: <XTypeGroup>[typeGroup]);
+      }
+
+      if (photo == null) {
+        if (!mounted) return;
+        Navigator.pop(context);
+        return;
+      }
+
+      String information = 'No results';
+
+      // List<List<MrzLine>>? results =
+      //     await mrzDetector.recognizeByFile(photo.path);
+      // print(results);
+      // if (results != null && results.isNotEmpty) {
+      //   for (List<MrzLine> area in results) {
+      //     if (area.length == 2) {
+      //       information =
+      //           MRZ.parseTwoLines(area[0].text, area[1].text).toString();
+      //     } else if (area.length == 3) {
+      //       information = MRZ
+      //           .parseThreeLines(area[0].text, area[1].text, area[2].text)
+      //           .toString();
+      //     }
+      //   }
+      // }
+
+      Uint8List fileBytes = await photo.readAsBytes();
+
+      ui.Image image = await decodeImageFromList(fileBytes);
+
+      ByteData? byteData =
+          await image.toByteData(format: ui.ImageByteFormat.rawRgba);
+      if (byteData != null) {
+        List<List<MrzLine>>? results = await mrzDetector.recognizeByBuffer(
+            byteData.buffer.asUint8List(),
+            image.width,
+            image.height,
+            byteData.lengthInBytes ~/ image.height,
+            ImagePixelFormat.IPF_ARGB_8888.index);
+
+        if (results != null && results.isNotEmpty) {
+          for (List<MrzLine> area in results) {
+            if (area.length == 2) {
+              information =
+                  MRZ.parseTwoLines(area[0].text, area[1].text).toString();
+            } else if (area.length == 3) {
+              information = MRZ
+                  .parseThreeLines(area[0].text, area[1].text, area[2].text)
+                  .toString();
+            }
+          }
+        }
+      }
+
+      // if (!mounted) return;
+      // Navigator.pop(context);
+      // Navigator.push(
+      //   context,
+      //   MaterialPageRoute(
+      //     builder: (context) => DisplayPictureScreen(
+      //         imagePath: photo!.path, mrzInformation: information),
+      //   ),
+      // );
+    }
+
     final buttons = Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
         GestureDetector(
             onTap: () {
-              setState(() {});
+              if (Platform.isLinux) {
+                showAlert(context, "Warning",
+                    "${Platform.operatingSystem} is not supported");
+                return;
+              }
+
+              Navigator.push(context, MaterialPageRoute(builder: (context) {
+                return CameraPage();
+              }));
             },
             child: Container(
               width: 150,
