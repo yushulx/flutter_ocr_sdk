@@ -1,6 +1,40 @@
-import 'package:flutter/material.dart';
+import 'dart:convert';
 
-class HistoryPage extends StatelessWidget {
+import 'package:flutter/material.dart';
+import 'package:flutter_ocr_sdk/mrz_result.dart';
+import 'package:share_plus/share_plus.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+class HistoryPage extends StatefulWidget {
+  const HistoryPage({super.key});
+
+  @override
+  State<HistoryPage> createState() => _HistoryPageState();
+}
+
+class _HistoryPageState extends State<HistoryPage> {
+  bool _isLoaded = false;
+  List<MrzResult> _mrzData = List<MrzResult>.empty(growable: true);
+  @override
+  void initState() {
+    super.initState();
+    loadHistory();
+  }
+
+  Future<void> loadHistory() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    var data = prefs.getStringList('mrz_data');
+    if (data != null) {
+      for (String json in data) {
+        MrzResult mrzResult = MrzResult.fromJson(jsonDecode(json));
+        _mrzData.add(mrzResult);
+      }
+    }
+    setState(() {
+      _isLoaded = true;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final bar = Stack(
@@ -24,7 +58,14 @@ class HistoryPage extends StatelessWidget {
           child: Container(
               padding: EdgeInsets.only(top: 59, right: 30),
               child: IconButton(
-                onPressed: () async {},
+                onPressed: () async {
+                  final SharedPreferences prefs =
+                      await SharedPreferences.getInstance();
+                  await prefs.remove('mrz_data');
+                  setState(() {
+                    _mrzData.clear();
+                  });
+                },
                 icon: Image.asset(
                   "images/icon-delete.png",
                   width: 26,
@@ -35,15 +76,70 @@ class HistoryPage extends StatelessWidget {
         ),
       ],
     );
+
+    var listView = Expanded(
+        child: ListView.builder(
+            itemCount: _mrzData.length,
+            itemBuilder: (context, index) {
+              // return ListTile(
+              //   title: Text(_mrzData[index].type!),
+              //   subtitle: Text(_mrzData[index].surname!),
+              //   trailing: Text(_mrzData[index].passportNumber!),
+              // );
+              return MyCustomWidget(
+                result: _mrzData[index],
+              );
+            }));
     return Scaffold(
-      body: Column(
-        children: [bar],
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {},
-        child: const Icon(Icons.more_vert),
-        backgroundColor: Colors.green,
-      ),
+      body: _isLoaded
+          ? Column(
+              children: [bar, listView],
+            )
+          : const Center(
+              child: CircularProgressIndicator(),
+            ),
     );
+  }
+}
+
+class MyCustomWidget extends StatelessWidget {
+  final MrzResult result;
+
+  const MyCustomWidget({super.key, required this.result});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+        padding: EdgeInsets.only(top: 18, bottom: 16, left: 84),
+        child: Row(
+          children: [
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  result.surname!,
+                  style: TextStyle(color: Colors.white),
+                ),
+                Text(
+                  result.passportNumber!,
+                  style: TextStyle(color: Color(0xffCCCCCC)),
+                ),
+              ],
+            ),
+            Expanded(child: Container()),
+            Padding(
+              padding: EdgeInsets.only(right: 27),
+              child: IconButton(
+                icon: Icon(Icons.more_vert),
+                color: Colors.white,
+                onPressed: () {
+                  Map<String, dynamic> jsonObject = result.toJson();
+                  String jsonString = jsonEncode(jsonObject);
+                  Share.share(jsonString);
+                },
+              ),
+            ),
+          ],
+        ));
   }
 }

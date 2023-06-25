@@ -36,6 +36,7 @@ dependencies:
   camera_windows: 
     git:
       url: https://github.com/yushulx/flutter_camera_windows.git
+  share_plus: ^7.0.2
 
 dev_dependencies:
   flutter_test:

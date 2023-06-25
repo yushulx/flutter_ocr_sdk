@@ -1,7 +1,11 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_ocr_sdk/mrz_line.dart';
 import 'package:flutter_ocr_sdk/mrz_parser.dart';
 import 'package:flutter_ocr_sdk/mrz_result.dart';
+import 'package:share_plus/share_plus.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ResultPage extends StatefulWidget {
   const ResultPage({super.key, required this.area});
@@ -43,7 +47,7 @@ class _ResultPageState extends State<ResultPage> {
                 SizedBox(
                   height: 3,
                 ),
-                Text(_information.type, style: valueStyle),
+                Text(_information.type!, style: valueStyle),
                 SizedBox(
                   height: 6,
                 ),
@@ -51,7 +55,7 @@ class _ResultPageState extends State<ResultPage> {
                 SizedBox(
                   height: 3,
                 ),
-                Text(_information.issuingCountry, style: valueStyle),
+                Text(_information.issuingCountry!, style: valueStyle),
                 SizedBox(
                   height: 6,
                 ),
@@ -59,7 +63,7 @@ class _ResultPageState extends State<ResultPage> {
                 SizedBox(
                   height: 3,
                 ),
-                Text(_information.surname, style: valueStyle),
+                Text(_information.surname!, style: valueStyle),
                 SizedBox(
                   height: 6,
                 ),
@@ -67,7 +71,7 @@ class _ResultPageState extends State<ResultPage> {
                 SizedBox(
                   height: 3,
                 ),
-                Text(_information.givenName, style: valueStyle),
+                Text(_information.givenName!, style: valueStyle),
                 SizedBox(
                   height: 6,
                 ),
@@ -75,7 +79,7 @@ class _ResultPageState extends State<ResultPage> {
                 SizedBox(
                   height: 3,
                 ),
-                Text(_information.passportNumber, style: valueStyle),
+                Text(_information.passportNumber!, style: valueStyle),
                 SizedBox(
                   height: 6,
                 ),
@@ -83,7 +87,7 @@ class _ResultPageState extends State<ResultPage> {
                 SizedBox(
                   height: 3,
                 ),
-                Text(_information.nationality, style: valueStyle),
+                Text(_information.nationality!, style: valueStyle),
                 SizedBox(
                   height: 6,
                 ),
@@ -91,7 +95,7 @@ class _ResultPageState extends State<ResultPage> {
                 SizedBox(
                   height: 3,
                 ),
-                Text(_information.birthDate, style: valueStyle),
+                Text(_information.birthDate!, style: valueStyle),
                 SizedBox(
                   height: 6,
                 ),
@@ -99,7 +103,7 @@ class _ResultPageState extends State<ResultPage> {
                 SizedBox(
                   height: 3,
                 ),
-                Text(_information.gender, style: valueStyle),
+                Text(_information.gender!, style: valueStyle),
                 SizedBox(
                   height: 6,
                 ),
@@ -107,7 +111,7 @@ class _ResultPageState extends State<ResultPage> {
                 SizedBox(
                   height: 3,
                 ),
-                Text(_information.expiration, style: valueStyle),
+                Text(_information.expiration!, style: valueStyle),
                 SizedBox(
                   height: 6,
                 ),
@@ -139,7 +143,21 @@ class _ResultPageState extends State<ResultPage> {
             child: MaterialButton(
               minWidth: 208,
               height: 45,
-              onPressed: () {},
+              onPressed: () async {
+                Map<String, dynamic> jsonObject = _information.toJson();
+                String jsonString = jsonEncode(jsonObject);
+                final SharedPreferences prefs =
+                    await SharedPreferences.getInstance();
+                var results = await prefs.getStringList('mrz_data');
+                if (results == null) {
+                  prefs.setStringList('mrz_data', <String>[jsonString]);
+                } else {
+                  results.add(jsonString);
+                  prefs.setStringList('mrz_data', results);
+                }
+
+                Navigator.pop(context);
+              },
               color: Color(0xffFE8E14),
               child: Text(
                 'Save and Continue',
@@ -164,7 +182,11 @@ class _ResultPageState extends State<ResultPage> {
               Padding(
                 padding: const EdgeInsets.only(right: 20), // Add padding here
                 child: IconButton(
-                  onPressed: () async {},
+                  onPressed: () {
+                    Map<String, dynamic> jsonObject = _information.toJson();
+                    String jsonString = jsonEncode(jsonObject);
+                    Share.share(jsonString);
+                  },
                   icon: const Icon(Icons.share, color: Colors.white),
                 ),
               )
