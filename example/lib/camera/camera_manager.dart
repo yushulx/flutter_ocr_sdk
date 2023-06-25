@@ -8,8 +8,6 @@ import 'package:flutter_ocr_sdk/mrz_line.dart';
 
 import 'dart:io';
 import 'package:flutter/foundation.dart';
-import 'package:flutter_ocr_sdk/mrz_parser.dart';
-import 'package:flutter_ocr_sdk/mrz_result.dart';
 
 import '../global.dart';
 
@@ -78,11 +76,17 @@ class CameraManager {
       try {
         for (List<MrzLine> area in results) {
           if (area.length == 2) {
-            finalArea = area;
-            break;
+            if (area[0].confidence >= 70 && area[1].confidence >= 70) {
+              finalArea = area;
+              break;
+            }
           } else if (area.length == 3) {
-            finalArea = area;
-            break;
+            if (area[0].confidence >= 70 &&
+                area[1].confidence >= 70 &&
+                area[2].confidence >= 70) {
+              finalArea = area;
+              break;
+            }
           }
         }
       } catch (e) {

@@ -109,37 +109,40 @@ class MyCustomWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-        padding: EdgeInsets.only(top: 18, bottom: 16, left: 84),
-        child: Row(
-          children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+    return DecoratedBox(
+        decoration:
+            BoxDecoration(color: Colors.black), // Set the background color
+        child: Padding(
+            padding: EdgeInsets.only(top: 18, bottom: 16, left: 84),
+            child: Row(
               children: [
-                Text(
-                  result.surname!,
-                  style: TextStyle(color: Colors.white),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      result.surname!,
+                      style: TextStyle(color: Colors.white),
+                    ),
+                    Text(
+                      result.passportNumber!,
+                      style: TextStyle(color: Color(0xffCCCCCC)),
+                    ),
+                  ],
                 ),
-                Text(
-                  result.passportNumber!,
-                  style: TextStyle(color: Color(0xffCCCCCC)),
+                Expanded(child: Container()),
+                Padding(
+                  padding: EdgeInsets.only(right: 27),
+                  child: IconButton(
+                    icon: Icon(Icons.more_vert),
+                    color: Colors.white,
+                    onPressed: () {
+                      Map<String, dynamic> jsonObject = result.toJson();
+                      String jsonString = jsonEncode(jsonObject);
+                      Share.share(jsonString);
+                    },
+                  ),
                 ),
               ],
-            ),
-            Expanded(child: Container()),
-            Padding(
-              padding: EdgeInsets.only(right: 27),
-              child: IconButton(
-                icon: Icon(Icons.more_vert),
-                color: Colors.white,
-                onPressed: () {
-                  Map<String, dynamic> jsonObject = result.toJson();
-                  String jsonString = jsonEncode(jsonObject);
-                  Share.share(jsonString);
-                },
-              ),
-            ),
-          ],
-        ));
+            )));
   }
 }
