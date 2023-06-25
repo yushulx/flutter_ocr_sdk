@@ -35,10 +35,8 @@ class MyApp extends StatelessWidget {
             return const CircularProgressIndicator(); // Loading indicator
           }
           Future.microtask(() {
-            MaterialPageRoute route;
-            Widget widget = Platform.isLinux ? LinuxPage() : TabPage();
-            route = MaterialPageRoute(builder: (context) => widget);
-            Navigator.pushReplacement(context, route);
+            Navigator.pushReplacement(
+                context, MaterialPageRoute(builder: (context) => TabPage()));
           });
           return Container();
         },

@@ -137,7 +137,7 @@ class _HomePageState extends State<HomePage> {
       children: [
         GestureDetector(
             onTap: () {
-              if (Platform.isLinux) {
+              if (!kIsWeb && Platform.isLinux) {
                 showAlert(context, "Warning",
                     "${Platform.operatingSystem} is not supported");
                 return;

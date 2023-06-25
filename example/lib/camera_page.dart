@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import 'camera/camera_manager.dart';
@@ -124,8 +125,8 @@ class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
         ),
         Positioned(
           top: 300,
-          left: Platform.isAndroid || Platform.isIOS ? 0 : 150,
-          child: Platform.isAndroid || Platform.isIOS
+          left: !kIsWeb && (Platform.isAndroid || Platform.isIOS) ? 0 : 150,
+          child: !kIsWeb && (Platform.isAndroid || Platform.isIOS)
               ? Transform.rotate(
                   angle: pi / 2, // 90 degrees in radians
                   child: hint,
