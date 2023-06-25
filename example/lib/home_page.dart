@@ -72,28 +72,8 @@ class _HomePageState extends State<HomePage> {
       }
 
       if (photo == null) {
-        if (!mounted) return;
-        Navigator.pop(context);
         return;
       }
-
-      String information = 'No results';
-
-      // List<List<MrzLine>>? results =
-      //     await mrzDetector.recognizeByFile(photo.path);
-      // print(results);
-      // if (results != null && results.isNotEmpty) {
-      //   for (List<MrzLine> area in results) {
-      //     if (area.length == 2) {
-      //       information =
-      //           MRZ.parseTwoLines(area[0].text, area[1].text).toString();
-      //     } else if (area.length == 3) {
-      //       information = MRZ
-      //           .parseThreeLines(area[0].text, area[1].text, area[2].text)
-      //           .toString();
-      //     }
-      //   }
-      // }
 
       Uint8List fileBytes = await photo.readAsBytes();
 
@@ -109,27 +89,23 @@ class _HomePageState extends State<HomePage> {
             byteData.lengthInBytes ~/ image.height,
             ImagePixelFormat.IPF_ARGB_8888.index);
         List<MrzLine>? finalArea;
-        MrzResult? finalInfo;
         if (results != null && results.isNotEmpty) {
           for (List<MrzLine> area in results) {
             if (area.length == 2) {
               finalArea = area;
-              finalInfo = MRZ.parseTwoLines(area[0].text, area[1].text);
               break;
             } else if (area.length == 3) {
               finalArea = area;
-              finalInfo =
-                  MRZ.parseThreeLines(area[0].text, area[1].text, area[2].text);
+              MRZ.parseThreeLines(area[0].text, area[1].text, area[2].text);
               break;
             }
           }
         }
-        if (finalArea != null && finalInfo != null) {
+        if (finalArea != null) {
           Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) =>
-                    ResultPage(area: finalArea!, information: finalInfo!),
+                builder: (context) => ResultPage(area: finalArea!),
               ));
         }
       }

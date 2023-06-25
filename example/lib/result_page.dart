@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_ocr_sdk/mrz_line.dart';
+import 'package:flutter_ocr_sdk/mrz_parser.dart';
 import 'package:flutter_ocr_sdk/mrz_result.dart';
 
 class ResultPage extends StatefulWidget {
-  const ResultPage({super.key, required this.area, required this.information});
-  final MrzResult information;
+  const ResultPage({super.key, required this.area});
+
   final List<MrzLine> area;
 
   @override
@@ -12,6 +13,21 @@ class ResultPage extends StatefulWidget {
 }
 
 class _ResultPageState extends State<ResultPage> {
+  late MrzResult _information;
+
+  @override
+  void initState() {
+    super.initState();
+
+    List<MrzLine> area = widget.area;
+    if (area.length == 2) {
+      _information = MRZ.parseTwoLines(area[0].text, area[1].text);
+    } else if (area.length == 3) {
+      _information =
+          MRZ.parseThreeLines(area[0].text, area[1].text, area[2].text);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final keyStyle = TextStyle(color: Color(0xff888888), fontSize: 14);
@@ -27,7 +43,7 @@ class _ResultPageState extends State<ResultPage> {
                 SizedBox(
                   height: 3,
                 ),
-                Text(widget.information.type, style: valueStyle),
+                Text(_information.type, style: valueStyle),
                 SizedBox(
                   height: 6,
                 ),
@@ -35,7 +51,7 @@ class _ResultPageState extends State<ResultPage> {
                 SizedBox(
                   height: 3,
                 ),
-                Text(widget.information.issuingCountry, style: valueStyle),
+                Text(_information.issuingCountry, style: valueStyle),
                 SizedBox(
                   height: 6,
                 ),
@@ -43,7 +59,7 @@ class _ResultPageState extends State<ResultPage> {
                 SizedBox(
                   height: 3,
                 ),
-                Text(widget.information.surname, style: valueStyle),
+                Text(_information.surname, style: valueStyle),
                 SizedBox(
                   height: 6,
                 ),
@@ -51,7 +67,7 @@ class _ResultPageState extends State<ResultPage> {
                 SizedBox(
                   height: 3,
                 ),
-                Text(widget.information.givenName, style: valueStyle),
+                Text(_information.givenName, style: valueStyle),
                 SizedBox(
                   height: 6,
                 ),
@@ -59,7 +75,7 @@ class _ResultPageState extends State<ResultPage> {
                 SizedBox(
                   height: 3,
                 ),
-                Text(widget.information.passportNumber, style: valueStyle),
+                Text(_information.passportNumber, style: valueStyle),
                 SizedBox(
                   height: 6,
                 ),
@@ -67,7 +83,7 @@ class _ResultPageState extends State<ResultPage> {
                 SizedBox(
                   height: 3,
                 ),
-                Text(widget.information.nationality, style: valueStyle),
+                Text(_information.nationality, style: valueStyle),
                 SizedBox(
                   height: 6,
                 ),
@@ -75,7 +91,7 @@ class _ResultPageState extends State<ResultPage> {
                 SizedBox(
                   height: 3,
                 ),
-                Text(widget.information.birthDate, style: valueStyle),
+                Text(_information.birthDate, style: valueStyle),
                 SizedBox(
                   height: 6,
                 ),
@@ -83,7 +99,7 @@ class _ResultPageState extends State<ResultPage> {
                 SizedBox(
                   height: 3,
                 ),
-                Text(widget.information.gender, style: valueStyle),
+                Text(_information.gender, style: valueStyle),
                 SizedBox(
                   height: 6,
                 ),
@@ -91,7 +107,7 @@ class _ResultPageState extends State<ResultPage> {
                 SizedBox(
                   height: 3,
                 ),
-                Text(widget.information.expiration, style: valueStyle),
+                Text(_information.expiration, style: valueStyle),
                 SizedBox(
                   height: 6,
                 ),

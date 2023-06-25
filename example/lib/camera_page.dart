@@ -2,10 +2,13 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_ocr_sdk/mrz_line.dart';
 
 import 'camera/camera_manager.dart';
 import 'global.dart';
 import 'dart:math';
+
+import 'result_page.dart';
 
 class CameraPage extends StatefulWidget {
   const CameraPage({super.key});
@@ -26,23 +29,18 @@ class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
         context: context,
         cbRefreshUi: refreshUI,
         cbIsMounted: isMounted,
-        cbNavigation: navigation,
-        scanType: ScanType.barcode);
+        cbNavigation: navigation);
     _mobileCamera.initState();
   }
 
   void navigation(dynamic order) {
-    // routes.removeLast();
     // Navigator.of(context).pop();
-
-    // MaterialPageRoute route = MaterialPageRoute(
-    //   builder: (context) => DeliveryPage(order: order),
-    // );
-    // routes.add(route);
-    // Navigator.push(
-    //   context,
-    //   route,
-    // );
+    List<MrzLine> finalArea = order;
+    Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => ResultPage(area: finalArea),
+        ));
   }
 
   void refreshUI() {
@@ -162,12 +160,6 @@ class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
             title: const Text(
               'MRZ Scanner',
               style: TextStyle(color: Colors.white),
-            ),
-            leading: IconButton(
-              icon: const Icon(Icons.arrow_back, color: Colors.white),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
             ),
           ),
           body: Stack(

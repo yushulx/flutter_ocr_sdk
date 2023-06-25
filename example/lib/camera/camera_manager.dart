@@ -13,10 +13,7 @@ import 'package:flutter_ocr_sdk/mrz_result.dart';
 
 import '../global.dart';
 
-import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:camera_platform_interface/camera_platform_interface.dart';
-
-enum ScanType { id, barcode, document }
 
 class CameraManager {
   BuildContext context;
@@ -26,7 +23,6 @@ class CameraManager {
   bool _isScanAvailable = true;
   List<List<MrzLine>>? mrzLines;
   bool isDriverLicense = true;
-  ScanType scanType = ScanType.id;
   bool isFinished = false;
   StreamSubscription<FrameAvailabledEvent>? _frameAvailableStreamSubscription;
   bool _isMobileWeb = false;
@@ -35,8 +31,7 @@ class CameraManager {
       {required this.context,
       required this.cbRefreshUi,
       required this.cbIsMounted,
-      required this.cbNavigation,
-      required this.scanType});
+      required this.cbNavigation});
 
   Function cbRefreshUi;
   Function cbIsMounted;
@@ -64,14 +59,12 @@ class CameraManager {
 
     XFile file = await controller!.takePicture();
 
-    if (scanType == ScanType.id) {
-      var results = await mrzDetector.recognizeByFile(file.path);
-      if (results == null || !cbIsMounted()) return;
+    var results = await mrzDetector.recognizeByFile(file.path);
+    if (results == null || !cbIsMounted()) return;
 
-      mrzLines = results;
-      cbRefreshUi();
-      handleMrz(results);
-    }
+    mrzLines = results;
+    cbRefreshUi();
+    handleMrz(results);
 
     if (!isFinished) {
       webCamera();
@@ -80,46 +73,25 @@ class CameraManager {
 
   void handleMrz(List<List<MrzLine>> results) {
     if (results.isNotEmpty) {
-      MrzResult information = MrzResult();
+      List<MrzLine>? finalArea;
 
       try {
         for (List<MrzLine> area in results) {
           if (area.length == 2) {
-            information = MRZ.parseTwoLines(area[0].text, area[1].text);
+            finalArea = area;
+            break;
           } else if (area.length == 3) {
-            information =
-                MRZ.parseThreeLines(area[0].text, area[1].text, area[2].text);
+            finalArea = area;
+            break;
           }
         }
       } catch (e) {
         print(e);
       }
 
-      if (information.surname == '') {
-        information.surname = 'Not found';
-      }
-
-      if (information.givenName == '') {
-        information.givenName = 'Not found';
-      }
-
-      if (information.nationality == '') {
-        information.nationality = 'Not found';
-      }
-
-      if (information.passportNumber == '') {
-        information.passportNumber = 'Not found';
-      }
-
-      if (!isFinished) {
+      if (!isFinished && finalArea != null) {
         isFinished = true;
-        // ProfileData scannedData = ProfileData();
-
-        // scannedData.firstName = information.givenName;
-        // scannedData.lastName = information.surname;
-        // scannedData.nationality = information.nationality;
-        // scannedData.idNumber = information.passportNumber;
-        // cbNavigation(scannedData);
+        cbNavigation(finalArea);
       }
     }
   }
@@ -171,14 +143,8 @@ class CameraManager {
 
       _isScanAvailable = false;
 
-      if (scanType == ScanType.id) {
-        processId(
-            availableImage.planes[0].bytes,
-            availableImage.width,
-            availableImage.height,
-            availableImage.planes[0].bytesPerRow,
-            format);
-      }
+      processId(availableImage.planes[0].bytes, availableImage.width,
+          availableImage.height, availableImage.planes[0].bytesPerRow, format);
     });
   }
 
@@ -216,10 +182,8 @@ class CameraManager {
       int width = previewSize!.width.toInt();
       int height = previewSize!.height.toInt();
 
-      if (scanType == ScanType.id) {
-        processId(data, width, height, width * 4,
-            ImagePixelFormat.IPF_ARGB_8888.index);
-      }
+      processId(
+          data, width, height, width * 4, ImagePixelFormat.IPF_ARGB_8888.index);
     }
   }
 
