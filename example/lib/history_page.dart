@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_ocr_sdk/mrz_result.dart';
+import 'package:flutter_ocr_sdk_example/result_page.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -81,11 +82,6 @@ class _HistoryPageState extends State<HistoryPage> {
         child: ListView.builder(
             itemCount: _mrzData.length,
             itemBuilder: (context, index) {
-              // return ListTile(
-              //   title: Text(_mrzData[index].type!),
-              //   subtitle: Text(_mrzData[index].surname!),
-              //   trailing: Text(_mrzData[index].passportNumber!),
-              // );
               return MyCustomWidget(
                 result: _mrzData[index],
               );
@@ -110,8 +106,7 @@ class MyCustomWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DecoratedBox(
-        decoration:
-            BoxDecoration(color: Colors.black), // Set the background color
+        decoration: BoxDecoration(color: Colors.black),
         child: Padding(
             padding: EdgeInsets.only(top: 18, bottom: 16, left: 84),
             child: Row(
@@ -135,10 +130,61 @@ class MyCustomWidget extends StatelessWidget {
                   child: IconButton(
                     icon: Icon(Icons.more_vert),
                     color: Colors.white,
-                    onPressed: () {
-                      Map<String, dynamic> jsonObject = result.toJson();
-                      String jsonString = jsonEncode(jsonObject);
-                      Share.share(jsonString);
+                    onPressed: () async {
+                      final RenderBox button =
+                          context.findRenderObject() as RenderBox;
+
+                      final RelativeRect position = RelativeRect.fromLTRB(
+                        100,
+                        button.localToGlobal(Offset.zero).dy,
+                        40,
+                        0,
+                      );
+
+                      final selected = await showMenu(
+                        context: context,
+                        position: position,
+                        color: Color(0xff323234),
+                        items: [
+                          PopupMenuItem<int>(
+                              value: 0,
+                              child: Text(
+                                'Delete',
+                                style: TextStyle(color: Colors.white),
+                              )),
+                          PopupMenuItem<int>(
+                              value: 1,
+                              child: Text(
+                                'Share',
+                                style: TextStyle(color: Colors.white),
+                              )),
+                          PopupMenuItem<int>(
+                              value: 2,
+                              child: Text(
+                                'View',
+                                style: TextStyle(color: Colors.white),
+                              )),
+                        ],
+                      );
+
+                      if (selected != null) {
+                        if (selected == 0) {
+                          // delete
+                        } else if (selected == 1) {
+                          // share
+                          Map<String, dynamic> jsonObject = result.toJson();
+                          String jsonString = jsonEncode(jsonObject);
+                          Share.share(jsonString);
+                        } else {
+                          // view
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    ResultPage(information: result),
+                              ));
+                        }
+                      }
                     },
                   ),
                 ),

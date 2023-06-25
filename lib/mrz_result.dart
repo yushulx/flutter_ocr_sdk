@@ -1,31 +1,34 @@
 /// MrzResult class.
 class MrzResult {
   /// Document type.
-  String? type = '';
+  String? type;
 
   /// Nationality.
-  String? nationality = '';
+  String? nationality;
 
   /// Surname.
-  String? surname = '';
+  String? surname;
 
   /// Given name.
-  String? givenName = '';
+  String? givenName;
 
   /// Passport number.
-  String? passportNumber = '';
+  String? passportNumber;
 
   /// Issuing country.
-  String? issuingCountry = '';
+  String? issuingCountry;
 
   /// Birth date.
-  String? birthDate = '';
+  String? birthDate;
 
   /// Gender.
-  String? gender = '';
+  String? gender;
 
   /// Expiration date.
-  String? expiration = '';
+  String? expiration;
+
+  // MRZ lines
+  String? lines;
 
   MrzResult(
       {String? type,
@@ -36,7 +39,8 @@ class MrzResult {
       String? issuingCountry,
       String? birthDate,
       String? gender,
-      String? expiration})
+      String? expiration,
+      String? lines})
       : this.type = type ?? 'N/A',
         this.nationality = nationality ?? 'N/A',
         this.surname = surname ?? 'N/A',
@@ -45,7 +49,8 @@ class MrzResult {
         this.issuingCountry = issuingCountry ?? 'N/A',
         this.birthDate = birthDate ?? 'N/A',
         this.gender = gender ?? 'N/A',
-        this.expiration = expiration ?? 'N/A';
+        this.expiration = expiration ?? 'N/A',
+        this.lines = lines ?? 'N/A';
 
   @override
   String toString() {
@@ -76,6 +81,7 @@ class MrzResult {
         'birthDate': birthDate ?? '',
         'gender': gender ?? '',
         'expiration': expiration ?? '',
+        'lines': lines,
       };
 
   factory MrzResult.fromJson(Map<String, dynamic> json) {
@@ -89,6 +95,7 @@ class MrzResult {
       birthDate: json['birthDate'],
       gender: json['gender'],
       expiration: json['expiration'],
+      lines: json['lines'],
     );
   }
 }

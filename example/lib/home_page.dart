@@ -89,14 +89,20 @@ class _HomePageState extends State<HomePage> {
             byteData.lengthInBytes ~/ image.height,
             ImagePixelFormat.IPF_ARGB_8888.index);
         List<MrzLine>? finalArea;
+        var information;
         if (results != null && results.isNotEmpty) {
           for (List<MrzLine> area in results) {
             if (area.length == 2) {
               finalArea = area;
+              information = MRZ.parseTwoLines(area[0].text, area[1].text);
+              information.lines = '${area[0].text}\n${area[1].text}';
               break;
             } else if (area.length == 3) {
               finalArea = area;
-              MRZ.parseThreeLines(area[0].text, area[1].text, area[2].text);
+              information =
+                  MRZ.parseThreeLines(area[0].text, area[1].text, area[2].text);
+              information.lines =
+                  '${area[0].text}\n${area[1].text}\n${area[2].text}';
               break;
             }
           }
@@ -105,7 +111,7 @@ class _HomePageState extends State<HomePage> {
           Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => ResultPage(area: finalArea!),
+                builder: (context) => ResultPage(information: information!),
               ));
         }
       }

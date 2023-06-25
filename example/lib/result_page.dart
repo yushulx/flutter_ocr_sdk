@@ -8,30 +8,16 @@ import 'package:share_plus/share_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ResultPage extends StatefulWidget {
-  const ResultPage({super.key, required this.area});
+  const ResultPage({super.key, required this.information});
 
-  final List<MrzLine> area;
+  // final List<MrzLine> area;
+  final MrzResult information;
 
   @override
   State<ResultPage> createState() => _ResultPageState();
 }
 
 class _ResultPageState extends State<ResultPage> {
-  late MrzResult _information;
-
-  @override
-  void initState() {
-    super.initState();
-
-    List<MrzLine> area = widget.area;
-    if (area.length == 2) {
-      _information = MRZ.parseTwoLines(area[0].text, area[1].text);
-    } else if (area.length == 3) {
-      _information =
-          MRZ.parseThreeLines(area[0].text, area[1].text, area[2].text);
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final keyStyle = TextStyle(color: Color(0xff888888), fontSize: 14);
@@ -47,7 +33,7 @@ class _ResultPageState extends State<ResultPage> {
                 SizedBox(
                   height: 3,
                 ),
-                Text(_information.type!, style: valueStyle),
+                Text(widget.information.type!, style: valueStyle),
                 SizedBox(
                   height: 6,
                 ),
@@ -55,7 +41,7 @@ class _ResultPageState extends State<ResultPage> {
                 SizedBox(
                   height: 3,
                 ),
-                Text(_information.issuingCountry!, style: valueStyle),
+                Text(widget.information.issuingCountry!, style: valueStyle),
                 SizedBox(
                   height: 6,
                 ),
@@ -63,7 +49,7 @@ class _ResultPageState extends State<ResultPage> {
                 SizedBox(
                   height: 3,
                 ),
-                Text(_information.surname!, style: valueStyle),
+                Text(widget.information.surname!, style: valueStyle),
                 SizedBox(
                   height: 6,
                 ),
@@ -71,7 +57,7 @@ class _ResultPageState extends State<ResultPage> {
                 SizedBox(
                   height: 3,
                 ),
-                Text(_information.givenName!, style: valueStyle),
+                Text(widget.information.givenName!, style: valueStyle),
                 SizedBox(
                   height: 6,
                 ),
@@ -79,7 +65,7 @@ class _ResultPageState extends State<ResultPage> {
                 SizedBox(
                   height: 3,
                 ),
-                Text(_information.passportNumber!, style: valueStyle),
+                Text(widget.information.passportNumber!, style: valueStyle),
                 SizedBox(
                   height: 6,
                 ),
@@ -87,7 +73,7 @@ class _ResultPageState extends State<ResultPage> {
                 SizedBox(
                   height: 3,
                 ),
-                Text(_information.nationality!, style: valueStyle),
+                Text(widget.information.nationality!, style: valueStyle),
                 SizedBox(
                   height: 6,
                 ),
@@ -95,7 +81,7 @@ class _ResultPageState extends State<ResultPage> {
                 SizedBox(
                   height: 3,
                 ),
-                Text(_information.birthDate!, style: valueStyle),
+                Text(widget.information.birthDate!, style: valueStyle),
                 SizedBox(
                   height: 6,
                 ),
@@ -103,7 +89,7 @@ class _ResultPageState extends State<ResultPage> {
                 SizedBox(
                   height: 3,
                 ),
-                Text(_information.gender!, style: valueStyle),
+                Text(widget.information.gender!, style: valueStyle),
                 SizedBox(
                   height: 6,
                 ),
@@ -111,7 +97,7 @@ class _ResultPageState extends State<ResultPage> {
                 SizedBox(
                   height: 3,
                 ),
-                Text(_information.expiration!, style: valueStyle),
+                Text(widget.information.expiration!, style: valueStyle),
                 SizedBox(
                   height: 6,
                 ),
@@ -119,10 +105,7 @@ class _ResultPageState extends State<ResultPage> {
                 SizedBox(
                   height: 3,
                 ),
-                Text(
-                    widget.area.length == 2
-                        ? '${widget.area[0].text}\n${widget.area[1].text}'
-                        : '${widget.area[0].text}\n${widget.area[1].text}\n${widget.area[2].text}',
+                Text(widget.information.lines!,
                     style: TextStyle(
                         color: Colors.white,
                         fontSize: 11,
@@ -144,7 +127,7 @@ class _ResultPageState extends State<ResultPage> {
               minWidth: 208,
               height: 45,
               onPressed: () async {
-                Map<String, dynamic> jsonObject = _information.toJson();
+                Map<String, dynamic> jsonObject = widget.information.toJson();
                 String jsonString = jsonEncode(jsonObject);
                 final SharedPreferences prefs =
                     await SharedPreferences.getInstance();
@@ -183,7 +166,8 @@ class _ResultPageState extends State<ResultPage> {
                 padding: const EdgeInsets.only(right: 20), // Add padding here
                 child: IconButton(
                   onPressed: () {
-                    Map<String, dynamic> jsonObject = _information.toJson();
+                    Map<String, dynamic> jsonObject =
+                        widget.information.toJson();
                     String jsonString = jsonEncode(jsonObject);
                     Share.share(jsonString);
                   },
