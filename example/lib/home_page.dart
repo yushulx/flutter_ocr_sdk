@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_ocr_sdk/flutter_ocr_sdk_platform_interface.dart';
 import 'package:flutter_ocr_sdk/mrz_line.dart';
 import 'package:flutter_ocr_sdk/mrz_parser.dart';
+import 'package:flutter_ocr_sdk/mrz_result.dart';
+import 'package:flutter_ocr_sdk_example/result_page.dart';
 import 'package:flutter_ocr_sdk_example/utils.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:image_picker/image_picker.dart';
@@ -106,30 +108,31 @@ class _HomePageState extends State<HomePage> {
             image.height,
             byteData.lengthInBytes ~/ image.height,
             ImagePixelFormat.IPF_ARGB_8888.index);
-
+        List<MrzLine>? finalArea;
+        MrzResult? finalInfo;
         if (results != null && results.isNotEmpty) {
           for (List<MrzLine> area in results) {
             if (area.length == 2) {
-              information =
-                  MRZ.parseTwoLines(area[0].text, area[1].text).toString();
+              finalArea = area;
+              finalInfo = MRZ.parseTwoLines(area[0].text, area[1].text);
+              break;
             } else if (area.length == 3) {
-              information = MRZ
-                  .parseThreeLines(area[0].text, area[1].text, area[2].text)
-                  .toString();
+              finalArea = area;
+              finalInfo =
+                  MRZ.parseThreeLines(area[0].text, area[1].text, area[2].text);
+              break;
             }
           }
         }
+        if (finalArea != null && finalInfo != null) {
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) =>
+                    ResultPage(area: finalArea!, information: finalInfo!),
+              ));
+        }
       }
-
-      // if (!mounted) return;
-      // Navigator.pop(context);
-      // Navigator.push(
-      //   context,
-      //   MaterialPageRoute(
-      //     builder: (context) => DisplayPictureScreen(
-      //         imagePath: photo!.path, mrzInformation: information),
-      //   ),
-      // );
     }
 
     final buttons = Row(
@@ -172,7 +175,7 @@ class _HomePageState extends State<HomePage> {
             )),
         GestureDetector(
             onTap: () {
-              setState(() {});
+              scanImage();
             },
             child: Container(
               width: 150,
