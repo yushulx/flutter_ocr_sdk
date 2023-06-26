@@ -15,7 +15,7 @@ class HistoryPage extends StatefulWidget {
 
 class _HistoryPageState extends State<HistoryPage> {
   bool _isLoaded = false;
-  List<MrzResult> _mrzData = List<MrzResult>.empty(growable: true);
+  List<MrzResult> _mrzHistory = List<MrzResult>.empty(growable: true);
   @override
   void initState() {
     super.initState();
@@ -26,9 +26,10 @@ class _HistoryPageState extends State<HistoryPage> {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     var data = prefs.getStringList('mrz_data');
     if (data != null) {
+      _mrzHistory.clear();
       for (String json in data) {
         MrzResult mrzResult = MrzResult.fromJson(jsonDecode(json));
-        _mrzData.add(mrzResult);
+        _mrzHistory.add(mrzResult);
       }
     }
     setState(() {
@@ -64,7 +65,7 @@ class _HistoryPageState extends State<HistoryPage> {
                       await SharedPreferences.getInstance();
                   await prefs.remove('mrz_data');
                   setState(() {
-                    _mrzData.clear();
+                    _mrzHistory.clear();
                   });
                 },
                 icon: Image.asset(
@@ -80,10 +81,20 @@ class _HistoryPageState extends State<HistoryPage> {
 
     var listView = Expanded(
         child: ListView.builder(
-            itemCount: _mrzData.length,
+            itemCount: _mrzHistory.length,
             itemBuilder: (context, index) {
               return MyCustomWidget(
-                result: _mrzData[index],
+                result: _mrzHistory[index],
+                cbDeleted: () async {
+                  _mrzHistory.removeAt(index);
+                  final SharedPreferences prefs =
+                      await SharedPreferences.getInstance();
+                  List<String> data =
+                      prefs.getStringList('mrz_data') as List<String>;
+                  data.removeAt(index);
+                  prefs.setStringList('mrz_data', data);
+                  setState(() {});
+                },
               );
             }));
     return Scaffold(
@@ -100,8 +111,13 @@ class _HistoryPageState extends State<HistoryPage> {
 
 class MyCustomWidget extends StatelessWidget {
   final MrzResult result;
+  final Function cbDeleted;
 
-  const MyCustomWidget({super.key, required this.result});
+  MyCustomWidget({
+    super.key,
+    required this.result,
+    required this.cbDeleted,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -170,6 +186,7 @@ class MyCustomWidget extends StatelessWidget {
                       if (selected != null) {
                         if (selected == 0) {
                           // delete
+                          cbDeleted();
                         } else if (selected == 1) {
                           // share
                           Map<String, dynamic> jsonObject = result.toJson();
@@ -180,8 +197,10 @@ class MyCustomWidget extends StatelessWidget {
                           Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) =>
-                                    ResultPage(information: result),
+                                builder: (context) => ResultPage(
+                                  information: result,
+                                  isViewOnly: true,
+                                ),
                               ));
                         }
                       }

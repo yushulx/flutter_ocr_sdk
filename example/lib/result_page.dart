@@ -1,17 +1,17 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_ocr_sdk/mrz_line.dart';
-import 'package:flutter_ocr_sdk/mrz_parser.dart';
 import 'package:flutter_ocr_sdk/mrz_result.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ResultPage extends StatefulWidget {
-  const ResultPage({super.key, required this.information});
+  const ResultPage(
+      {super.key, required this.information, this.isViewOnly = false});
 
   // final List<MrzLine> area;
   final MrzResult information;
+  final bool isViewOnly;
 
   @override
   State<ResultPage> createState() => _ResultPageState();
@@ -182,7 +182,7 @@ class _ResultPageState extends State<ResultPage> {
               Expanded(
                 child: Container(),
               ),
-              button
+              if (!widget.isViewOnly) button
             ],
           ),
         ));
