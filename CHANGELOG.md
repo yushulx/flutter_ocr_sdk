@@ -1,3 +1,7 @@
+## 1.1.1
+- Supported JSON serialization for `MrzResult` class.
+- Refurbished the example app.
+
 ## 1.1.0
 - Updated `init()` method.
 - Implemented `recognizeByBuffer()` method asynchronously for Windows.

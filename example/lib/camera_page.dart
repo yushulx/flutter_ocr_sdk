@@ -133,8 +133,8 @@ class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
         ),
         Positioned(
           top: 300,
-          left: !kIsWeb && (Platform.isAndroid || Platform.isIOS) ? 0 : 150,
-          child: !kIsWeb && (Platform.isAndroid || Platform.isIOS)
+          left: !kIsWeb && (Platform.isAndroid) ? 0 : 150,
+          child: !kIsWeb && (Platform.isAndroid)
               ? Transform.rotate(
                   angle: pi / 2, // 90 degrees in radians
                   child: hint,
