@@ -1,3 +1,6 @@
+## 1.1.2
+- Fixed confidence issue for web.
+
 ## 1.1.1
 - Supported JSON serialization for `MrzResult` class.
 - Refurbished the example app.

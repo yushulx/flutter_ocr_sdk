@@ -82,6 +82,7 @@ class DLRManager {
         for (int i = 0; i < area.length; i++) {
           MrzLine line = MrzLine();
           line.text = area[i]['text'];
+          line.confidence = area[i]['confidence'];
           line.x1 = area[i]['location']['points'][0]['x'];
           line.y1 = area[i]['location']['points'][0]['y'];
           line.x2 = area[i]['location']['points'][1]['x'];

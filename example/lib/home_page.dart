@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_ocr_sdk/flutter_ocr_sdk_platform_interface.dart';
 import 'package:flutter_ocr_sdk/mrz_line.dart';
 import 'package:flutter_ocr_sdk/mrz_parser.dart';
-import 'package:flutter_ocr_sdk/mrz_result.dart';
 import 'package:flutter_ocr_sdk_example/result_page.dart';
 import 'package:flutter_ocr_sdk_example/utils.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
