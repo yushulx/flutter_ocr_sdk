@@ -1,35 +1,60 @@
 /// MrzResult class.
 class MrzResult {
   /// Document type.
-  String type = '';
+  String? type;
 
   /// Nationality.
-  String nationality = '';
+  String? nationality;
 
   /// Surname.
-  String surname = '';
+  String? surname;
 
   /// Given name.
-  String givenName = '';
+  String? givenName;
 
   /// Passport number.
-  String passportNumber = '';
+  String? passportNumber;
 
   /// Issuing country.
-  String issuingCountry = '';
+  String? issuingCountry;
 
   /// Birth date.
-  String birthDate = '';
+  String? birthDate;
 
   /// Gender.
-  String gender = '';
+  String? gender;
 
   /// Expiration date.
-  String expiration = '';
+  String? expiration;
+
+  // MRZ lines
+  String? lines;
+
+  MrzResult(
+      {String? type,
+      String? nationality,
+      String? surname,
+      String? givenName,
+      String? passportNumber,
+      String? issuingCountry,
+      String? birthDate,
+      String? gender,
+      String? expiration,
+      String? lines})
+      : this.type = type ?? 'N/A',
+        this.nationality = nationality ?? 'N/A',
+        this.surname = surname ?? 'N/A',
+        this.givenName = givenName ?? 'N/A',
+        this.passportNumber = passportNumber ?? 'N/A',
+        this.issuingCountry = issuingCountry ?? 'N/A',
+        this.birthDate = birthDate ?? 'N/A',
+        this.gender = gender ?? 'N/A',
+        this.expiration = expiration ?? 'N/A',
+        this.lines = lines ?? 'N/A';
 
   @override
   String toString() {
-    if (type.isEmpty) return "No results";
+    if (type == null || type!.isEmpty) return "No results";
 
     String result = '';
 
@@ -44,5 +69,33 @@ class MrzResult {
     result += 'Expiration: $expiration\n\n';
 
     return result;
+  }
+
+  Map<String, dynamic> toJson() => {
+        'type': type ?? '',
+        'nationality': nationality ?? '',
+        'surname': surname ?? '',
+        'givenName': givenName ?? '',
+        'passportNumber': passportNumber ?? '',
+        'issuingCountry': issuingCountry ?? '',
+        'birthDate': birthDate ?? '',
+        'gender': gender ?? '',
+        'expiration': expiration ?? '',
+        'lines': lines,
+      };
+
+  factory MrzResult.fromJson(Map<String, dynamic> json) {
+    return MrzResult(
+      type: json['type'],
+      nationality: json['nationality'],
+      surname: json['surname'],
+      givenName: json['givenName'],
+      passportNumber: json['passportNumber'],
+      issuingCountry: json['issuingCountry'],
+      birthDate: json['birthDate'],
+      gender: json['gender'],
+      expiration: json['expiration'],
+      lines: json['lines'],
+    );
   }
 }
