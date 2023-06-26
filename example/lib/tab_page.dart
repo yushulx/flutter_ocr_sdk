@@ -39,28 +39,30 @@ class _TabPageState extends State<TabPage> with SingleTickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: TabBarView(
-        controller: _tabController,
-        children: [
-          HomePage(),
-          HistoryPage(),
-          AboutPage(),
-        ],
-      ),
-      bottomNavigationBar: TabBar(
-        labelColor: Colors.blue,
-        controller: _tabController,
-        onTap: (index) {
-          setState(() {
-            selectedIndex = index;
-          });
-        },
-        tabs: myTabs.map((CustomTab tab) {
-          return MyTab(
-              tab: tab, isSelected: myTabs.indexOf(tab) == selectedIndex);
-        }).toList(),
-      ),
-    );
+        body: TabBarView(
+          controller: _tabController,
+          children: [
+            HomePage(),
+            HistoryPage(),
+            AboutPage(),
+          ],
+        ),
+        bottomNavigationBar: Container(
+          height: 83,
+          child: TabBar(
+            labelColor: Colors.blue,
+            controller: _tabController,
+            onTap: (index) {
+              setState(() {
+                selectedIndex = index;
+              });
+            },
+            tabs: myTabs.map((CustomTab tab) {
+              return MyTab(
+                  tab: tab, isSelected: myTabs.indexOf(tab) == selectedIndex);
+            }).toList(),
+          ),
+        ));
   }
 }
 
