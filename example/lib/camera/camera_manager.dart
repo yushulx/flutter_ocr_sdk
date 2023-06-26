@@ -227,13 +227,13 @@ class CameraManager {
       );
     }
 
-    if (kIsWeb && !_isMobileWeb) {
-      return Transform(
-        alignment: Alignment.center,
-        transform: Matrix4.identity()..scale(-1.0, 1.0), // Flip horizontally
-        child: CameraPreview(controller!),
-      );
-    }
+    // if (kIsWeb && !_isMobileWeb) {
+    //   return Transform(
+    //     alignment: Alignment.center,
+    //     transform: Matrix4.identity()..scale(-1.0, 1.0), // Flip horizontally
+    //     child: CameraPreview(controller!),
+    //   );
+    // }
 
     return CameraPreview(controller!);
   }
