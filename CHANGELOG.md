@@ -1,3 +1,6 @@
+## 1.1.3
+- Added try/catch for web license.
+
 ## 1.1.2
 - Fixed confidence issue for web.
 

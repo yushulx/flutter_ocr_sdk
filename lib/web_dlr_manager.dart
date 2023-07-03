@@ -28,11 +28,18 @@ class DLRManager {
   /// Configure Dynamsoft Label Recognizer.
   /// Returns 0 if successful.
   Future<int> init(String key) async {
-    LabelRecognizer.license = key;
+    int ret = 0;
+
+    try {
+      LabelRecognizer.license = key;
+    } catch (e) {
+      print(e);
+      ret = -1;
+    }
 
     _recognizer = await handleThenable(LabelRecognizer.createInstance());
 
-    return 0;
+    return ret;
   }
 
   /// MRZ detection.
