@@ -50,7 +50,7 @@ dependencies:
 Include the JavaScript library of Dynamsoft Label Recognizer in your `index.html` file:
 
 ```html
-<script src="https://cdn.jsdelivr.net/npm/dynamsoft-label-recognizer@2.2.11/dist/dlr.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/dynamsoft-label-recognizer@2.2.31/dist/dlr.js"></script>
 ```
 
 

@@ -1,3 +1,6 @@
+## 1.1.4
+- Fixed dependency issue for iOS. 
+
 ## 1.1.3
 - Added try/catch for web license.
 
