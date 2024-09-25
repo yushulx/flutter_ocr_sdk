@@ -64,7 +64,7 @@ Include the JavaScript library of Dynamsoft Label Recognizer in your `index.html
 
 
 ## Usage
-- Initialize the MRZ detector with a [valid license key](https://www.dynamsoft.com/customer/license/trialLicense/?product=dlr):
+- Initialize the MRZ detector with a [valid license key](https://www.dynamsoft.com/customer/license/trialLicense/?product=dcv&package=cross-platform):
 
     ```dart
     FlutterOcrSdk _mrzDetector = FlutterOcrSdk();
