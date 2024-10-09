@@ -33,3 +33,6 @@ https://github.com/user-attachments/assets/1bed4643-a76d-4f75-bfc2-5449a14a8a1a
     
 ## Try Online Demo
 [https://yushulx.me/flutter_ocr_sdk/](https://yushulx.me/flutter_ocr_sdk/)
+
+## Blog
+[How to Create a Cross-platform MRZ Scanner App Using Flutter and Dynamsoft Label Recognizer](https://www.dynamsoft.com/codepool/flutter-mrz-scanner-how-to.html)
