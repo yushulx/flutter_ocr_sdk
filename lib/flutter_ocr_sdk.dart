@@ -8,7 +8,7 @@ class FlutterOcrSdk {
     return FlutterOcrSdkPlatform.instance.getPlatformVersion();
   }
 
-  /// Initialize the SDK: https://www.dynamsoft.com/customer/license/trialLicense?product=dlr
+  /// Initialize the SDK: https://www.dynamsoft.com/customer/license/trialLicense/?product=dcv&package=cross-platform
   Future<int?> init(String key) {
     return FlutterOcrSdkPlatform.instance.init(key);
   }

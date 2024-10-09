@@ -2,7 +2,8 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_ocr_sdk/mrz_result.dart';
-import 'package:flutter_ocr_sdk_example/result_page.dart';
+import 'global.dart';
+import 'result_page.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -15,7 +16,7 @@ class HistoryPage extends StatefulWidget {
 
 class _HistoryPageState extends State<HistoryPage> {
   bool _isLoaded = false;
-  List<MrzResult> _mrzHistory = List<MrzResult>.empty(growable: true);
+  final List<MrzResult> _mrzHistory = List<MrzResult>.empty(growable: true);
   @override
   void initState() {
     super.initState();
@@ -39,26 +40,45 @@ class _HistoryPageState extends State<HistoryPage> {
 
   @override
   Widget build(BuildContext context) {
-    final bar = Stack(
-      children: [
-        Align(
-          alignment: Alignment.center,
-          child: Container(
-            padding: EdgeInsets.only(
-              top: 64,
-              bottom: 15,
-            ),
-            child: Text('History',
-                style: TextStyle(
-                  fontSize: 22,
-                  color: Color(0xffF5F5F5),
-                )),
-          ),
-        ),
-        Align(
-          alignment: Alignment.centerRight,
-          child: Container(
-              padding: EdgeInsets.only(top: 59, right: 30),
+    var listView = Expanded(
+        child: ListView.builder(
+            itemCount: _mrzHistory.length,
+            itemBuilder: (context, index) {
+              return MyCustomWidget(
+                  result: _mrzHistory[index],
+                  cbDeleted: () async {
+                    _mrzHistory.removeAt(index);
+                    final SharedPreferences prefs =
+                        await SharedPreferences.getInstance();
+                    List<String> data =
+                        prefs.getStringList('mrz_data') as List<String>;
+                    data.removeAt(index);
+                    prefs.setStringList('mrz_data', data);
+                    setState(() {});
+                  },
+                  cbOpenResultPage: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ResultPage(
+                            information: _mrzHistory[index],
+                            isViewOnly: true,
+                          ),
+                        ));
+                  });
+            }));
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('History',
+            style: TextStyle(
+              fontSize: 22,
+              color: colorTitle,
+            )),
+        centerTitle: true,
+        backgroundColor: colorMainTheme,
+        actions: [
+          Padding(
+              padding: const EdgeInsets.only(right: 30),
               child: IconButton(
                 onPressed: () async {
                   final SharedPreferences prefs =
@@ -74,33 +94,12 @@ class _HistoryPageState extends State<HistoryPage> {
                   height: 26,
                   fit: BoxFit.cover,
                 ),
-              )),
-        ),
-      ],
-    );
-
-    var listView = Expanded(
-        child: ListView.builder(
-            itemCount: _mrzHistory.length,
-            itemBuilder: (context, index) {
-              return MyCustomWidget(
-                result: _mrzHistory[index],
-                cbDeleted: () async {
-                  _mrzHistory.removeAt(index);
-                  final SharedPreferences prefs =
-                      await SharedPreferences.getInstance();
-                  List<String> data =
-                      prefs.getStringList('mrz_data') as List<String>;
-                  data.removeAt(index);
-                  prefs.setStringList('mrz_data', data);
-                  setState(() {});
-                },
-              );
-            }));
-    return Scaffold(
+              ))
+        ],
+      ),
       body: _isLoaded
           ? Column(
-              children: [bar, listView],
+              children: [listView],
             )
           : const Center(
               child: CircularProgressIndicator(),
@@ -112,19 +111,21 @@ class _HistoryPageState extends State<HistoryPage> {
 class MyCustomWidget extends StatelessWidget {
   final MrzResult result;
   final Function cbDeleted;
+  final Function cbOpenResultPage;
 
-  MyCustomWidget({
+  const MyCustomWidget({
     super.key,
     required this.result,
     required this.cbDeleted,
+    required this.cbOpenResultPage,
   });
 
   @override
   Widget build(BuildContext context) {
     return DecoratedBox(
-        decoration: BoxDecoration(color: Colors.black),
+        decoration: const BoxDecoration(color: Colors.black),
         child: Padding(
-            padding: EdgeInsets.only(top: 18, bottom: 16, left: 84),
+            padding: const EdgeInsets.only(top: 18, bottom: 16, left: 84),
             child: Row(
               children: [
                 Column(
@@ -132,19 +133,19 @@ class MyCustomWidget extends StatelessWidget {
                   children: [
                     Text(
                       result.surname!,
-                      style: TextStyle(color: Colors.white),
+                      style: const TextStyle(color: Colors.white),
                     ),
                     Text(
                       result.passportNumber!,
-                      style: TextStyle(color: Color(0xffCCCCCC)),
+                      style: TextStyle(color: colorSubtitle),
                     ),
                   ],
                 ),
                 Expanded(child: Container()),
                 Padding(
-                  padding: EdgeInsets.only(right: 27),
+                  padding: const EdgeInsets.only(right: 27),
                   child: IconButton(
-                    icon: Icon(Icons.more_vert),
+                    icon: const Icon(Icons.more_vert),
                     color: Colors.white,
                     onPressed: () async {
                       final RenderBox button =
@@ -160,21 +161,21 @@ class MyCustomWidget extends StatelessWidget {
                       final selected = await showMenu(
                         context: context,
                         position: position,
-                        color: Color(0xff323234),
+                        color: colorBackground,
                         items: [
-                          PopupMenuItem<int>(
+                          const PopupMenuItem<int>(
                               value: 0,
                               child: Text(
                                 'Delete',
                                 style: TextStyle(color: Colors.white),
                               )),
-                          PopupMenuItem<int>(
+                          const PopupMenuItem<int>(
                               value: 1,
                               child: Text(
                                 'Share',
                                 style: TextStyle(color: Colors.white),
                               )),
-                          PopupMenuItem<int>(
+                          const PopupMenuItem<int>(
                               value: 2,
                               child: Text(
                                 'View',
@@ -194,14 +195,7 @@ class MyCustomWidget extends StatelessWidget {
                           Share.share(jsonString);
                         } else {
                           // view
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => ResultPage(
-                                  information: result,
-                                  isViewOnly: true,
-                                ),
-                              ));
+                          cbOpenResultPage();
                         }
                       }
                     },

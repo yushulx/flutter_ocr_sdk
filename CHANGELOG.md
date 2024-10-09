@@ -1,3 +1,7 @@
+## 1.2.0
+- Support AGP 8 for Android.
+- Update example code. 
+
 ## 1.1.4
 - Fixed dependency issue for iOS. 
 

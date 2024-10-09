@@ -3,12 +3,23 @@ import 'package:flutter_ocr_sdk/flutter_ocr_sdk.dart';
 import 'package:flutter_ocr_sdk/mrz_line.dart';
 
 FlutterOcrSdk mrzDetector = FlutterOcrSdk();
+bool isLicenseValid = false;
 
-Future<void> initMRZSDK() async {
-  await mrzDetector.init(
+Future<int> initMRZSDK() async {
+  int? ret = await mrzDetector.init(
       "DLS2eyJoYW5kc2hha2VDb2RlIjoiMjAwMDAxLTE2NDk4Mjk3OTI2MzUiLCJvcmdhbml6YXRpb25JRCI6IjIwMDAwMSIsInNlc3Npb25QYXNzd29yZCI6IndTcGR6Vm05WDJrcEQ5YUoifQ==");
-  await mrzDetector.loadModel();
+
+  if (ret == 0) isLicenseValid = true;
+  return await mrzDetector.loadModel() ?? -1;
 }
+
+Color colorMainTheme = const Color(0xff1D1B20);
+Color colorOrange = const Color(0xffFE8E14);
+Color colorTitle = const Color(0xffF5F5F5);
+Color colorSelect = const Color(0xff757575);
+Color colorText = const Color(0xff888888);
+Color colorBackground = const Color(0xFF323234);
+Color colorSubtitle = const Color(0xffCCCCCC);
 
 Widget createOverlay(List<List<MrzLine>>? mrzResults) {
   return CustomPaint(

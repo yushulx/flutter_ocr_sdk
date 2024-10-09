@@ -1,7 +1,6 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.dynamsoft.flutter_ocr_sdk_example">
-   <application
-        android:label="flutter_ocr_sdk_example"
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <application
+        android:label="mrzscanner"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

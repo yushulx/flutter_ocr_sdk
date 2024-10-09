@@ -1,11 +1,11 @@
 {
-    "name": "flutter_ocr_sdk_example",
-    "short_name": "flutter_ocr_sdk_example",
+    "name": "mrzscanner",
+    "short_name": "mrzscanner",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
     "theme_color": "#0175C2",
-    "description": "Demonstrates how to use the flutter_ocr_sdk plugin.",
+    "description": "A new Flutter project.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

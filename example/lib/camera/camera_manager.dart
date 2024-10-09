@@ -16,14 +16,17 @@ import 'package:camera_platform_interface/camera_platform_interface.dart';
 class CameraManager {
   BuildContext context;
   CameraController? controller;
-  late List<CameraDescription> _cameras;
+  List<CameraDescription> _cameras = [];
   Size? previewSize;
   bool _isScanAvailable = true;
   List<List<MrzLine>>? mrzLines;
   bool isDriverLicense = true;
   bool isFinished = false;
   StreamSubscription<FrameAvailabledEvent>? _frameAvailableStreamSubscription;
-  bool _isMobileWeb = false;
+  int cameraIndex = 0;
+  bool _isWebFrameStarted = false;
+  bool isFrontFound = false;
+  bool isBackFound = false;
 
   CameraManager(
       {required this.context,
@@ -39,7 +42,43 @@ class CameraManager {
     initCamera();
   }
 
+  Future<void> switchCamera() async {
+    if (_cameras.length == 1) return;
+    isFinished = true;
+
+    if (kIsWeb) {
+      await waitForStop();
+      controller?.dispose();
+      controller = null;
+    }
+
+    cameraIndex = cameraIndex == 0 ? 1 : 0;
+    toggleCamera(cameraIndex);
+  }
+
+  void resumeCamera() {
+    toggleCamera(cameraIndex);
+  }
+
+  void pauseCamera() {
+    stopVideo();
+  }
+
+  Future<void> waitForStop() async {
+    while (true) {
+      if (_isWebFrameStarted == false) {
+        break;
+      }
+
+      await Future.delayed(const Duration(milliseconds: 10));
+    }
+  }
+
   Future<void> stopVideo() async {
+    isFinished = true;
+    if (kIsWeb) {
+      await waitForStop();
+    }
     if (controller == null) return;
     if (!kIsWeb && (Platform.isAndroid || Platform.isIOS)) {
       await controller!.stopImageStream();
@@ -53,20 +92,17 @@ class CameraManager {
   }
 
   Future<void> webCamera() async {
-    if (controller == null || isFinished || cbIsMounted() == false) return;
+    _isWebFrameStarted = true;
+    while (!(controller == null || isFinished || cbIsMounted() == false)) {
+      XFile file = await controller!.takePicture();
+      var results = await mrzDetector.recognizeByFile(file.path);
+      if (results == null || !cbIsMounted()) return;
 
-    XFile file = await controller!.takePicture();
-
-    var results = await mrzDetector.recognizeByFile(file.path);
-    if (results == null || !cbIsMounted()) return;
-
-    mrzLines = results;
-    cbRefreshUi();
-    handleMrz(results);
-
-    if (!isFinished) {
-      webCamera();
+      mrzLines = results;
+      cbRefreshUi();
+      handleMrz(results);
     }
+    _isWebFrameStarted = false;
   }
 
   void handleMrz(List<List<MrzLine>> results) {
@@ -102,7 +138,7 @@ class CameraManager {
 
   void processId(
       Uint8List bytes, int width, int height, int stride, int format) {
-    cbRefreshUi();
+    // cbRefreshUi();
     mrzDetector
         .recognizeByBuffer(bytes, width, height, stride, format)
         .then((results) {
@@ -110,7 +146,7 @@ class CameraManager {
 
       if (MediaQuery.of(context).size.width <
           MediaQuery.of(context).size.height) {
-        if (Platform.isAndroid) {
+        if (Platform.isAndroid && results.isNotEmpty) {
           results = rotate90mrz(results, previewSize!.height.toInt());
         }
       }
@@ -194,25 +230,38 @@ class CameraManager {
   Future<void> initCamera() async {
     try {
       WidgetsFlutterBinding.ensureInitialized();
-      _cameras = await availableCameras();
-      int index = 0;
 
-      for (; index < _cameras.length; index++) {
-        CameraDescription description = _cameras[index];
-        if (description.name.toLowerCase().contains('back')) {
-          _isMobileWeb = true;
-          break;
+      List<CameraDescription> allCameras = await availableCameras();
+
+      if (kIsWeb) {
+        for (final CameraDescription cameraDescription in allCameras) {
+          print(cameraDescription.name);
+          if (cameraDescription.name.toLowerCase().contains('front')) {
+            if (isFrontFound) continue;
+            isFrontFound = true;
+            _cameras.add(cameraDescription);
+          } else if (cameraDescription.name.toLowerCase().contains('back')) {
+            if (isBackFound) continue;
+            isBackFound = true;
+            _cameras.add(cameraDescription);
+          } else {
+            _cameras.add(cameraDescription);
+          }
         }
+      } else {
+        _cameras = allCameras;
       }
+
       if (_cameras.isEmpty) return;
 
       if (!kIsWeb) {
-        toggleCamera(0);
+        toggleCamera(cameraIndex);
       } else {
-        if (_isMobileWeb) {
-          toggleCamera(index);
+        if (_cameras.length > 1) {
+          cameraIndex = 1;
+          toggleCamera(cameraIndex);
         } else {
-          toggleCamera(0);
+          toggleCamera(cameraIndex);
         }
       }
     } on CameraException catch (e) {
@@ -238,27 +287,56 @@ class CameraManager {
     return CameraPreview(controller!);
   }
 
+  void showInSnackBar(String message) {
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text(message)));
+  }
+
+  void _logError(String code, String? message) {
+    // ignore: avoid_print
+    print('Error: $code${message == null ? '' : '\nError Message: $message'}');
+  }
+
+  void _showCameraException(CameraException e) {
+    _logError(e.code, e.description);
+    showInSnackBar('Error: ${e.code}\n${e.description}');
+  }
+
   Future<void> toggleCamera(int index) async {
-    if (controller != null) controller!.dispose();
+    ResolutionPreset preset = ResolutionPreset.high;
+    controller = CameraController(
+        _cameras[index], kIsWeb ? ResolutionPreset.max : preset,
+        enableAudio: false);
 
-    controller = CameraController(_cameras[index], ResolutionPreset.medium);
-    controller!.initialize().then((_) {
-      if (!cbIsMounted()) {
-        return;
+    try {
+      await controller!.initialize();
+      if (cbIsMounted()) {
+        previewSize = controller!.value.previewSize;
+
+        startVideo();
       }
-
-      previewSize = controller!.value.previewSize;
-
-      startVideo();
-    }).catchError((Object e) {
-      if (e is CameraException) {
-        switch (e.code) {
-          case 'CameraAccessDenied':
-            break;
-          default:
-            break;
-        }
+    } on CameraException catch (e) {
+      switch (e.code) {
+        case 'CameraAccessDenied':
+          showInSnackBar('You have denied camera access.');
+        case 'CameraAccessDeniedWithoutPrompt':
+          // iOS only
+          showInSnackBar('Please go to Settings app to enable camera access.');
+        case 'CameraAccessRestricted':
+          // iOS only
+          showInSnackBar('Camera access is restricted.');
+        case 'AudioAccessDenied':
+          showInSnackBar('You have denied audio access.');
+        case 'AudioAccessDeniedWithoutPrompt':
+          // iOS only
+          showInSnackBar('Please go to Settings app to enable audio access.');
+        case 'AudioAccessRestricted':
+          // iOS only
+          showInSnackBar('Audio access is restricted.');
+        default:
+          _showCameraException(e);
+          break;
       }
-    });
+    }
   }
 }

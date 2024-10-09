@@ -5,11 +5,12 @@ import 'package:flutter_ocr_sdk/mrz_result.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'global.dart';
+
 class ResultPage extends StatefulWidget {
   const ResultPage(
       {super.key, required this.information, this.isViewOnly = false});
 
-  // final List<MrzLine> area;
   final MrzResult information;
   final bool isViewOnly;
 
@@ -20,97 +21,97 @@ class ResultPage extends StatefulWidget {
 class _ResultPageState extends State<ResultPage> {
   @override
   Widget build(BuildContext context) {
-    final keyStyle = TextStyle(color: Color(0xff888888), fontSize: 14);
-    final valueStyle = TextStyle(color: Colors.white, fontSize: 14);
+    var keyStyle = TextStyle(color: colorText, fontSize: 14);
+    const valueStyle = TextStyle(color: Colors.white, fontSize: 14);
     final infoList = Row(mainAxisAlignment: MainAxisAlignment.start, children: [
       Container(
-          padding: EdgeInsets.only(left: 35, bottom: 40),
+          padding: const EdgeInsets.only(left: 35, bottom: 40),
           child: SingleChildScrollView(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text("Document Type", style: keyStyle),
-                SizedBox(
+                const SizedBox(
                   height: 3,
                 ),
                 Text(widget.information.type!, style: valueStyle),
-                SizedBox(
+                const SizedBox(
                   height: 6,
                 ),
                 Text("Issuing State", style: keyStyle),
-                SizedBox(
+                const SizedBox(
                   height: 3,
                 ),
                 Text(widget.information.issuingCountry!, style: valueStyle),
-                SizedBox(
+                const SizedBox(
                   height: 6,
                 ),
                 Text("Surname", style: keyStyle),
-                SizedBox(
+                const SizedBox(
                   height: 3,
                 ),
                 Text(widget.information.surname!, style: valueStyle),
-                SizedBox(
+                const SizedBox(
                   height: 6,
                 ),
                 Text("Given Name", style: keyStyle),
-                SizedBox(
+                const SizedBox(
                   height: 3,
                 ),
                 Text(widget.information.givenName!, style: valueStyle),
-                SizedBox(
+                const SizedBox(
                   height: 6,
                 ),
                 Text("Passport Number", style: keyStyle),
-                SizedBox(
+                const SizedBox(
                   height: 3,
                 ),
                 Text(widget.information.passportNumber!, style: valueStyle),
-                SizedBox(
+                const SizedBox(
                   height: 6,
                 ),
                 Text("Nationality", style: keyStyle),
-                SizedBox(
+                const SizedBox(
                   height: 3,
                 ),
                 Text(widget.information.nationality!, style: valueStyle),
-                SizedBox(
+                const SizedBox(
                   height: 6,
                 ),
                 Text("Date of Birth (YYYY-MM-DD)", style: keyStyle),
-                SizedBox(
+                const SizedBox(
                   height: 3,
                 ),
                 Text(widget.information.birthDate!, style: valueStyle),
-                SizedBox(
+                const SizedBox(
                   height: 6,
                 ),
                 Text("Gender", style: keyStyle),
-                SizedBox(
+                const SizedBox(
                   height: 3,
                 ),
                 Text(widget.information.gender!, style: valueStyle),
-                SizedBox(
+                const SizedBox(
                   height: 6,
                 ),
                 Text("Date of Expiry(YYYY-MM-DD)", style: keyStyle),
-                SizedBox(
+                const SizedBox(
                   height: 3,
                 ),
                 Text(widget.information.expiration!, style: valueStyle),
-                SizedBox(
+                const SizedBox(
                   height: 6,
                 ),
                 Text("MRZ String", style: keyStyle),
-                SizedBox(
+                const SizedBox(
                   height: 3,
                 ),
                 Text(widget.information.lines!,
-                    style: TextStyle(
+                    style: const TextStyle(
                         color: Colors.white,
                         fontSize: 11,
                         overflow: TextOverflow.ellipsis)),
-                SizedBox(
+                const SizedBox(
                   height: 6,
                 ),
               ],
@@ -118,11 +119,15 @@ class _ResultPageState extends State<ResultPage> {
           ))
     ]);
 
+    void close() {
+      Navigator.pop(context);
+    }
+
     final button = Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Container(
-            padding: EdgeInsets.only(bottom: 23),
+            padding: const EdgeInsets.only(bottom: 23),
             child: MaterialButton(
               minWidth: 208,
               height: 45,
@@ -131,7 +136,7 @@ class _ResultPageState extends State<ResultPage> {
                 String jsonString = jsonEncode(jsonObject);
                 final SharedPreferences prefs =
                     await SharedPreferences.getInstance();
-                var results = await prefs.getStringList('mrz_data');
+                var results = prefs.getStringList('mrz_data');
                 if (results == null) {
                   prefs.setStringList('mrz_data', <String>[jsonString]);
                 } else {
@@ -139,10 +144,10 @@ class _ResultPageState extends State<ResultPage> {
                   prefs.setStringList('mrz_data', results);
                 }
 
-                Navigator.pop(context);
+                close();
               },
-              color: Color(0xffFE8E14),
-              child: Text(
+              color: colorOrange,
+              child: const Text(
                 'Save and Continue',
                 style: TextStyle(color: Colors.white, fontSize: 18),
               ),
@@ -161,9 +166,13 @@ class _ResultPageState extends State<ResultPage> {
               'Result',
               style: TextStyle(color: Colors.white),
             ),
+            iconTheme: const IconThemeData(
+              color: Colors
+                  .white, // Set the color of the back arrow and other icons
+            ),
             actions: [
               Padding(
-                padding: const EdgeInsets.only(right: 20), // Add padding here
+                padding: const EdgeInsets.only(right: 20),
                 child: IconButton(
                   onPressed: () {
                     Map<String, dynamic> jsonObject =

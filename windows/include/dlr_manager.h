@@ -27,7 +27,7 @@ class Task
 {
 public:
     std::function<void()> func;
-    unsigned char* buffer;
+    unsigned char *buffer;
 };
 
 class WorkerThread
@@ -51,7 +51,6 @@ public:
             DLR_DestroyInstance(recognizer);
             recognizer = NULL;
         }
-
     };
 
     void clearTasks()
@@ -72,7 +71,7 @@ public:
         {
             std::unique_lock<std::mutex> lk(worker->m);
             worker->running = false;
-            
+
             clearTasks();
 
             worker->cv.notify_one();
@@ -87,10 +86,10 @@ public:
 
     int Init(const char *license)
     {
-        // Click https://www.dynamsoft.com/customer/license/trialLicense/?product=dlr to get a trial license.
+        // Click https://www.dynamsoft.com/customer/license/trialLicense/?product=dcv&package=cross-platform to get a trial license.
         char errorMsgBuffer[512];
-		int ret = DLR_InitLicense(license, errorMsgBuffer, 512);
-		printf("DC_InitLicense: %s\n", errorMsgBuffer);
+        int ret = DLR_InitLicense(license, errorMsgBuffer, 512);
+        printf("DC_InitLicense: %s\n", errorMsgBuffer);
         recognizer = DLR_CreateInstance();
         worker = new WorkerThread();
         worker->running = true;
@@ -100,12 +99,13 @@ public:
 
     int LoadModel(const char *modelPath, const char *params)
     {
-        if (!recognizer) return -1;
+        if (!recognizer)
+            return -1;
 
         char errorMessage[256];
 
         int ret = DLR_AppendSettingsFromString(recognizer, params, errorMessage, 256);
-        
+
         return ret;
     }
 
@@ -116,7 +116,7 @@ public:
             std::function<void()> task;
             std::unique_lock<std::mutex> lk(self->worker->m);
             self->worker->cv.wait(lk, [&]
-                                { return !self->worker->tasks.empty() || !self->worker->running; });
+                                  { return !self->worker->tasks.empty() || !self->worker->running; });
             if (!self->worker->running)
             {
                 break;
@@ -129,8 +129,8 @@ public:
         }
     }
 
-    void queueTask(unsigned char* imageBuffer, int width, int height, int stride, int format, int len)
-    {    
+    void queueTask(unsigned char *imageBuffer, int width, int height, int stride, int format, int len)
+    {
         unsigned char *data = (unsigned char *)malloc(len);
         memcpy(data, imageBuffer, len);
 
@@ -148,52 +148,53 @@ public:
     ImagePixelFormat getPixelFormat(int format)
     {
         ImagePixelFormat pixelFormat = IPF_BGR_888;
-        switch(format) {
-            case 0:
-                pixelFormat = IPF_BINARY;
-                break;
-            case 1:
-                pixelFormat = IPF_BINARYINVERTED;
-                break;
-            case 2:
-                pixelFormat = IPF_GRAYSCALED;
-                break;
-            case 3:
-                pixelFormat = IPF_NV21;
-                break;
-            case 4:
-                pixelFormat = IPF_RGB_565;
-                break;
-            case 5:
-                pixelFormat = IPF_RGB_555;
-                break;
-            case 6:
-                pixelFormat = IPF_RGB_888;
-                break;
-            case 7:
-                pixelFormat = IPF_ARGB_8888;
-                break;
-            case 8:
-                pixelFormat = IPF_RGB_161616;
-                break;
-            case 9: 
-                pixelFormat = IPF_ARGB_16161616;
-                break;
-            case 10:
-                pixelFormat = IPF_ABGR_8888;
-                break;
-            case 11:
-                pixelFormat = IPF_ABGR_16161616;
-                break;
-            case 12:
-                pixelFormat = IPF_BGR_888;
-                break;
+        switch (format)
+        {
+        case 0:
+            pixelFormat = IPF_BINARY;
+            break;
+        case 1:
+            pixelFormat = IPF_BINARYINVERTED;
+            break;
+        case 2:
+            pixelFormat = IPF_GRAYSCALED;
+            break;
+        case 3:
+            pixelFormat = IPF_NV21;
+            break;
+        case 4:
+            pixelFormat = IPF_RGB_565;
+            break;
+        case 5:
+            pixelFormat = IPF_RGB_555;
+            break;
+        case 6:
+            pixelFormat = IPF_RGB_888;
+            break;
+        case 7:
+            pixelFormat = IPF_ARGB_8888;
+            break;
+        case 8:
+            pixelFormat = IPF_RGB_161616;
+            break;
+        case 9:
+            pixelFormat = IPF_ARGB_16161616;
+            break;
+        case 10:
+            pixelFormat = IPF_ABGR_8888;
+            break;
+        case 11:
+            pixelFormat = IPF_ABGR_16161616;
+            break;
+        case 12:
+            pixelFormat = IPF_BGR_888;
+            break;
         }
 
         return pixelFormat;
     }
 
-    static void processBuffer(DlrManager *self, unsigned char * buffer, int width, int height, int stride, int format)
+    static void processBuffer(DlrManager *self, unsigned char *buffer, int width, int height, int stride, int format)
     {
         ImageData data;
         data.bytes = buffer;
@@ -205,9 +206,9 @@ public:
 
         int ret = DLR_RecognizeByBuffer(self->recognizer, &data, "locr");
         if (ret)
-		{
-			printf("Detection error: %s\n", DLR_GetErrorString(ret));
-		}
+        {
+            printf("Detection error: %s\n", DLR_GetErrorString(ret));
+        }
 
         free(buffer);
         EncodableList results = self->WrapResults();
@@ -219,47 +220,49 @@ public:
     EncodableList RecognizeFile(const char *filename)
     {
         EncodableList out;
-        if (recognizer == NULL) return out;
+        if (recognizer == NULL)
+            return out;
 
         int ret = DLR_RecognizeByFile(recognizer, filename, "locr");
         if (ret)
-		{
-			printf("Detection error: %s\n", DLR_GetErrorString(ret));
-		}
+        {
+            printf("Detection error: %s\n", DLR_GetErrorString(ret));
+        }
         return WrapResults();
     }
 
-    EncodableList WrapResults() {
+    EncodableList WrapResults()
+    {
         EncodableList out;
         DLR_ResultArray *pResults = NULL;
-		DLR_GetAllResults(recognizer, &pResults);
-		if (!pResults)
-		{
-			return out;
-		}
+        DLR_GetAllResults(recognizer, &pResults);
+        if (!pResults)
+        {
+            return out;
+        }
 
-		int count = pResults->resultsCount;
+        int count = pResults->resultsCount;
 
-		for (int i = 0; i < count; i++)
-		{
+        for (int i = 0; i < count; i++)
+        {
             EncodableList area;
-			DLR_Result *mrzResult = pResults->results[i];
-			int lCount = mrzResult->lineResultsCount;
-			for (int j = 0; j < lCount; j++)
-			{
+            DLR_Result *mrzResult = pResults->results[i];
+            int lCount = mrzResult->lineResultsCount;
+            for (int j = 0; j < lCount; j++)
+            {
                 EncodableMap map;
 
-				DM_Point *points = mrzResult->lineResults[j]->location.points;
-				int x1 = points[0].x;
-				int y1 = points[0].y;
-				int x2 = points[1].x;
-				int y2 = points[1].y;
-				int x3 = points[2].x;
-				int y3 = points[2].y;
-				int x4 = points[3].x;
-				int y4 = points[3].y;
+                DM_Point *points = mrzResult->lineResults[j]->location.points;
+                int x1 = points[0].x;
+                int y1 = points[0].y;
+                int x2 = points[1].x;
+                int y2 = points[1].y;
+                int x3 = points[2].x;
+                int y3 = points[2].y;
+                int x4 = points[3].x;
+                int y4 = points[3].y;
 
-				map[EncodableValue("confidence")] = EncodableValue(mrzResult->lineResults[j]->confidence);
+                map[EncodableValue("confidence")] = EncodableValue(mrzResult->lineResults[j]->confidence);
                 map[EncodableValue("text")] = EncodableValue(mrzResult->lineResults[j]->text);
                 map[EncodableValue("x1")] = EncodableValue(x1);
                 map[EncodableValue("y1")] = EncodableValue(y1);
@@ -270,20 +273,20 @@ public:
                 map[EncodableValue("x4")] = EncodableValue(x4);
                 map[EncodableValue("y4")] = EncodableValue(y4);
                 area.push_back(map);
-			}
+            }
 
             out.push_back(area);
-		}
+        }
 
-		// Release memory
-		DLR_FreeResults(&pResults);
+        // Release memory
+        DLR_FreeResults(&pResults);
         return out;
     }
 
-    void RecognizeBuffer(std::unique_ptr<flutter::MethodResult<flutter::EncodableValue>>& pendingResult, const unsigned char * buffer, int width, int height, int stride, int format)
+    void RecognizeBuffer(std::unique_ptr<flutter::MethodResult<flutter::EncodableValue>> &pendingResult, const unsigned char *buffer, int width, int height, int stride, int format)
     {
         pendingResults.push_back(std::move(pendingResult));
-        queueTask((unsigned char*)buffer, width, height, stride, format, stride * height);
+        queueTask((unsigned char *)buffer, width, height, stride, format, stride * height);
     }
 
 private:

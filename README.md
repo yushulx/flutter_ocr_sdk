@@ -1,34 +1,21 @@
-# flutter_ocr_sdk
+# Flutter MRZ SDK
 
-A wrapper for [Dynamsoft OCR SDK](https://www.dynamsoft.com/label-recognition/overview/) with MRZ detection model. It helps developers build Flutter applications to detect machine-readable zones (**MRZ**) in passports, travel documents, and ID cards. 
+A wrapper for [Dynamsoft Label Recognizer v2.x](https://www.dynamsoft.com/label-recognition/overview/) with MRZ detection model. It helps developers build Flutter applications to detect machine-readable zones (**MRZ**) in passports, travel documents, and ID cards. 
 
-## Try MRZ Detection Example
+## License Key
+To use the SDK, you need a [license key for Dynamsoft Label Recognizer](https://www.dynamsoft.com/customer/license/trialLicense/?product=dcv&package=cross-platform). Make sure to get your trial or commercial license before using the library.
 
-### Mobile: Android and iOS
+## Try Flutter MRZ Detection Example
+
 ```bash
 cd example
-flutter run 
+flutter run # for Android
+flutter run -d chrome # for Web
+flutter run -d windows # for Windows
 ```
 
-![Flutter Passport MRZ recognition](https://www.dynamsoft.com/codepool/img/2021/07/flutter-passport-mrz-recognition.jpg)
+![Flutter Passport MRZ recognition](https://www.dynamsoft.com/codepool/img/2024/10/flutter-passport-mrz-reader-scanner.png)
 
-### Web
-```bash
-cd example
-flutter run -d chrome
-```
-
-![Flutter MRZ recognition in web](https://www.dynamsoft.com/codepool/img/2023/01/flutter_mrz_ocr_web.png)
-
-### Desktop: Windows and Linux
-```bash
-cd example
-flutter run -d windows
-
-# flutter run -d linux
-```
-
-![Flutter MRZ OCR in Windows](https://www.dynamsoft.com/codepool/img/2023/01/flutter-mrz-ocr-windows.png)
 
 ## Supported Platforms
 - Android
@@ -46,8 +33,8 @@ dependencies:
     flutter_ocr_sdk:
 ```
 
-### One More Step for Web
-Include the JavaScript library of Dynamsoft Label Recognizer in your `index.html` file:
+### Additional Step for Web
+To support web functionality, include the JavaScript library of Dynamsoft Label Recognizer in your `index.html` file:
 
 ```html
 <script src="https://cdn.jsdelivr.net/npm/dynamsoft-label-recognizer@2.2.31/dist/dlr.js"></script>
@@ -64,7 +51,7 @@ Include the JavaScript library of Dynamsoft Label Recognizer in your `index.html
 
 
 ## Usage
-- Initialize the MRZ detector with a [valid license key](https://www.dynamsoft.com/customer/license/trialLicense/?product=dlr):
+- Initialize the MRZ detector with a valid license key:
 
     ```dart
     FlutterOcrSdk _mrzDetector = FlutterOcrSdk();

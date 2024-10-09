@@ -25,6 +25,10 @@ rootProject.allprojects {
 apply plugin: 'com.android.library'
 
 android {
+    if (project.android.hasProperty('namespace')) {
+        namespace 'com.dynamsoft.flutter_ocr_sdk'
+    }
+
     compileSdkVersion 31
 
     compileOptions {

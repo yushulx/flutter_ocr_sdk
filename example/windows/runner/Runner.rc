@@ -89,13 +89,13 @@ BEGIN
     BEGIN
         BLOCK "040904e4"
         BEGIN
-            VALUE "CompanyName", "com.dynamsoft" "\0"
-            VALUE "FileDescription", "flutter_ocr_sdk_example" "\0"
+            VALUE "CompanyName", "com.example" "\0"
+            VALUE "FileDescription", "mrzscanner" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
-            VALUE "InternalName", "flutter_ocr_sdk_example" "\0"
-            VALUE "LegalCopyright", "Copyright (C) 2023 com.dynamsoft. All rights reserved." "\0"
-            VALUE "OriginalFilename", "flutter_ocr_sdk_example.exe" "\0"
-            VALUE "ProductName", "flutter_ocr_sdk_example" "\0"
+            VALUE "InternalName", "mrzscanner" "\0"
+            VALUE "LegalCopyright", "Copyright (C) 2023 com.example. All rights reserved." "\0"
+            VALUE "OriginalFilename", "mrzscanner.exe" "\0"
+            VALUE "ProductName", "mrzscanner" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END

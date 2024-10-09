@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_ocr_sdk_example/history_page.dart';
+import 'global.dart';
+import 'history_page.dart';
 
 import 'about_page.dart';
 import 'home_page.dart';
@@ -41,13 +42,13 @@ class _TabPageState extends State<TabPage> with SingleTickerProviderStateMixin {
     return Scaffold(
         body: TabBarView(
           controller: _tabController,
-          children: [
+          children: const [
             HomePage(),
             HistoryPage(),
             AboutPage(),
           ],
         ),
-        bottomNavigationBar: Container(
+        bottomNavigationBar: SizedBox(
           height: 83,
           child: TabBar(
             labelColor: Colors.blue,
@@ -70,7 +71,7 @@ class MyTab extends StatelessWidget {
   final CustomTab tab;
   final bool isSelected;
 
-  MyTab({required this.tab, required this.isSelected});
+  const MyTab({super.key, required this.tab, required this.isSelected});
 
   @override
   Widget build(BuildContext context) {
@@ -83,13 +84,12 @@ class MyTab extends StatelessWidget {
             width: 48,
             height: 32,
           ),
-          Text(
-            tab.text,
-            overflow: TextOverflow.ellipsis,
-            style: TextStyle(
+          Text(tab.text,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
                 fontSize: 9,
-                color: isSelected ? Color(0xffFE8E14) : Color(0xff757575)),
-          )
+                color: isSelected ? colorOrange : colorSelect,
+              ))
         ],
       ),
     );

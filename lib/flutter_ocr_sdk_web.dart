@@ -29,7 +29,7 @@ class FlutterOcrSdkWeb extends FlutterOcrSdkPlatform {
     return version;
   }
 
-  /// Initialize the SDK: https://www.dynamsoft.com/customer/license/trialLicense?product=dlr
+  /// Initialize the SDK: https://www.dynamsoft.com/customer/license/trialLicense/?product=dcv&package=cross-platform
   @override
   Future<int?> init(String key) {
     return _dlrManager.init(key);
