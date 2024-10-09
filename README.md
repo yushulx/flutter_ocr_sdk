@@ -1,137 +1,102 @@
-# flutter_document_scan_sdk
-The Flutter plugin is a wrapper for Dynamsoft's [Document Normalizer SDK v1.x](https://www.dynamsoft.com/document-normalizer/docs/introduction/). It enables you to build document rectification applications for **Windows**, **Linux**, **web**, **Android** and **iOS**.
+# Flutter MRZ SDK
 
-## Try Document Rectification Example
+A wrapper for [Dynamsoft Label Recognizer v2.x](https://www.dynamsoft.com/label-recognition/overview/) with MRZ detection model. It helps developers build Flutter applications to detect machine-readable zones (**MRZ**) in passports, travel documents, and ID cards. 
 
-### Desktop: Windows & Linux
+## License Key
+To use the SDK, you need a [license key for Dynamsoft Label Recognizer](https://www.dynamsoft.com/customer/license/trialLicense/?product=dcv&package=cross-platform). Make sure to get your trial or commercial license before using the library.
 
-
-**Windows** 
-
-```bash
-cd example
-flutter run -d windows
-```
-
-![Flutter windows document edge detection and normalization](https://www.dynamsoft.com/codepool/img/2022/12/flutter-windows-desktop-document-scanner.png)
-
-
-**Linux**
+## Try Flutter MRZ Detection Example
 
 ```bash
 cd example
-flutter run -d linux
+flutter run # for Android
+flutter run -d chrome # for Web
+flutter run -d windows # for Windows
 ```
 
-![Flutter Linux document edge detection and normalization](https://www.dynamsoft.com/codepool/img/2022/12/flutter-linux-desktop-document-scanner.png)
+![Flutter Passport MRZ recognition](https://www.dynamsoft.com/codepool/img/2024/10/flutter-passport-mrz-reader-scanner.png)
 
-### Web
-```bash
-cd example
-flutter run -d chrome
-```
-
-![Flutter web document edge detection and normalization](https://www.dynamsoft.com/codepool/img/2023/05/document-edge-edit.png)
-
-### Mobile: Android & iOS
-
-```bash
-cd example
-flutter run 
-```
-
-![Flutter document rectification for Android and iOS](https://www.dynamsoft.com/codepool/img/2023/02/flutter-document-rectification-android-ios.jpg)
-
-## Getting a License Key for Dynamsoft Document Normalizer
-[![](https://img.shields.io/badge/Get-30--day%20FREE%20Trial-blue)](https://www.dynamsoft.com/customer/license/trialLicense/?product=dcv&package=cross-platform)
 
 ## Supported Platforms
+- Android
 - Web
 - Windows
 - Linux
-- Android
 - iOS
 
 ## Installation
-Add `flutter_document_scan_sdk` as a dependency in your `pubspec.yaml` file.
+Add `flutter_ocr_sdk` as a dependency in your `pubspec.yaml` file.
 
 ```yml
 dependencies:
     ...
-    flutter_document_scan_sdk:
+    flutter_ocr_sdk:
 ```
 
-### One More Step for Web
-Include the JavaScript library of Dynamsoft Document Normalizer in your `index.html` file:
+### Additional Step for Web
+To support web functionality, include the JavaScript library of Dynamsoft Label Recognizer in your `index.html` file:
 
 ```html
-<script src="https://cdn.jsdelivr.net/npm/dynamsoft-document-normalizer@1.0.12/dist/ddn.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/dynamsoft-label-recognizer@2.2.31/dist/dlr.js"></script>
 ```
 
+
 ## API Compatibility
-| Methods      | Android |    iOS | Windows | Linux | Web|
-| ----------- | ----------- | ----------- | ----------- |----------- |----------- |
-| `Future<int?> init(String key)`     | :heavy_check_mark:       | :heavy_check_mark:   | :heavy_check_mark:      | :heavy_check_mark:      |:heavy_check_mark:      | 
-| `Future<List<DocumentResult>?> detectFile(String file)`     | :heavy_check_mark:      | :heavy_check_mark:   | :heavy_check_mark:      |:heavy_check_mark:      | :heavy_check_mark:     |
-| `Future<NormalizedImage?> normalizeFile(String file, dynamic points)`     | :heavy_check_mark:      | :heavy_check_mark:   | :heavy_check_mark:      |:heavy_check_mark:      | :heavy_check_mark:     |
-| `Future<int?> setParameters(String params)`     | :heavy_check_mark:       | :heavy_check_mark:   | :heavy_check_mark:       | :heavy_check_mark:       |:heavy_check_mark:      | 
-| `Future<String?> getParameters()`     | :heavy_check_mark:       | :heavy_check_mark:   | :heavy_check_mark:       | :heavy_check_mark:       |:heavy_check_mark:      | 
-| `Future<List<DocumentResult>?> detectBuffer(Uint8List bytes, int width, int height, int stride, int format)`     | :heavy_check_mark:      | :heavy_check_mark:   | :heavy_check_mark:      |:heavy_check_mark:      | :heavy_check_mark:      |
-| `Future<NormalizedImage?> normalizeBuffer(Uint8List bytes, int width, int height, int stride, int format, dynamic points)`     | :heavy_check_mark:      | :heavy_check_mark:   | :heavy_check_mark:      |:heavy_check_mark:      | :heavy_check_mark:     |
+| Methods      | Android |    iOS | Windows | Linux | macOS | Web|
+| ----------- | ----------- | ----------- | ----------- |----------- |----------- |----------- |
+| `Future<int?> init(String key)`     | :heavy_check_mark:       | :heavy_check_mark:   | :heavy_check_mark:      | :heavy_check_mark:      |:heavy_check_mark:      | :heavy_check_mark:    |
+| `Future<int?> loadModel()`     | :heavy_check_mark:      | :heavy_check_mark:   | :heavy_check_mark:      |:heavy_check_mark:      | :heavy_check_mark:     |:heavy_check_mark:      |
+| `Future<List<List<MrzLine>>?> recognizeByFile(String filename)`     | :heavy_check_mark:      | :heavy_check_mark:   | :heavy_check_mark:      |:heavy_check_mark:      | :heavy_check_mark:     |:heavy_check_mark:    |
+| `Future<List<List<MrzLine>>?> recognizeByBuffer(Uint8List bytes, int width, int height, int stride, int format)`     | :heavy_check_mark:       | :heavy_check_mark:   | :heavy_check_mark:       | :heavy_check_mark:       |:heavy_check_mark:      | :heavy_check_mark:     |
+
 
 ## Usage
-- Initialize the document rectification SDK with a valid license key:
-
-     ```dart
-    final _flutterDocumentScanSdkPlugin = FlutterDocumentScanSdk();
-    await _flutterDocumentScanSdkPlugin.init(
-        "LICENSE-KEY");
-
-    await _flutterDocumentScanSdkPlugin.setParameters(Template.grayscale);
-    ```
-
-- Do document edge detection and return quadrilaterals:
+- Initialize the MRZ detector with a [valid license key](https://www.dynamsoft.com/customer/license/trialLicense/?product=dlr):
 
     ```dart
-    List<DocumentResult>? detectionResults =
-            await _flutterDocumentScanSdkPlugin
-                .detectFile(file);
+    FlutterOcrSdk _mrzDetector = FlutterOcrSdk();
+    int? ret = await _mrzDetector.init( "DLS2eyJoYW5kc2hha2VDb2RlIjoiMjAwMDAxLTE2NDk4Mjk3OTI2MzUiLCJvcmdhbml6YXRpb25JRCI6IjIwMDAwMSIsInNlc3Npb25QYXNzd29yZCI6IndTcGR6Vm05WDJrcEQ5YUoifQ==");
     ```
-- Detect document edges from a buffer:
+- Load the MRZ detection model:
+    ```dart
+    await _mrzDetector.loadModel();
+    ```
+- Recognize MRZ from an image file:
 
     ```dart
-    List<DocumentResult>? detectionResults =
-            await _flutterDocumentScanSdkPlugin
-                .detectBuffer(bytes, width, height, stride, format);
+    List<List<MrzLine>>? results = await _mrzDetector.recognizeByFile(photo.path);
     ```
-- Rectify the document based on document corners:
+- Recognize MRZ from an image buffer:
 
     ```dart
-    NormalizedImage? normalizedImage = await _flutterDocumentScanSdkPlugin.normalizeFile(
-        file, detectionResults[0].points);
+    ui.Image image = await decodeImageFromList(fileBytes);
+
+    ByteData? byteData =
+        await image.toByteData(format: ui.ImageByteFormat.rawRgba);
+
+    List<List<MrzLine>>? results = await _mrzDetector.recognizeByBuffer(
+          byteData.buffer.asUint8List(),
+          image.width,
+          image.height,
+          byteData.lengthInBytes ~/ image.height,
+          ImagePixelFormat.IPF_ARGB_8888.index);
     ```
-- Rectify the document based on document corners from a buffer:
+- Parse MRZ information:
 
     ```dart
-    NormalizedImage? normalizedImage = await _flutterDocumentScanSdkPlugin.normalizeBuffer(
-        bytes, width, height, stride, format, detectionResults[0].points);
-    ```
-- Save the rectified document image to a file:
-
-    ```dart
-    if (normalizedUiImage != null) {
-        const String mimeType = 'image/png';
-        ByteData? data = await normalizedUiImage!
-            .toByteData(format: ui.ImageByteFormat.png);
-        if (data != null) {
-            final XFile imageFile = XFile.fromData(
-                data.buffer.asUint8List(),
-                mimeType: mimeType,
-            );
-            await imageFile.saveTo(path);
+    String information = '';
+    if (results != null && results.isNotEmpty) {
+        for (List<MrzLine> area in results) {
+            if (area.length == 2) {
+            information =
+                MRZ.parseTwoLines(area[0].text, area[1].text).toString();
+            } else if (area.length == 3) {
+            information = MRZ
+                .parseThreeLines(area[0].text, area[1].text, area[2].text)
+                .toString();
+            }
         }
     }
     ```
-
 
 
