@@ -4,7 +4,8 @@ import 'package:camera_windows/camera_windows.dart';
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
 import 'package:flutter_ocr_sdk/flutter_ocr_sdk_platform_interface.dart';
-import 'package:flutter_ocr_sdk/mrz_line.dart';
+import 'package:flutter_ocr_sdk/model_type.dart';
+import 'package:flutter_ocr_sdk/ocr_line.dart';
 
 import 'dart:io';
 import 'package:flutter/foundation.dart';
@@ -19,7 +20,7 @@ class CameraManager {
   List<CameraDescription> _cameras = [];
   Size? previewSize;
   bool _isScanAvailable = true;
-  List<List<MrzLine>>? mrzLines;
+  List<List<OcrLine>>? ocrLines;
   bool isDriverLicense = true;
   bool isFinished = false;
   StreamSubscription<FrameAvailabledEvent>? _frameAvailableStreamSubscription;
@@ -98,19 +99,19 @@ class CameraManager {
       var results = await mrzDetector.recognizeByFile(file.path);
       if (results == null || !cbIsMounted()) return;
 
-      mrzLines = results;
+      ocrLines = results;
       cbRefreshUi();
       handleMrz(results);
     }
     _isWebFrameStarted = false;
   }
 
-  void handleMrz(List<List<MrzLine>> results) {
+  void handleMrz(List<List<OcrLine>> results) {
     if (results.isNotEmpty) {
-      List<MrzLine>? finalArea;
+      List<OcrLine>? finalArea;
 
       try {
-        for (List<MrzLine> area in results) {
+        for (List<OcrLine> area in results) {
           if (area.length == 2) {
             if (area[0].confidence >= 70 && area[1].confidence >= 70) {
               finalArea = area;
@@ -123,13 +124,18 @@ class CameraManager {
               finalArea = area;
               break;
             }
+          } else {
+            finalArea = area;
           }
         }
       } catch (e) {
         print(e);
       }
 
-      if (!isFinished && finalArea != null) {
+      if (!isFinished &&
+          finalArea != null &&
+          model == ModelType.mrz &&
+          (finalArea.length == 2 || finalArea.length == 3)) {
         isFinished = true;
         cbNavigation(finalArea);
       }
@@ -151,7 +157,7 @@ class CameraManager {
         }
       }
 
-      mrzLines = results;
+      ocrLines = results;
       cbRefreshUi();
       handleMrz(results);
 
@@ -189,7 +195,7 @@ class CameraManager {
   }
 
   Future<void> startVideo() async {
-    mrzLines = null;
+    ocrLines = null;
 
     isFinished = false;
 

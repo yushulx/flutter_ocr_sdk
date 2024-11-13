@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_exif_rotation/flutter_exif_rotation.dart';
 import 'package:flutter_ocr_sdk/flutter_ocr_sdk_platform_interface.dart';
-import 'package:flutter_ocr_sdk/mrz_line.dart';
+import 'package:flutter_ocr_sdk/ocr_line.dart';
 import 'package:flutter_ocr_sdk/mrz_parser.dart';
 import 'package:flutter_ocr_sdk/mrz_result.dart';
 import 'package:url_launcher/url_launcher_string.dart';
@@ -55,16 +55,17 @@ class _HomePageState extends State<HomePage> {
     ByteData? byteData =
         await image.toByteData(format: ui.ImageByteFormat.rawRgba);
     if (byteData != null) {
-      List<List<MrzLine>>? results = await mrzDetector.recognizeByBuffer(
+      List<List<OcrLine>>? results = await mrzDetector.recognizeByBuffer(
           byteData.buffer.asUint8List(),
           image.width,
           image.height,
           byteData.lengthInBytes ~/ image.height,
           ImagePixelFormat.IPF_ARGB_8888.index);
-      List<MrzLine>? finalArea;
+
+      List<OcrLine>? finalArea;
       MrzResult? information;
       if (results != null && results.isNotEmpty) {
-        for (List<MrzLine> area in results) {
+        for (List<OcrLine> area in results) {
           if (area.length == 2) {
             finalArea = area;
             information = MRZ.parseTwoLines(area[0].text, area[1].text);
@@ -82,6 +83,10 @@ class _HomePageState extends State<HomePage> {
       }
       if (finalArea != null) {
         openResultPage(information!);
+      } else {
+        if (results != null && results.isNotEmpty) {
+          showAlert(context, "VIN Result", results[0][0].text);
+        }
       }
     }
   }

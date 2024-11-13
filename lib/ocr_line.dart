@@ -1,5 +1,5 @@
-/// MrzLine class.
-class MrzLine {
+/// OcrLine class.
+class OcrLine {
   int confidence = 0;
   String text = '';
 

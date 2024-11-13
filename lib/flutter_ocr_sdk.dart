@@ -1,7 +1,8 @@
 import 'dart:typed_data';
 
 import 'flutter_ocr_sdk_platform_interface.dart';
-import 'mrz_line.dart';
+import 'model_type.dart';
+import 'ocr_line.dart';
 
 class FlutterOcrSdk {
   Future<String?> getPlatformVersion() {
@@ -13,17 +14,17 @@ class FlutterOcrSdk {
     return FlutterOcrSdkPlatform.instance.init(key);
   }
 
-  Future<List<List<MrzLine>>?> recognizeByBuffer(
+  Future<List<List<OcrLine>>?> recognizeByBuffer(
       Uint8List bytes, int width, int height, int stride, int format) {
     return FlutterOcrSdkPlatform.instance
         .recognizeByBuffer(bytes, width, height, stride, format);
   }
 
-  Future<List<List<MrzLine>>?> recognizeByFile(String filename) {
+  Future<List<List<OcrLine>>?> recognizeByFile(String filename) {
     return FlutterOcrSdkPlatform.instance.recognizeByFile(filename);
   }
 
-  Future<int?> loadModel() async {
-    return FlutterOcrSdkPlatform.instance.loadModel();
+  Future<int?> loadModel({ModelType modelType = ModelType.mrz}) async {
+    return FlutterOcrSdkPlatform.instance.loadModel(modelType: modelType);
   }
 }

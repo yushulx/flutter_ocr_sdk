@@ -46,8 +46,8 @@ To support web functionality, include the JavaScript library of Dynamsoft Label 
 | ----------- | ----------- | ----------- | ----------- |----------- |----------- |----------- |
 | `Future<int?> init(String key)`     | :heavy_check_mark:       | :heavy_check_mark:   | :heavy_check_mark:      | :heavy_check_mark:      |:heavy_check_mark:      | :heavy_check_mark:    |
 | `Future<int?> loadModel()`     | :heavy_check_mark:      | :heavy_check_mark:   | :heavy_check_mark:      |:heavy_check_mark:      | :heavy_check_mark:     |:heavy_check_mark:      |
-| `Future<List<List<MrzLine>>?> recognizeByFile(String filename)`     | :heavy_check_mark:      | :heavy_check_mark:   | :heavy_check_mark:      |:heavy_check_mark:      | :heavy_check_mark:     |:heavy_check_mark:    |
-| `Future<List<List<MrzLine>>?> recognizeByBuffer(Uint8List bytes, int width, int height, int stride, int format)`     | :heavy_check_mark:       | :heavy_check_mark:   | :heavy_check_mark:       | :heavy_check_mark:       |:heavy_check_mark:      | :heavy_check_mark:     |
+| `Future<List<List<OcrLine>>?> recognizeByFile(String filename)`     | :heavy_check_mark:      | :heavy_check_mark:   | :heavy_check_mark:      |:heavy_check_mark:      | :heavy_check_mark:     |:heavy_check_mark:    |
+| `Future<List<List<OcrLine>>?> recognizeByBuffer(Uint8List bytes, int width, int height, int stride, int format)`     | :heavy_check_mark:       | :heavy_check_mark:   | :heavy_check_mark:       | :heavy_check_mark:       |:heavy_check_mark:      | :heavy_check_mark:     |
 
 
 ## Usage
@@ -64,7 +64,7 @@ To support web functionality, include the JavaScript library of Dynamsoft Label 
 - Recognize MRZ from an image file:
 
     ```dart
-    List<List<MrzLine>>? results = await _mrzDetector.recognizeByFile(photo.path);
+    List<List<OcrLine>>? results = await _mrzDetector.recognizeByFile(photo.path);
     ```
 - Recognize MRZ from an image buffer:
 
@@ -74,7 +74,7 @@ To support web functionality, include the JavaScript library of Dynamsoft Label 
     ByteData? byteData =
         await image.toByteData(format: ui.ImageByteFormat.rawRgba);
 
-    List<List<MrzLine>>? results = await _mrzDetector.recognizeByBuffer(
+    List<List<OcrLine>>? results = await _mrzDetector.recognizeByBuffer(
           byteData.buffer.asUint8List(),
           image.width,
           image.height,
@@ -86,7 +86,7 @@ To support web functionality, include the JavaScript library of Dynamsoft Label 
     ```dart
     String information = '';
     if (results != null && results.isNotEmpty) {
-        for (List<MrzLine> area in results) {
+        for (List<OcrLine> area in results) {
             if (area.length == 2) {
             information =
                 MRZ.parseTwoLines(area[0].text, area[1].text).toString();

@@ -2,7 +2,8 @@ import 'package:flutter/services.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 
 import 'flutter_ocr_sdk_method_channel.dart';
-import 'mrz_line.dart';
+import 'model_type.dart';
+import 'ocr_line.dart';
 
 /// Image pixel format.
 enum ImagePixelFormat {
@@ -75,16 +76,16 @@ abstract class FlutterOcrSdkPlatform extends PlatformInterface {
     throw UnimplementedError('init() has not been implemented.');
   }
 
-  Future<List<List<MrzLine>>?> recognizeByBuffer(
+  Future<List<List<OcrLine>>?> recognizeByBuffer(
       Uint8List bytes, int width, int height, int stride, int format) {
     throw UnimplementedError('recognizeByBuffer() has not been implemented.');
   }
 
-  Future<List<List<MrzLine>>?> recognizeByFile(String filename) {
+  Future<List<List<OcrLine>>?> recognizeByFile(String filename) {
     throw UnimplementedError('recognizeByFile() has not been implemented.');
   }
 
-  Future<int?> loadModel() async {
+  Future<int?> loadModel({ModelType modelType = ModelType.mrz}) async {
     throw UnimplementedError('loadModel() has not been implemented.');
   }
 }

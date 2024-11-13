@@ -1,16 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_ocr_sdk/flutter_ocr_sdk.dart';
-import 'package:flutter_ocr_sdk/mrz_line.dart';
+import 'package:flutter_ocr_sdk/model_type.dart';
+import 'package:flutter_ocr_sdk/ocr_line.dart';
 
 FlutterOcrSdk mrzDetector = FlutterOcrSdk();
 bool isLicenseValid = false;
+ModelType model = ModelType.vin;
 
 Future<int> initMRZSDK() async {
   int? ret = await mrzDetector.init(
       "DLS2eyJoYW5kc2hha2VDb2RlIjoiMjAwMDAxLTE2NDk4Mjk3OTI2MzUiLCJvcmdhbml6YXRpb25JRCI6IjIwMDAwMSIsInNlc3Npb25QYXNzd29yZCI6IndTcGR6Vm05WDJrcEQ5YUoifQ==");
 
   if (ret == 0) isLicenseValid = true;
-  return await mrzDetector.loadModel() ?? -1;
+  return await mrzDetector.loadModel(modelType: model) ?? -1;
 }
 
 Color colorMainTheme = const Color(0xff1D1B20);
@@ -21,16 +23,16 @@ Color colorText = const Color(0xff888888);
 Color colorBackground = const Color(0xFF323234);
 Color colorSubtitle = const Color(0xffCCCCCC);
 
-Widget createOverlay(List<List<MrzLine>>? mrzResults) {
+Widget createOverlay(List<List<OcrLine>>? ocrResults) {
   return CustomPaint(
-    painter: OverlayPainter(mrzResults),
+    painter: OverlayPainter(ocrResults),
   );
 }
 
 class OverlayPainter extends CustomPainter {
-  List<List<MrzLine>>? mrzResults;
+  List<List<OcrLine>>? ocrResults;
 
-  OverlayPainter(this.mrzResults);
+  OverlayPainter(this.ocrResults);
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -39,9 +41,14 @@ class OverlayPainter extends CustomPainter {
       ..strokeWidth = 5
       ..style = PaintingStyle.stroke;
 
-    if (mrzResults != null) {
-      for (List<MrzLine> area in mrzResults!) {
-        for (MrzLine line in area) {
+    final textStyle = TextStyle(
+      color: Colors.red, // Set the text color
+      fontSize: 16, // Set the font size
+    );
+
+    if (ocrResults != null) {
+      for (List<OcrLine> area in ocrResults!) {
+        for (OcrLine line in area) {
           canvas.drawLine(Offset(line.x1.toDouble(), line.y1.toDouble()),
               Offset(line.x2.toDouble(), line.y2.toDouble()), paint);
           canvas.drawLine(Offset(line.x2.toDouble(), line.y2.toDouble()),
@@ -50,6 +57,30 @@ class OverlayPainter extends CustomPainter {
               Offset(line.x4.toDouble(), line.y4.toDouble()), paint);
           canvas.drawLine(Offset(line.x4.toDouble(), line.y4.toDouble()),
               Offset(line.x1.toDouble(), line.y1.toDouble()), paint);
+
+          // draw text
+          final textSpan = TextSpan(
+            text: line.text,
+            style: textStyle,
+          );
+
+          final textPainter = TextPainter(
+            text: textSpan,
+            textAlign: TextAlign.left,
+            textDirection: TextDirection.ltr,
+          );
+
+          // Layout the text based on its constraints
+          textPainter.layout();
+
+          // Calculate the position to draw the text
+          final offset = Offset(
+            line.x1.toDouble(),
+            line.y1.toDouble(),
+          );
+
+          // Draw the text on the canvas
+          textPainter.paint(canvas, offset);
         }
       }
     }
@@ -59,13 +90,13 @@ class OverlayPainter extends CustomPainter {
   bool shouldRepaint(OverlayPainter oldDelegate) => true;
 }
 
-List<List<MrzLine>> rotate90mrz(List<List<MrzLine>> input, int height) {
-  List<List<MrzLine>> output = [];
+List<List<OcrLine>> rotate90mrz(List<List<OcrLine>> input, int height) {
+  List<List<OcrLine>> output = [];
 
-  for (List<MrzLine> area in input) {
-    List<MrzLine> tmp = [];
+  for (List<OcrLine> area in input) {
+    List<OcrLine> tmp = [];
     for (int i = 0; i < area.length; i++) {
-      MrzLine line = area[i];
+      OcrLine line = area[i];
       int x1 = line.x1;
       int x2 = line.x2;
       int x3 = line.x3;
@@ -75,7 +106,7 @@ List<List<MrzLine>> rotate90mrz(List<List<MrzLine>> input, int height) {
       int y3 = line.y3;
       int y4 = line.y4;
 
-      MrzLine newline = MrzLine();
+      OcrLine newline = OcrLine();
       newline.confidence = line.confidence;
       newline.text = line.text;
       newline.x1 = height - y1;

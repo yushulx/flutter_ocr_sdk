@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_ocr_sdk/mrz_line.dart';
+import 'package:flutter_ocr_sdk/ocr_line.dart';
 import 'package:flutter_ocr_sdk/mrz_parser.dart';
 import 'package:flutter_ocr_sdk/mrz_result.dart';
 
@@ -11,6 +11,7 @@ import 'global.dart';
 import 'dart:math';
 
 import 'result_page.dart';
+import 'utils.dart';
 
 class CameraPage extends StatefulWidget {
   const CameraPage({super.key});
@@ -36,7 +37,7 @@ class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
   }
 
   void navigation(dynamic order) {
-    List<MrzLine> area = order;
+    List<OcrLine> area = order;
     MrzResult? information;
     if (area.length == 2) {
       information = MRZ.parseTwoLines(area[0].text, area[1].text);
@@ -104,7 +105,7 @@ class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
           bottom: 0,
           left: 0.0,
           child: createOverlay(
-            _cameraManager.mrzLines,
+            _cameraManager.ocrLines,
           ),
         ),
       ];
@@ -186,18 +187,18 @@ class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
               //     ),
               //   ),
               // ),
-              Positioned(
-                bottom: (MediaQuery.of(context).size.height - 41 * 3) / 2,
-                left: !kIsWeb && (Platform.isAndroid)
-                    ? 0
-                    : (MediaQuery.of(context).size.width - 41 * 9) / 2,
-                child: !kIsWeb && (Platform.isAndroid)
-                    ? Transform.rotate(
-                        angle: pi / 2,
-                        child: hint,
-                      )
-                    : hint,
-              ),
+              // Positioned(
+              //   bottom: (MediaQuery.of(context).size.height - 41 * 3) / 2,
+              //   left: !kIsWeb && (Platform.isAndroid)
+              //       ? 0
+              //       : (MediaQuery.of(context).size.width - 41 * 9) / 2,
+              //   child: !kIsWeb && (Platform.isAndroid)
+              //       ? Transform.rotate(
+              //           angle: pi / 2,
+              //           child: hint,
+              //         )
+              //       : hint,
+              // ),
             ],
           ),
           floatingActionButton: Opacity(

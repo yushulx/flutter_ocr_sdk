@@ -6,7 +6,7 @@ import 'dart:typed_data';
 
 import 'package:js/js.dart';
 
-import 'mrz_line.dart';
+import 'ocr_line.dart';
 import 'utils.dart';
 
 /// DocumentNormalizer class.
@@ -44,8 +44,8 @@ class DLRManager {
 
   /// MRZ detection.
   /// [file] - path to the file.
-  /// Returns a [List] of [List<MrzLine>].
-  Future<List<List<MrzLine>>?> recognizeByFile(String file) async {
+  /// Returns a [List] of [List<OcrLine>].
+  Future<List<List<OcrLine>>?> recognizeByFile(String file) async {
     if (_recognizer != null) {
       List<dynamic> results =
           await handleThenable(_recognizer!.recognize(file));
@@ -57,8 +57,8 @@ class DLRManager {
 
   /// MRZ detection.
   /// [bytes] - image buffer.
-  /// Returns a [List] of [List<MrzLine>].
-  Future<List<List<MrzLine>>?> recognizeByBuffer(
+  /// Returns a [List] of [List<OcrLine>].
+  Future<List<List<OcrLine>>?> recognizeByBuffer(
       Uint8List bytes, int width, int height, int stride, int format) async {
     if (_recognizer != null) {
       List<dynamic> results = await handleThenable(
@@ -76,18 +76,18 @@ class DLRManager {
     return 0;
   }
 
-  /// Convert List<dynamic> to List<List<MrzLine>>.
-  List<List<MrzLine>> _resultWrapper(List<dynamic> results) {
-    List<List<MrzLine>> output = [];
+  /// Convert List<dynamic> to List<List<OcrLine>>.
+  List<List<OcrLine>> _resultWrapper(List<dynamic> results) {
+    List<List<OcrLine>> output = [];
 
     for (dynamic result in results) {
       Map value = json.decode(stringify(result));
 
       List<dynamic> area = value['lineResults'];
-      List<MrzLine> lines = [];
+      List<OcrLine> lines = [];
       if (area.length == 2 || area.length == 3) {
         for (int i = 0; i < area.length; i++) {
-          MrzLine line = MrzLine();
+          OcrLine line = OcrLine();
           line.text = area[i]['text'];
           line.confidence = area[i]['confidence'];
           line.x1 = area[i]['location']['points'][0]['x'];

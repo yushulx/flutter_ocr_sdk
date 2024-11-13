@@ -1,0 +1,89 @@
+{
+  "CharacterModelArray": [
+    {
+      "DirectoryPath": "",
+      "FilterFilePath": "",
+      "Name": "VIN"
+    }
+  ],
+  "LabelRecognizerParameterArray": [
+    {
+      "BinarizationModes": [
+        {
+          "EnableFillBinaryVacancy": 1,
+          "Mode": "BM_LOCAL_BLOCK"
+        }
+      ],
+      "GrayscaleTransformationModes": [
+        {
+          "Mode": "GTM_AUTO"
+        }
+      ],
+      "CharacterModelName": "VIN",
+      "LetterHeightRange": [
+        5,
+        1000,
+        1
+      ],
+      "LineStringLengthRange": [
+        17,
+        17
+      ],
+      "LineStringRegExPattern": "[0-9A-HJ-NPR-Z]{9}[1-9A-HJ-NPR-TV-Y][0-9A-HJ-NPR-Z]{2}[0-9]{5}",
+      "Name": "locr",
+      "ReferenceRegionNameArray": [
+        "defaultReferenceRegion"
+      ],
+      "Timeout": 10000
+    }
+  ],
+  "ReferenceRegionArray": [
+    {
+      "Localization": {
+        "FirstPoint": [
+          0,
+          0
+        ],
+        "FourthPoint": [
+          0,
+          100
+        ],
+        "MeasuredByPercentage": 1,
+        "SecondPoint": [
+          100,
+          0
+        ],
+        "SourceType": "LST_MANUAL_SPECIFICATION",
+        "ThirdPoint": [
+          100,
+          100
+        ]
+      },
+      "Name": "defaultReferenceRegion",
+      "TextAreaNameArray": [
+        "defaultTextArea"
+      ]
+    }
+  ],
+  "TextAreaArray": [
+    {
+      "Name": "defaultTextArea",
+      "FirstPoint": [
+        0,
+        0
+      ],
+      "FourthPoint": [
+        0,
+        100
+      ],
+      "SecondPoint": [
+        100,
+        0
+      ],
+      "ThirdPoint": [
+        100,
+        100
+      ]
+    }
+  ]
+}

@@ -3,11 +3,12 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_ocr_sdk/mrz_line.dart';
+import 'package:flutter_ocr_sdk/ocr_line.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 
 import 'flutter_ocr_sdk_platform_interface.dart';
+import 'model_type.dart';
 
 /// An implementation of [FlutterOcrSdkPlatform] that uses method channels.
 class MethodChannelFlutterOcrSdk extends FlutterOcrSdkPlatform {
@@ -29,9 +30,9 @@ class MethodChannelFlutterOcrSdk extends FlutterOcrSdkPlatform {
   }
 
   /// Do OCR by image buffer.
-  /// Returns a [List<List<MrzLine>>] containing the OCR results.
+  /// Returns a [List<List<OcrLine>>] containing the OCR results.
   @override
-  Future<List<List<MrzLine>>?> recognizeByBuffer(
+  Future<List<List<OcrLine>>?> recognizeByBuffer(
       Uint8List bytes, int width, int height, int stride, int format) async {
     List<dynamic>? results =
         await methodChannel.invokeMethod('recognizeByBuffer', {
@@ -48,9 +49,9 @@ class MethodChannelFlutterOcrSdk extends FlutterOcrSdkPlatform {
   }
 
   /// Do OCR by file.
-  /// Returns a [List<List<MrzLine>>] containing the OCR results.
+  /// Returns a [List<List<OcrLine>>] containing the OCR results.
   @override
-  Future<List<List<MrzLine>>?> recognizeByFile(String filename) async {
+  Future<List<List<OcrLine>>?> recognizeByFile(String filename) async {
     List<dynamic>? results =
         await methodChannel.invokeMethod('recognizeByFile', {
       'filename': filename,
@@ -61,28 +62,26 @@ class MethodChannelFlutterOcrSdk extends FlutterOcrSdkPlatform {
     return _resultWrapper(results);
   }
 
-  /// Convert JSON string to List<MrzLine>
-  List<List<MrzLine>> _resultWrapper(List<dynamic> data) {
-    List<List<MrzLine>> results = [];
+  /// Convert JSON string to List<OcrLine>
+  List<List<OcrLine>> _resultWrapper(List<dynamic> data) {
+    List<List<OcrLine>> results = [];
 
     for (List<dynamic> area in data) {
-      List<MrzLine> lines = [];
-      if (area.length == 2 || area.length == 3) {
-        for (int i = 0; i < area.length; i++) {
-          MrzLine line = MrzLine();
-          Map<dynamic, dynamic> map = area[i];
-          line.confidence = map['confidence'];
-          line.text = map['text'];
-          line.x1 = map['x1'];
-          line.y1 = map['y1'];
-          line.x2 = map['x2'];
-          line.y2 = map['y2'];
-          line.x3 = map['x3'];
-          line.y3 = map['y3'];
-          line.x4 = map['x4'];
-          line.y4 = map['y4'];
-          lines.add(line);
-        }
+      List<OcrLine> lines = [];
+      for (int i = 0; i < area.length; i++) {
+        OcrLine line = OcrLine();
+        Map<dynamic, dynamic> map = area[i];
+        line.confidence = map['confidence'];
+        line.text = map['text'];
+        line.x1 = map['x1'];
+        line.y1 = map['y1'];
+        line.x2 = map['x2'];
+        line.y2 = map['y2'];
+        line.x3 = map['x3'];
+        line.y3 = map['y3'];
+        line.x4 = map['x4'];
+        line.y4 = map['y4'];
+        lines.add(line);
       }
 
       results.add(lines);
@@ -112,10 +111,12 @@ class MethodChannelFlutterOcrSdk extends FlutterOcrSdkPlatform {
 
   /// Load the whole model by folder.
   @override
-  Future<int?> loadModel() async {
+  Future<int?> loadModel({ModelType modelType = ModelType.mrz}) async {
     final directory = await getApplicationDocumentsDirectory();
-
-    String modelPath = 'packages/flutter_ocr_sdk/lib/model/';
+    print(directory.path);
+    String modelPath = 'packages/flutter_ocr_sdk/lib/model/mrz/';
+    var fileName = "MRZ";
+    var templateName = 'MRZ.json';
 
     bool isDesktop = false;
     if (Platform.isWindows || Platform.isLinux) {
@@ -123,43 +124,44 @@ class MethodChannelFlutterOcrSdk extends FlutterOcrSdkPlatform {
     }
 
     int? ret = 0;
-    var fileNames = ["MRZ"];
-    for (var i = 0; i < fileNames.length; i++) {
-      var fileName = fileNames[i];
 
-      var prototxtName = '$fileName.prototxt';
-      var prototxtBufferPath = join(modelPath, prototxtName);
-      ByteData prototxtBuffer = await loadAssetBytes(prototxtBufferPath);
-
-      var txtBufferName = '$fileName.txt';
-      var txtBufferPath = join(modelPath, txtBufferName);
-      ByteData txtBuffer = await loadAssetBytes(txtBufferPath);
-
-      var characterModelName = '$fileName.caffemodel';
-      var characterModelBufferPath = join(modelPath, characterModelName);
-      ByteData characterModelBuffer =
-          await loadAssetBytes(characterModelBufferPath);
-
-      if (isDesktop) {
-        List<int> bytes = prototxtBuffer.buffer.asUint8List();
-        await File(join(directory.path, prototxtName)).writeAsBytes(bytes);
-
-        bytes = txtBuffer.buffer.asUint8List();
-        await File(join(directory.path, txtBufferName)).writeAsBytes(bytes);
-
-        bytes = characterModelBuffer.buffer.asUint8List();
-        await File(join(directory.path, characterModelName))
-            .writeAsBytes(bytes);
-      } else {
-        loadModelFiles(
-            fileName,
-            prototxtBuffer.buffer.asUint8List(),
-            txtBuffer.buffer.asUint8List(),
-            characterModelBuffer.buffer.asUint8List());
-      }
+    if (modelType == ModelType.vin) {
+      fileName = "VIN";
+      modelPath = 'packages/flutter_ocr_sdk/lib/model/vin/';
+      templateName = 'VIN.json';
     }
 
-    var templateName = 'MRZ.json';
+    var prototxtName = '$fileName.prototxt';
+    var prototxtBufferPath = join(modelPath, prototxtName);
+    print(prototxtBufferPath);
+    ByteData prototxtBuffer = await loadAssetBytes(prototxtBufferPath);
+
+    var txtBufferName = '$fileName.txt';
+    var txtBufferPath = join(modelPath, txtBufferName);
+    ByteData txtBuffer = await loadAssetBytes(txtBufferPath);
+
+    var characterModelName = '$fileName.caffemodel';
+    var characterModelBufferPath = join(modelPath, characterModelName);
+    ByteData characterModelBuffer =
+        await loadAssetBytes(characterModelBufferPath);
+
+    if (isDesktop) {
+      List<int> bytes = prototxtBuffer.buffer.asUint8List();
+      await File(join(directory.path, prototxtName)).writeAsBytes(bytes);
+
+      bytes = txtBuffer.buffer.asUint8List();
+      await File(join(directory.path, txtBufferName)).writeAsBytes(bytes);
+
+      bytes = characterModelBuffer.buffer.asUint8List();
+      await File(join(directory.path, characterModelName)).writeAsBytes(bytes);
+    } else {
+      loadModelFiles(
+          fileName,
+          prototxtBuffer.buffer.asUint8List(),
+          txtBuffer.buffer.asUint8List(),
+          characterModelBuffer.buffer.asUint8List());
+    }
+
     var templatePath = join(modelPath, templateName);
     String template = await loadAssetString(templatePath);
     if (isDesktop) {

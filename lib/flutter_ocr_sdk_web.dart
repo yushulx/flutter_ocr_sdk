@@ -9,7 +9,7 @@ import 'package:flutter_ocr_sdk/web_dlr_manager.dart';
 import 'package:flutter_web_plugins/flutter_web_plugins.dart';
 
 import 'flutter_ocr_sdk_platform_interface.dart';
-import 'mrz_line.dart';
+import 'ocr_line.dart';
 
 /// A web implementation of the FlutterOcrSdkPlatform of the FlutterOcrSdk plugin.
 class FlutterOcrSdkWeb extends FlutterOcrSdkPlatform {
@@ -43,7 +43,7 @@ class FlutterOcrSdkWeb extends FlutterOcrSdkPlatform {
   /// [format] is the format of the image
   /// Returns a list of MRZ lines
   @override
-  Future<List<List<MrzLine>>?> recognizeByBuffer(
+  Future<List<List<OcrLine>>?> recognizeByBuffer(
       Uint8List bytes, int width, int height, int stride, int format) async {
     return _dlrManager.recognizeByBuffer(bytes, width, height, stride, format);
   }
@@ -52,13 +52,13 @@ class FlutterOcrSdkWeb extends FlutterOcrSdkPlatform {
   /// [filename] is the path of the file
   /// Returns a list of MRZ lines
   @override
-  Future<List<List<MrzLine>>?> recognizeByFile(String filename) async {
+  Future<List<List<OcrLine>>?> recognizeByFile(String filename) async {
     return _dlrManager.recognizeByFile(filename);
   }
 
   /// Load the MRZ detection model.
   @override
-  Future<int?> loadModel() async {
-    return _dlrManager.loadModel();
+  Future<int?> loadModel({ModelType modelType = ModelType.mrz}) async {
+    return _dlrManager.loadModel(modelType);
   }
 }
