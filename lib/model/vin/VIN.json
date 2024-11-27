@@ -1,89 +1,93 @@
 {
-  "CharacterModelArray": [
+  "LabelRecognizerTaskSettingOptions": [
     {
-      "DirectoryPath": "",
-      "FilterFilePath": "",
-      "Name": "VIN"
+      "Name": "task_vin_text",
+      "TextLineSpecificationNameArray": [
+        "tls_vin_text"
+      ],
+      "SectionImageParameterArray": [
+        {
+          "Section": "ST_REGION_PREDETECTION",
+          "ImageParameterName": "ip_recognize_text"
+        },
+        {
+          "Section": "ST_TEXT_LINE_LOCALIZATION",
+          "ImageParameterName": "ip_recognize_text"
+        },
+        {
+          "Section": "ST_TEXT_LINE_RECOGNITION",
+          "ImageParameterName": "ip_recognize_text"
+        }
+      ]
     }
   ],
-  "LabelRecognizerParameterArray": [
+  "TextLineSpecificationOptions": [
     {
-      "BinarizationModes": [
-        {
-          "EnableFillBinaryVacancy": 1,
-          "Mode": "BM_LOCAL_BLOCK"
-        }
-      ],
-      "GrayscaleTransformationModes": [
-        {
-          "Mode": "GTM_AUTO"
-        }
-      ],
+      "Name": "tls_vin_text",
       "CharacterModelName": "VIN",
-      "LetterHeightRange": [
+      "StringRegExPattern": "[0-9A-HJ-NPR-Z]{9}[1-9A-HJ-NPR-TV-Y][0-9A-HJ-NPR-Z]{2}[0-9]{5}",
+      "CharHeightRange": [
         5,
         1000,
         1
       ],
-      "LineStringLengthRange": [
+      "StringLengthRange": [
         17,
         17
       ],
-      "LineStringRegExPattern": "[0-9A-HJ-NPR-Z]{9}[1-9A-HJ-NPR-TV-Y][0-9A-HJ-NPR-Z]{2}[0-9]{5}",
-      "Name": "locr",
-      "ReferenceRegionNameArray": [
-        "defaultReferenceRegion"
-      ],
-      "Timeout": 10000
+      "OutputResults": 1
     }
   ],
-  "ReferenceRegionArray": [
+  "CaptureVisionTemplates": [
     {
-      "Localization": {
-        "FirstPoint": [
-          0,
-          0
+      "Name": "ReadVINText",
+      "ImageROIProcessingNameArray": [
+        "roi_vin_text"
+      ]
+    }
+  ],
+  "ImageParameterOptions": [
+    {
+      "Name": "ip_recognize_text",
+      "TextDetectionMode": {
+        "Mode": "TTDM_LINE",
+        "Direction": "HORIZONTAL",
+        "CharHeightRange": [
+          5,
+          1000,
+          1
         ],
-        "FourthPoint": [
-          0,
-          100
-        ],
-        "MeasuredByPercentage": 1,
-        "SecondPoint": [
-          100,
-          0
-        ],
-        "SourceType": "LST_MANUAL_SPECIFICATION",
-        "ThirdPoint": [
-          100,
-          100
-        ]
+        "Sensitivity": 7
       },
-      "Name": "defaultReferenceRegion",
-      "TextAreaNameArray": [
-        "defaultTextArea"
+      "GrayscaleTransformationModes": [
+        {
+          "Mode": "GTM_ORIGINAL"
+        },
+        {
+          "Mode": "GTM_INVERTED"
+        }
       ]
     }
   ],
-  "TextAreaArray": [
+  "TargetROIDefOptions": [
     {
-      "Name": "defaultTextArea",
-      "FirstPoint": [
-        0,
-        0
-      ],
-      "FourthPoint": [
-        0,
-        100
-      ],
-      "SecondPoint": [
-        100,
-        0
-      ],
-      "ThirdPoint": [
-        100,
-        100
+      "Name": "roi_vin_text",
+      "TaskSettingNameArray": [
+        "task_vin_text"
       ]
+    }
+  ],
+  "CharacterModelOptions": [
+    {
+      "Name": "VIN",
+      "DirectoryPath": "",
+      "CharSet": {
+        "ExcludeChars": [
+          "O",
+          "Q",
+          "I"
+        ]
+      }
     }
   ]
 }

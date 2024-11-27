@@ -36,11 +36,13 @@ namespace flutter_ocr_sdk
     registrar->AddPlugin(std::move(plugin));
   }
 
-  FlutterOcrSdkPlugin::FlutterOcrSdkPlugin() {
+  FlutterOcrSdkPlugin::FlutterOcrSdkPlugin()
+  {
     manager = new DlrManager();
   }
 
-  FlutterOcrSdkPlugin::~FlutterOcrSdkPlugin() {
+  FlutterOcrSdkPlugin::~FlutterOcrSdkPlugin()
+  {
     delete manager;
   }
 
@@ -122,10 +124,8 @@ namespace flutter_ocr_sdk
           filename = std::get<std::string>(filename_it->second);
         }
 
-        results = manager->RecognizeFile(filename.c_str());
+        manager->RecognizeFile(result, filename.c_str());
       }
-
-      result->Success(results);
     }
     else if (method_call.method_name().compare("recognizeByBuffer") == 0)
     {
@@ -165,7 +165,7 @@ namespace flutter_ocr_sdk
         {
           format = std::get<int>(format_it->second);
         }
-        manager->RecognizeBuffer(result, reinterpret_cast<unsigned char*>(bytes.data()), width, height, stride, format);
+        manager->RecognizeBuffer(result, reinterpret_cast<unsigned char *>(bytes.data()), width, height, stride, format);
       }
     }
     else

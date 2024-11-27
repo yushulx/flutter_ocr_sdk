@@ -112,6 +112,9 @@ class MethodChannelFlutterOcrSdk extends FlutterOcrSdkPlatform {
   /// Load the whole model by folder.
   @override
   Future<int?> loadModel({ModelType modelType = ModelType.mrz}) async {
+    final executableDir = Directory.current.path;
+    print('executableDir: $executableDir');
+
     final directory = await getApplicationDocumentsDirectory();
     print(directory.path);
     String modelPath = 'packages/flutter_ocr_sdk/lib/model/mrz/';
@@ -133,7 +136,6 @@ class MethodChannelFlutterOcrSdk extends FlutterOcrSdkPlatform {
 
     var prototxtName = '$fileName.prototxt';
     var prototxtBufferPath = join(modelPath, prototxtName);
-    print(prototxtBufferPath);
     ByteData prototxtBuffer = await loadAssetBytes(prototxtBufferPath);
 
     var txtBufferName = '$fileName.txt';
@@ -166,7 +168,7 @@ class MethodChannelFlutterOcrSdk extends FlutterOcrSdkPlatform {
     String template = await loadAssetString(templatePath);
     if (isDesktop) {
       var templateMap = json.decode(template);
-      templateMap['CharacterModelArray'][0]['DirectoryPath'] = directory.path;
+      templateMap['CharacterModelOptions'][0]['DirectoryPath'] = directory.path;
 
       ByteData templateBuffer = await loadAssetBytes(templatePath);
       List<int> bytes = templateBuffer.buffer.asUint8List();

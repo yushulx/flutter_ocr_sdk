@@ -1,75 +1,417 @@
 {
-   "CharacterModelArray" : [
+  "CaptureVisionTemplates": [
+    {
+      "Name": "ReadPassportAndId",
+      "ImageROIProcessingNameArray": [
+        "roi_passport_and_id"
+      ],
+      "Timeout": 2000
+    },
+    {
+      "Name": "ReadPassport",
+      "ImageROIProcessingNameArray": [
+        "roi_passport"
+      ],
+      "Timeout": 2000
+    },
+    {
+      "Name": "ReadId",
+      "ImageROIProcessingNameArray": [
+        "roi_id"
+      ],
+      "Timeout": 2000
+    },
+    {
+      "Name": "ReadVisa",
+      "ImageROIProcessingNameArray": [
+        "roi_visa"
+      ],
+      "Timeout": 2000
+    },
+    {
+      "Name": "ReadMRZ",
+      "ImageROIProcessingNameArray": [
+        "roi_mrz"
+      ],
+      "Timeout": 2000
+    }
+  ],
+  "TargetROIDefOptions": [
+    {
+      "Name": "roi_passport_and_id",
+      "TaskSettingNameArray": [
+        "task_passport_and_id"
+      ]
+    },
+    {
+      "Name": "roi_passport",
+      "TaskSettingNameArray": [
+        "task_passport"
+      ]
+    },
+    {
+      "Name": "roi_id",
+      "TaskSettingNameArray": [
+        "task_id"
+      ]
+    },
+    {
+      "Name": "roi_visa",
+      "TaskSettingNameArray": [
+        "task_visa"
+      ]
+    },
+    {
+      "Name": "roi_mrz",
+      "TaskSettingNameArray": [
+        "task_mrz"
+      ]
+    }
+  ],
+  "TextLineSpecificationOptions": [
+    {
+      "Name": "tls_mrz_passport",
+      "BaseTextLineSpecificationName": "tls_base",
+      "StringLengthRange": [
+        44,
+        44
+      ],
+      "OutputResults": 1,
+      "ExpectedGroupsCount": 1,
+      "ConcatResults": 1,
+      "ConcatSeparator": "\n",
+      "SubGroups": [
+        {
+          "StringRegExPattern": "(P[A-Z<][A-Z<]{3}[A-Z<]{39}){(44)}",
+          "StringLengthRange": [
+            44,
+            44
+          ],
+          "BaseTextLineSpecificationName": "tls_base"
+        },
+        {
+          "StringRegExPattern": "([A-Z0-9<]{9}[0-9][A-Z<]{3}[0-9]{2}[(01-12)][(01-31)][0-9][MF<][0-9]{2}[(01-12)][(01-31)][0-9][A-Z0-9<]{14}[0-9<][0-9]){(44)}",
+          "StringLengthRange": [
+            44,
+            44
+          ],
+          "BaseTextLineSpecificationName": "tls_base"
+        }
+      ]
+    },
+    {
+      "Name": "tls_mrz_id_td2",
+      "BaseTextLineSpecificationName": "tls_base",
+      "StringLengthRange": [
+        36,
+        36
+      ],
+      "OutputResults": 1,
+      "ExpectedGroupsCount": 1,
+      "ConcatResults": 1,
+      "ConcatSeparator": "\n",
+      "SubGroups": [
+        {
+          "StringRegExPattern": "([ACI][A-Z<][A-Z<]{3}[A-Z<]{31}){(36)}",
+          "StringLengthRange": [
+            36,
+            36
+          ],
+          "BaseTextLineSpecificationName": "tls_base"
+        },
+        {
+          "StringRegExPattern": "([A-Z0-9<]{9}[0-9][A-Z<]{3}[0-9]{2}[(01-12)][(01-31)][0-9][MF<][0-9]{2}[(01-12)][(01-31)][0-9][A-Z0-9<]{8}){(36)}",
+          "StringLengthRange": [
+            36,
+            36
+          ],
+          "BaseTextLineSpecificationName": "tls_base"
+        }
+      ]
+    },
+    {
+      "Name": "tls_mrz_id_td1",
+      "BaseTextLineSpecificationName": "tls_base",
+      "StringLengthRange": [
+        30,
+        30
+      ],
+      "OutputResults": 1,
+      "ExpectedGroupsCount": 1,
+      "ConcatResults": 1,
+      "ConcatSeparator": "\n",
+      "SubGroups": [
+        {
+          "StringRegExPattern": "([ACI][A-Z<][A-Z<]{3}[A-Z0-9<]{9}[0-9<][A-Z0-9<]{15}){(30)}",
+          "StringLengthRange": [
+            30,
+            30
+          ],
+          "BaseTextLineSpecificationName": "tls_base"
+        },
+        {
+          "StringRegExPattern": "([0-9]{2}[(01-12)][(01-31)][0-9][MF<][0-9]{2}[(01-12)][(01-31)][0-9][A-Z<]{3}[A-Z0-9<]{11}[0-9]){(30)}",
+          "StringLengthRange": [
+            30,
+            30
+          ],
+          "BaseTextLineSpecificationName": "tls_base"
+        },
+        {
+          "StringRegExPattern": "([A-Z<]{30}){(30)}",
+          "StringLengthRange": [
+            30,
+            30
+          ],
+          "BaseTextLineSpecificationName": "tls_base"
+        }
+      ]
+    },
+    {
+      "Name": "tls_mrz_visa_td2",
+      "BaseTextLineSpecificationName": "tls_base",
+      "StringLengthRange": [
+        36,
+        36
+      ],
+      "OutputResults": 1,
+      "ExpectedGroupsCount": 1,
+      "ConcatResults": 1,
+      "ConcatSeparator": "\n",
+      "SubGroups": [
+        {
+          "StringRegExPattern": "(V[A-Z<][A-Z<]{3}[A-Z<]{31}){(36)}",
+          "StringLengthRange": [
+            36,
+            36
+          ],
+          "BaseTextLineSpecificationName": "tls_base"
+        },
+        {
+          "StringRegExPattern": "([A-Z0-9<]{9}[0-9][A-Z<]{3}[0-9]{2}[(01-12)][(01-31)][0-9][MF<][0-9]{2}[(01-12)][(01-31)][0-9][A-Z0-9<]{8}){(36)}",
+          "StringLengthRange": [
+            36,
+            36
+          ],
+          "BaseTextLineSpecificationName": "tls_base"
+        }
+      ]
+    },
+    {
+      "Name": "tls_mrz_visa_td3",
+      "BaseTextLineSpecificationName": "tls_base",
+      "StringLengthRange": [
+        44,
+        44
+      ],
+      "OutputResults": 1,
+      "ExpectedGroupsCount": 1,
+      "ConcatResults": 1,
+      "ConcatSeparator": "\n",
+      "SubGroups": [
+        {
+          "StringRegExPattern": "(V[A-Z<][A-Z<]{3}[A-Z<]{39}){(44)}",
+          "StringLengthRange": [
+            44,
+            44
+          ],
+          "BaseTextLineSpecificationName": "tls_base"
+        },
+        {
+          "StringRegExPattern": "([A-Z0-9<]{9}[0-9][A-Z<]{3}[0-9]{2}[(01-12)][(01-31)][0-9][MF<][0-9]{2}[(01-12)][(01-31)][0-9][A-Z0-9<]{14}[A-Z0-9<]{2}){(44)}",
+          "StringLengthRange": [
+            44,
+            44
+          ],
+          "BaseTextLineSpecificationName": "tls_base"
+        }
+      ]
+    },
+    {
+      "Name": "tls_base",
+      "CharacterModelName": "MRZ",
+      "CharHeightRange": [
+        5,
+        1000,
+        1
+      ],
+      "BinarizationModes": [
+        {
+          "BlockSizeX": 30,
+          "BlockSizeY": 30,
+          "Mode": "BM_LOCAL_BLOCK",
+          "EnableFillBinaryVacancy": 0,
+          "ThresholdCompensation": 15
+        }
+      ],
+      "ConfusableCharactersCorrection": {
+        "ConfusableCharacters": [
+          [
+            "0",
+            "O"
+          ],
+          [
+            "1",
+            "I"
+          ],
+          [
+            "5",
+            "S"
+          ]
+        ],
+        "FontNameArray": [
+          "OCR_B"
+        ]
+      }
+    }
+  ],
+  "LabelRecognizerTaskSettingOptions": [
+    {
+      "Name": "task_passport",
+      "ConfusableCharactersPath": "ConfusableChars.data",
+      "TextLineSpecificationNameArray": [
+        "tls_mrz_passport"
+      ],
+      "SectionImageParameterArray": [
+        {
+          "Section": "ST_REGION_PREDETECTION",
+          "ImageParameterName": "ip_mrz"
+        },
+        {
+          "Section": "ST_TEXT_LINE_LOCALIZATION",
+          "ImageParameterName": "ip_mrz"
+        },
+        {
+          "Section": "ST_TEXT_LINE_RECOGNITION",
+          "ImageParameterName": "ip_mrz"
+        }
+      ]
+    },
+    {
+      "Name": "task_id",
+      "ConfusableCharactersPath": "ConfusableChars.data",
+      "TextLineSpecificationNameArray": [
+        "tls_mrz_id_td1",
+        "tls_mrz_id_td2"
+      ],
+      "SectionImageParameterArray": [
+        {
+          "Section": "ST_REGION_PREDETECTION",
+          "ImageParameterName": "ip_mrz"
+        },
+        {
+          "Section": "ST_TEXT_LINE_LOCALIZATION",
+          "ImageParameterName": "ip_mrz"
+        },
+        {
+          "Section": "ST_TEXT_LINE_RECOGNITION",
+          "ImageParameterName": "ip_mrz"
+        }
+      ]
+    },
+    {
+      "Name": "task_passport_and_id",
+      "ConfusableCharactersPath": "ConfusableChars.data",
+      "TextLineSpecificationNameArray": [
+        "tls_mrz_passport",
+        "tls_mrz_id_td1",
+        "tls_mrz_id_td2"
+      ],
+      "SectionImageParameterArray": [
+        {
+          "Section": "ST_REGION_PREDETECTION",
+          "ImageParameterName": "ip_mrz"
+        },
+        {
+          "Section": "ST_TEXT_LINE_LOCALIZATION",
+          "ImageParameterName": "ip_mrz"
+        },
+        {
+          "Section": "ST_TEXT_LINE_RECOGNITION",
+          "ImageParameterName": "ip_mrz"
+        }
+      ]
+    },
+    {
+      "Name": "task_visa",
+      "ConfusableCharactersPath": "ConfusableChars.data",
+      "TextLineSpecificationNameArray": [
+        "tls_mrz_visa_td2",
+        "tls_mrz_visa_td3"
+      ],
+      "SectionImageParameterArray": [
+        {
+          "Section": "ST_REGION_PREDETECTION",
+          "ImageParameterName": "ip_mrz"
+        },
+        {
+          "Section": "ST_TEXT_LINE_LOCALIZATION",
+          "ImageParameterName": "ip_mrz"
+        },
+        {
+          "Section": "ST_TEXT_LINE_RECOGNITION",
+          "ImageParameterName": "ip_mrz"
+        }
+      ]
+    },
+    {
+      "Name": "task_mrz",
+      "ConfusableCharactersPath": "ConfusableChars.data",
+      "TextLineSpecificationNameArray": [
+        "tls_mrz_passport",
+        "tls_mrz_id_td1",
+        "tls_mrz_id_td2",
+        "tls_mrz_visa_td2",
+        "tls_mrz_visa_td3"
+      ],
+      "SectionImageParameterArray": [
+        {
+          "Section": "ST_REGION_PREDETECTION",
+          "ImageParameterName": "ip_mrz"
+        },
+        {
+          "Section": "ST_TEXT_LINE_LOCALIZATION",
+          "ImageParameterName": "ip_mrz"
+        },
+        {
+          "Section": "ST_TEXT_LINE_RECOGNITION",
+          "ImageParameterName": "ip_mrz"
+        }
+      ]
+    }
+  ],
+  "CharacterModelOptions": [
     {
       "DirectoryPath": "",
-      "FilterFilePath": "",
       "Name": "MRZ"
     }
-   ],
-   "LabelRecognizerParameterArray" : [
-      {
-         "BinarizationModes" : [
-            {
-               "BlockSizeX" : 0,
-               "BlockSizeY" : 0,
-               "EnableFillBinaryVacancy" : 1,
-               "LibraryFileName" : "",
-               "LibraryParameters" : "",
-               "Mode" : "BM_LOCAL_BLOCK",
-               "ThreshValueCoefficient" : 15
-            }
-         ],
-         "CharacterModelName" : "MRZ",
-         "LetterHeightRange" : [ 5, 1000, 1 ],
-		 "LineStringLengthRange" : [30, 44],
-		 "MaxLineCharacterSpacing" : 130,
-		 "LineStringRegExPattern" : "([ACI][A-Z<][A-Z<]{3}[A-Z0-9<]{9}[0-9][A-Z0-9<]{15}){(30)}|([0-9]{2}[(01-12)][(01-31)][0-9][MF<][0-9]{2}[(01-12)][(01-31)][0-9][A-Z<]{3}[A-Z0-9<]{11}[0-9]){(30)}|([A-Z<]{0,26}[A-Z]{1,3}[(<<)][A-Z]{1,3}[A-Z<]{0,26}<{0,26}){(30)}|([ACIV][A-Z<][A-Z<]{3}([A-Z<]{0,27}[A-Z]{1,3}[(<<)][A-Z]{1,3}[A-Z<]{0,27}){(31)}){(36)}|([A-Z0-9<]{9}[0-9][A-Z<]{3}[0-9]{2}[(01-12)][(01-31)][0-9][MF<][0-9]{2}[(01-12)][(01-31)][0-9][A-Z0-9<]{8}){(36)}|([PV][A-Z<][A-Z<]{3}([A-Z<]{0,35}[A-Z]{1,3}[(<<)][A-Z]{1,3}[A-Z<]{0,35}<{0,35}){(39)}){(44)}|([A-Z0-9<]{9}[0-9][A-Z<]{3}[0-9]{2}[(01-12)][(01-31)][0-9][MF<][0-9]{2}[(01-12)][(01-31)][0-9][A-Z0-9<]{14}[A-Z0-9<]{2}){(44)}",
-         "MaxThreadCount" : 4,
-         "Name" : "locr",
-		 "TextureDetectionModes" :[
-			{
-				"Mode" : "TDM_GENERAL_WIDTH_CONCENTRATION",
-				"Sensitivity" : 8
-			}
-		 ],
-         "ReferenceRegionNameArray" : [ "DRRegion" ]
-      }
-   ],
-   "LineSpecificationArray" : [
+  ],
+  "ImageParameterOptions": [
     {
-		"Name":"L0",
-		"LineNumber":"",
-		"BinarizationModes" : [
-            {
-               "BlockSizeX" : 30,
-               "BlockSizeY" : 30,
-               "Mode" : "BM_LOCAL_BLOCK"
-            }
-         ]
+      "Name": "ip_mrz",
+      "TextureDetectionModes": [
+        {
+          "Mode": "TDM_GENERAL_WIDTH_CONCENTRATION",
+          "Sensitivity": 8
+        }
+      ],
+      "BinarizationModes": [
+        {
+          "EnableFillBinaryVacancy": 0,
+          "ThresholdCompensation": 21,
+          "Mode": "BM_LOCAL_BLOCK"
+        }
+      ],
+      "TextDetectionMode": {
+        "Mode": "TTDM_LINE",
+        "CharHeightRange": [
+          5,
+          1000,
+          1
+        ],
+        "Direction": "HORIZONTAL",
+        "Sensitivity": 7
+      }
     }
-	],
-   "ReferenceRegionArray" : [
-      {
-         "Localization" : {
-            "FirstPoint" : [ 0, 0 ],
-            "SecondPoint" : [ 100, 0 ],
-            "ThirdPoint" : [ 100, 100 ],
-            "FourthPoint" : [ 0, 100 ],
-            "MeasuredByPercentage" : 1,
-            "SourceType" : "LST_MANUAL_SPECIFICATION"
-         },
-         "Name" : "DRRegion",
-         "TextAreaNameArray" : [ "DTArea" ]
-      }
-   ],
-   "TextAreaArray" : [
-      {
-         "LineSpecificationNameArray" : ["L0"],
-         "Name" : "DTArea",
-		 "FirstPoint" : [ 0, 0 ],
-         "SecondPoint" : [ 100, 0 ],
-         "ThirdPoint" : [ 100, 100 ],
-		 "FourthPoint" : [ 0, 100 ]
-      }
-   ]
+  ]
 }

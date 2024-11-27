@@ -1,9 +1,6 @@
 #ifndef DLR_MANAGER_H_
 #define DLR_MANAGER_H_
 
-#include "DynamsoftCore.h"
-#include "DynamsoftLabelRecognizer.h"
-
 #include <vector>
 #include <iostream>
 #include <map>
@@ -16,8 +13,15 @@
 #include <queue>
 #include <functional>
 
+#include "DynamsoftCaptureVisionRouter.h"
+#include "DynamsoftUtility.h"
+
 using namespace std;
+using namespace dynamsoft::license;
+using namespace dynamsoft::cvr;
 using namespace dynamsoft::dlr;
+using namespace dynamsoft::utility;
+using namespace dynamsoft::basic_structures;
 
 using flutter::EncodableList;
 using flutter::EncodableMap;
@@ -37,21 +41,92 @@ inline void printf_to_cerr(const char *format, ...)
 // Define printf to use our custom function
 #define printf printf_to_cerr
 
-class Task
+class MyCapturedResultReceiver : public CCapturedResultReceiver
 {
 public:
-    std::function<void()> func;
-    unsigned char *buffer;
+    vector<CRecognizedTextLinesResult *> results;
+    vector<std::unique_ptr<flutter::MethodResult<flutter::EncodableValue>>> pendingResults = {};
+    EncodableList out;
+
+public:
+    void OnRecognizedTextLinesReceived(CRecognizedTextLinesResult *pResult) override
+    {
+        WrapResults(pResult);
+    }
+
+    void sendResult()
+    {
+        std::unique_ptr<flutter::MethodResult<flutter::EncodableValue>> result = std::move(pendingResults.front());
+        pendingResults.erase(pendingResults.begin());
+        result->Success(out);
+        out.clear();
+    }
+
+    void WrapResults(CRecognizedTextLinesResult *pResults)
+    {
+
+        if (!pResults)
+        {
+            return;
+        }
+
+        int count = pResults->GetItemsCount();
+
+        for (int i = 0; i < count; i++)
+        {
+            EncodableList area;
+
+            const CTextLineResultItem *result = pResults->GetItem(i);
+            CPoint *points = result->GetLocation().points;
+
+            int x1 = points[0][0];
+            int y1 = points[0][1];
+            int x2 = points[1][0];
+            int y2 = points[1][1];
+            int x3 = points[2][0];
+            int y3 = points[2][1];
+            int x4 = points[3][0];
+            int y4 = points[3][1];
+
+            EncodableMap map;
+            map[EncodableValue("confidence")] = EncodableValue(result->GetConfidence());
+            map[EncodableValue("text")] = EncodableValue(result->GetText());
+            map[EncodableValue("x1")] = EncodableValue(x1);
+            map[EncodableValue("y1")] = EncodableValue(y1);
+            map[EncodableValue("x2")] = EncodableValue(x2);
+            map[EncodableValue("y2")] = EncodableValue(y2);
+            map[EncodableValue("x3")] = EncodableValue(x3);
+            map[EncodableValue("y3")] = EncodableValue(y3);
+            map[EncodableValue("x4")] = EncodableValue(x4);
+            map[EncodableValue("y4")] = EncodableValue(y4);
+            area.push_back(map);
+
+            out.push_back(area);
+        }
+    }
 };
 
-class WorkerThread
+class MyImageSourceStateListener : public CImageSourceStateListener
 {
+private:
+    CCaptureVisionRouter *m_router;
+    MyCapturedResultReceiver *m_receiver;
+
 public:
-    std::mutex m;
-    std::condition_variable cv;
-    std::queue<Task> tasks = {};
-    volatile bool running;
-    std::thread t;
+    MyImageSourceStateListener(CCaptureVisionRouter *router, MyCapturedResultReceiver *receiver)
+    {
+        m_router = router;
+        m_receiver = receiver;
+    }
+
+    void OnImageSourceStateReceived(ImageSourceState state)
+    {
+        if (state == ISS_EXHAUSTED)
+        {
+            m_router->StopCapturing();
+            m_receiver->sendResult();
+        }
+    }
 };
 
 class DlrManager
@@ -59,104 +134,78 @@ class DlrManager
 public:
     ~DlrManager()
     {
-        clear();
-        if (recognizer != NULL)
+        if (cvr != NULL)
         {
-            DLR_DestroyInstance(recognizer);
-            recognizer = NULL;
+            delete cvr;
+            cvr = NULL;
+        }
+
+        if (listener)
+        {
+            delete listener;
+            listener = NULL;
+        }
+
+        if (fileFetcher)
+        {
+            delete fileFetcher;
+            fileFetcher = NULL;
+        }
+
+        if (capturedReceiver)
+        {
+            delete capturedReceiver;
+            capturedReceiver = NULL;
         }
     };
-
-    void clearTasks()
-    {
-        if (worker->tasks.size() > 0)
-        {
-            for (int i = 0; i < worker->tasks.size(); i++)
-            {
-                free(worker->tasks.front().buffer);
-                worker->tasks.pop();
-            }
-        }
-    }
-
-    void clear()
-    {
-        if (worker)
-        {
-            std::unique_lock<std::mutex> lk(worker->m);
-            worker->running = false;
-
-            clearTasks();
-
-            worker->cv.notify_one();
-            lk.unlock();
-
-            worker->t.join();
-            delete worker;
-            worker = NULL;
-            printf("Quit native thread.\n");
-        }
-    }
 
     int Init(const char *license)
     {
         // Click https://www.dynamsoft.com/customer/license/trialLicense/?product=dcv&package=cross-platform to get a trial license.
         char errorMsgBuffer[512];
-        int ret = DLR_InitLicense(license, errorMsgBuffer, 512);
-        printf("DC_InitLicense: %s\n", errorMsgBuffer);
-        recognizer = DLR_CreateInstance();
-        worker = new WorkerThread();
-        worker->running = true;
-        worker->t = thread(&run, this);
+        int ret = CLicenseManager::InitLicense(license, errorMsgBuffer, 512);
+        printf("InitLicense: %s\n", errorMsgBuffer);
+
+        cvr = new CCaptureVisionRouter;
+
+        fileFetcher = new CFileFetcher();
+        ret = cvr->SetInput(fileFetcher);
+        if (ret)
+        {
+            printf("SetInput error: %d\n", ret);
+        }
+
+        capturedReceiver = new MyCapturedResultReceiver;
+        ret = cvr->AddResultReceiver(capturedReceiver);
+        if (ret)
+        {
+            printf("AddResultReceiver error: %d\n", ret);
+        }
+
+        listener = new MyImageSourceStateListener(cvr, capturedReceiver);
+        ret = cvr->AddImageSourceStateListener(listener);
+        if (ret)
+        {
+            printf("AddImageSourceStateListener error: %d\n", ret);
+        }
+
         return ret;
     }
 
-    int LoadModel(const char *modelPath, const char *params)
+    int LoadModel(const char *path, const char *params)
     {
-        if (!recognizer)
+        if (!cvr)
             return -1;
 
         char errorMessage[256];
 
-        int ret = DLR_AppendSettingsFromString(recognizer, params, errorMessage, 256);
-
-        return ret;
-    }
-
-    static void run(DlrManager *self)
-    {
-        while (self->worker->running)
+        int ret = cvr->InitSettings(params, errorMessage, 256);
+        if (ret)
         {
-            std::function<void()> task;
-            std::unique_lock<std::mutex> lk(self->worker->m);
-            self->worker->cv.wait(lk, [&]
-                                  { return !self->worker->tasks.empty() || !self->worker->running; });
-            if (!self->worker->running)
-            {
-                break;
-            }
-            task = std::move(self->worker->tasks.front().func);
-            self->worker->tasks.pop();
-            lk.unlock();
-
-            task();
+            printf("InitSettings error: %s\n", errorMessage);
         }
-    }
-
-    void queueTask(unsigned char *imageBuffer, int width, int height, int stride, int format, int len)
-    {
-        unsigned char *data = (unsigned char *)malloc(len);
-        memcpy(data, imageBuffer, len);
-
-        std::unique_lock<std::mutex> lk(worker->m);
-        clearTasks();
-        std::function<void()> task_function = std::bind(processBuffer, this, data, width, height, stride, format);
-        Task task;
-        task.func = task_function;
-        task.buffer = data;
-        worker->tasks.push(task);
-        worker->cv.notify_one();
-        lk.unlock();
+        printf("InitSettings: %d\n", ret);
+        return ret;
     }
 
     ImagePixelFormat getPixelFormat(int format)
@@ -208,105 +257,40 @@ public:
         return pixelFormat;
     }
 
-    static void processBuffer(DlrManager *self, unsigned char *buffer, int width, int height, int stride, int format)
+    void start()
     {
-        ImageData data;
-        data.bytes = buffer;
-        data.width = width;
-        data.height = height;
-        data.stride = stride;
-        data.format = self->getPixelFormat(format);
-        data.bytesLength = stride * height;
-
-        int ret = DLR_RecognizeByBuffer(self->recognizer, &data, "locr");
-        if (ret)
+        char errorMsg[512] = {0};
+        int errorCode = cvr->StartCapturing("", false, errorMsg, 512);
+        if (errorCode != 0)
         {
-            printf("Detection error: %s\n", DLR_GetErrorString(ret));
+            printf("StartCapturing: %s\n", errorMsg);
         }
-
-        free(buffer);
-        EncodableList results = self->WrapResults();
-        std::unique_ptr<flutter::MethodResult<flutter::EncodableValue>> result = std::move(self->pendingResults.front());
-        self->pendingResults.erase(self->pendingResults.begin());
-        result->Success(results);
     }
 
-    EncodableList RecognizeFile(const char *filename)
+    void RecognizeFile(std::unique_ptr<flutter::MethodResult<flutter::EncodableValue>> &pendingResult, const char *filename)
     {
-        EncodableList out;
-        if (recognizer == NULL)
-            return out;
-
-        int ret = DLR_RecognizeByFile(recognizer, filename, "locr");
-        if (ret)
-        {
-            printf("Detection error: %s\n", DLR_GetErrorString(ret));
-        }
-        return WrapResults();
-    }
-
-    EncodableList WrapResults()
-    {
-        EncodableList out;
-        DLR_ResultArray *pResults = NULL;
-        DLR_GetAllResults(recognizer, &pResults);
-        if (!pResults)
-        {
-            return out;
-        }
-
-        int count = pResults->resultsCount;
-
-        for (int i = 0; i < count; i++)
-        {
-            EncodableList area;
-            DLR_Result *mrzResult = pResults->results[i];
-            int lCount = mrzResult->lineResultsCount;
-            for (int j = 0; j < lCount; j++)
-            {
-                EncodableMap map;
-
-                DM_Point *points = mrzResult->lineResults[j]->location.points;
-                int x1 = points[0].x;
-                int y1 = points[0].y;
-                int x2 = points[1].x;
-                int y2 = points[1].y;
-                int x3 = points[2].x;
-                int y3 = points[2].y;
-                int x4 = points[3].x;
-                int y4 = points[3].y;
-
-                map[EncodableValue("confidence")] = EncodableValue(mrzResult->lineResults[j]->confidence);
-                map[EncodableValue("text")] = EncodableValue(mrzResult->lineResults[j]->text);
-                map[EncodableValue("x1")] = EncodableValue(x1);
-                map[EncodableValue("y1")] = EncodableValue(y1);
-                map[EncodableValue("x2")] = EncodableValue(x2);
-                map[EncodableValue("y2")] = EncodableValue(y2);
-                map[EncodableValue("x3")] = EncodableValue(x3);
-                map[EncodableValue("y3")] = EncodableValue(y3);
-                map[EncodableValue("x4")] = EncodableValue(x4);
-                map[EncodableValue("y4")] = EncodableValue(y4);
-                area.push_back(map);
-            }
-
-            out.push_back(area);
-        }
-
-        // Release memory
-        DLR_FreeResults(&pResults);
-        return out;
+        printf("RecognizeFile: %s\n", filename);
+        capturedReceiver->pendingResults.push_back(std::move(pendingResult));
+        fileFetcher->SetFile(filename);
+        start();
     }
 
     void RecognizeBuffer(std::unique_ptr<flutter::MethodResult<flutter::EncodableValue>> &pendingResult, const unsigned char *buffer, int width, int height, int stride, int format)
     {
-        pendingResults.push_back(std::move(pendingResult));
-        queueTask((unsigned char *)buffer, width, height, stride, format, stride * height);
+        capturedReceiver->pendingResults.push_back(std::move(pendingResult));
+        CImageData *imageData = new CImageData(stride * height, buffer, width, height, stride, getPixelFormat(format));
+        fileFetcher->SetFile(imageData);
+        delete imageData;
+
+
+        start();
     }
 
 private:
-    void *recognizer;
-    WorkerThread *worker;
-    vector<std::unique_ptr<flutter::MethodResult<flutter::EncodableValue>>> pendingResults = {};
+    MyCapturedResultReceiver *capturedReceiver;
+    CImageSourceStateListener *listener;
+    CFileFetcher *fileFetcher;
+    CCaptureVisionRouter *cvr;
 };
 
 #endif
