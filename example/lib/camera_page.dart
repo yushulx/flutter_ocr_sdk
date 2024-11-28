@@ -134,7 +134,7 @@ class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
           appBar: AppBar(
             backgroundColor: Colors.black,
             title: const Text(
-              'MRZ Scanner',
+              'MRZ/VIN Scanner',
               style: TextStyle(color: Colors.white),
             ),
             iconTheme: const IconThemeData(

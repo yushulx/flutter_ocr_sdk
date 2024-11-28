@@ -124,7 +124,7 @@ class AboutPage extends StatelessWidget {
               InkWell(
                   onTap: () {
                     launchUrlString(
-                        'https://github.com/yushulx/flutter-MRZ-scanner');
+                        'https://github.com/yushulx/flutter_ocr_sdk');
                   },
                   child: const Text(
                     'App Source Code >',

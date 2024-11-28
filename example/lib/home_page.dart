@@ -100,7 +100,7 @@ class _HomePageState extends State<HomePage> {
               top: 30,
               left: 33,
             ),
-            child: const Text('MRZ SCANNER',
+            child: const Text('MRZ/VIN SCANNER',
                 style: TextStyle(
                   fontSize: 36,
                   color: Colors.white,
