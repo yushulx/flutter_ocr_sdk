@@ -1,6 +1,6 @@
 # Flutter MRZ/VIN Scanner
 
-A Flutter project that demonstrates how to use Dynamsoft Capture Vision to scan MRZ (Machine Readable Zone) and VIN (Vehicle Identification Number) from images and camera streams.
+A Flutter project that demonstrates how to use [Dynamsoft Capture Vision](https://www.dynamsoft.com/capture-vision/docs/core/introduction/index.html?lang=cplusplus) to scan MRZ (Machine Readable Zone) and VIN (Vehicle Identification Number) from images and camera streams.
 
 https://github.com/user-attachments/assets/c754ec46-f147-45f1-b293-6fbbd20a6e52
 
