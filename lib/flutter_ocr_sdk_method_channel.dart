@@ -112,11 +112,8 @@ class MethodChannelFlutterOcrSdk extends FlutterOcrSdkPlatform {
   /// Load the whole model by folder.
   @override
   Future<int?> loadModel({ModelType modelType = ModelType.mrz}) async {
-    final executableDir = Directory.current.path;
-    print('executableDir: $executableDir');
-
-    final directory = await getApplicationDocumentsDirectory();
-    print(directory.path);
+    var directory =
+        'data/flutter_assets/packages/flutter_ocr_sdk/lib/model/mrz/';
     String modelPath = 'packages/flutter_ocr_sdk/lib/model/mrz/';
     var fileName = "MRZ";
     var templateName = 'MRZ.json';
@@ -132,6 +129,8 @@ class MethodChannelFlutterOcrSdk extends FlutterOcrSdkPlatform {
       fileName = "VIN";
       modelPath = 'packages/flutter_ocr_sdk/lib/model/vin/';
       templateName = 'VIN.json';
+      directory =
+          './data/flutter_assets/packages/flutter_ocr_sdk/lib/model/vin/';
     }
 
     var prototxtName = '$fileName.prototxt';
@@ -148,14 +147,6 @@ class MethodChannelFlutterOcrSdk extends FlutterOcrSdkPlatform {
         await loadAssetBytes(characterModelBufferPath);
 
     if (isDesktop) {
-      List<int> bytes = prototxtBuffer.buffer.asUint8List();
-      await File(join(directory.path, prototxtName)).writeAsBytes(bytes);
-
-      bytes = txtBuffer.buffer.asUint8List();
-      await File(join(directory.path, txtBufferName)).writeAsBytes(bytes);
-
-      bytes = characterModelBuffer.buffer.asUint8List();
-      await File(join(directory.path, characterModelName)).writeAsBytes(bytes);
     } else {
       loadModelFiles(
           fileName,
@@ -167,14 +158,14 @@ class MethodChannelFlutterOcrSdk extends FlutterOcrSdkPlatform {
     var templatePath = join(modelPath, templateName);
     String template = await loadAssetString(templatePath);
     if (isDesktop) {
+      String exePath = Platform.resolvedExecutable;
+      String exeDir = dirname(exePath);
+      String assetPath = join(exeDir, directory);
       var templateMap = json.decode(template);
-      templateMap['CharacterModelOptions'][0]['DirectoryPath'] = directory.path;
+      templateMap['CharacterModelOptions'][0]['DirectoryPath'] = assetPath;
 
-      ByteData templateBuffer = await loadAssetBytes(templatePath);
-      List<int> bytes = templateBuffer.buffer.asUint8List();
-      await File(join(directory.path, templateName)).writeAsBytes(bytes);
-      await methodChannel.invokeMethod('loadModel',
-          {'path': directory.path, 'template': json.encode(templateMap)});
+      await methodChannel
+          .invokeMethod('loadModel', {'template': json.encode(templateMap)});
     } else {
       ret = await loadTemplate(template);
     }

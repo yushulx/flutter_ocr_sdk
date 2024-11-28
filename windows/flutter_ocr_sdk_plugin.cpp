@@ -95,18 +95,12 @@ namespace flutter_ocr_sdk
 
       if (arguments)
       {
-        auto path_it = arguments->find(EncodableValue("path"));
-        if (path_it != arguments->end())
-        {
-          path = std::get<std::string>(path_it->second);
-        }
-
         auto params_it = arguments->find(EncodableValue("template"));
         if (params_it != arguments->end())
         {
           params = std::get<std::string>(params_it->second);
         }
-        ret = manager->LoadModel(path.c_str(), params.c_str());
+        ret = manager->LoadModel(params.c_str());
       }
 
       result->Success(EncodableValue(ret));

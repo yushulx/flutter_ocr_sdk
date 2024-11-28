@@ -96,7 +96,7 @@ class CameraManager {
     _isWebFrameStarted = true;
     while (!(controller == null || isFinished || cbIsMounted() == false)) {
       XFile file = await controller!.takePicture();
-      var results = await mrzDetector.recognizeByFile(file.path);
+      var results = await detector.recognizeByFile(file.path);
       if (results == null || !cbIsMounted()) return;
 
       ocrLines = results;
@@ -145,7 +145,7 @@ class CameraManager {
   void processId(
       Uint8List bytes, int width, int height, int stride, int format) {
     // cbRefreshUi();
-    mrzDetector
+    detector
         .recognizeByBuffer(bytes, width, height, stride, format)
         .then((results) {
       if (results == null || !cbIsMounted()) return;

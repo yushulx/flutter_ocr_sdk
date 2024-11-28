@@ -11,7 +11,7 @@ class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
   Future<int> loadData() async {
-    return await initMRZSDK();
+    return await initSDK();
   }
 
   @override

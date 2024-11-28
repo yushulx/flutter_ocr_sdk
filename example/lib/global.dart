@@ -3,16 +3,21 @@ import 'package:flutter_ocr_sdk/flutter_ocr_sdk.dart';
 import 'package:flutter_ocr_sdk/model_type.dart';
 import 'package:flutter_ocr_sdk/ocr_line.dart';
 
-FlutterOcrSdk mrzDetector = FlutterOcrSdk();
+FlutterOcrSdk detector = FlutterOcrSdk();
 bool isLicenseValid = false;
-ModelType model = ModelType.vin;
+ModelType model = ModelType.mrz;
 
-Future<int> initMRZSDK() async {
-  int? ret = await mrzDetector.init(
+Future<int> initSDK() async {
+  int? ret = await detector.init(
       "DLS2eyJoYW5kc2hha2VDb2RlIjoiMjAwMDAxLTE2NDk4Mjk3OTI2MzUiLCJvcmdhbml6YXRpb25JRCI6IjIwMDAwMSIsInNlc3Npb25QYXNzd29yZCI6IndTcGR6Vm05WDJrcEQ5YUoifQ==");
 
   if (ret == 0) isLicenseValid = true;
-  return await mrzDetector.loadModel(modelType: model) ?? -1;
+  return await detector.loadModel(modelType: model) ?? -1;
+}
+
+Future<void> switchModel(ModelType newModel) async {
+  model = newModel;
+  await detector.loadModel(modelType: newModel);
 }
 
 Color colorMainTheme = const Color(0xff1D1B20);

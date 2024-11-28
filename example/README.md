@@ -1,38 +1,24 @@
-# Flutter MRZ Scanner
+# Flutter MRZ/VIN Scanner
 
-A Flutter project that demonstrates how to use [Dynamsoft Label Recognizer](https://www.dynamsoft.com/label-recognition/overview/) to scan MRZ (Machine Readable Zone) from passport, visa, and ID cards.
-
-https://github.com/user-attachments/assets/1bed4643-a76d-4f75-bfc2-5449a14a8a1a
+A Flutter project that demonstrates how to use Dynamsoft Capture Vision to scan MRZ (Machine Readable Zone) and VIN (Vehicle Identification Number) from images and camera streams.
 
 ## Supported Platforms
-- **Web**
-- **Android**
-- **iOS**
 - **Windows**
-- **Linux** (Without camera support)
 
 ## Getting Started
 1. Apply for a [30-day trial license](https://www.dynamsoft.com/customer/license/trialLicense/?product=dcv&package=cross-platform) and replace the license key in the `global.dart` file with your own:
 
     ```dart
-    Future<int> initMRZSDK() async {
-        await mrzDetector.init(
-            "LICENSE-KEY");
-        return await mrzDetector.loadModel() ?? -1;
+    Future<int> initSDK() async {
+        int? ret = await detector.init("LICENSE-KEY");
+
+        if (ret == 0) isLicenseValid = true;
+        return await detector.loadModel(modelType: model) ?? -1;
     }
     ```
 
 2. Run the project:
 
     ```
-    flutter run
-    # flutter run -d windows
-    # flutter run -d edge
-    # flutter run -d linux
+    flutter run -d windows
     ```
-    
-## Try Online Demo
-[https://yushulx.me/flutter_ocr_sdk/](https://yushulx.me/flutter_ocr_sdk/)
-
-## Blog
-[How to Create a Cross-platform MRZ Scanner App Using Flutter and Dynamsoft Label Recognizer](https://www.dynamsoft.com/codepool/flutter-mrz-scanner-how-to.html)

@@ -192,7 +192,7 @@ public:
         return ret;
     }
 
-    int LoadModel(const char *path, const char *params)
+    int LoadModel(const char *params)
     {
         if (!cvr)
             return -1;
@@ -281,7 +281,6 @@ public:
         CImageData *imageData = new CImageData(stride * height, buffer, width, height, stride, getPixelFormat(format));
         fileFetcher->SetFile(imageData);
         delete imageData;
-
 
         start();
     }

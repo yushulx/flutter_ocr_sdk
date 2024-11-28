@@ -19,14 +19,14 @@ class _TabPageState extends State<TabPage> with SingleTickerProviderStateMixin {
         text: 'Home',
         icon: 'images/icon-home-gray.png',
         selectedIcon: 'images/icon-home-orange.png'),
-    CustomTab(
-        text: 'History',
-        icon: 'images/icon-history-gray.png',
-        selectedIcon: 'images/icon-history-orange.png'),
-    CustomTab(
-        text: 'About',
-        icon: 'images/icon-about-gray.png',
-        selectedIcon: 'images/icon-about-orange.png'),
+    // CustomTab(
+    //     text: 'History',
+    //     icon: 'images/icon-history-gray.png',
+    //     selectedIcon: 'images/icon-history-orange.png'),
+    // CustomTab(
+    //     text: 'About',
+    //     icon: 'images/icon-about-gray.png',
+    //     selectedIcon: 'images/icon-about-orange.png'),
   ];
 
   int selectedIndex = 0;
@@ -34,7 +34,8 @@ class _TabPageState extends State<TabPage> with SingleTickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(vsync: this, length: 3);
+    // _tabController = TabController(vsync: this, length: 3);
+    _tabController = TabController(vsync: this, length: 1);
   }
 
   @override
@@ -44,8 +45,8 @@ class _TabPageState extends State<TabPage> with SingleTickerProviderStateMixin {
           controller: _tabController,
           children: const [
             HomePage(),
-            HistoryPage(),
-            AboutPage(),
+            // HistoryPage(),
+            // AboutPage(),
           ],
         ),
         bottomNavigationBar: SizedBox(

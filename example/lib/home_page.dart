@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_exif_rotation/flutter_exif_rotation.dart';
 import 'package:flutter_ocr_sdk/flutter_ocr_sdk_platform_interface.dart';
+import 'package:flutter_ocr_sdk/model_type.dart';
 import 'package:flutter_ocr_sdk/ocr_line.dart';
 import 'package:flutter_ocr_sdk/mrz_parser.dart';
 import 'package:flutter_ocr_sdk/mrz_result.dart';
@@ -26,7 +27,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final picker = ImagePicker();
-
+  bool isMrzSelected = true;
   void openResultPage(MrzResult information) {
     Navigator.push(
         context,
@@ -55,7 +56,7 @@ class _HomePageState extends State<HomePage> {
     ByteData? byteData =
         await image.toByteData(format: ui.ImageByteFormat.rawRgba);
     if (byteData != null) {
-      List<List<OcrLine>>? results = await mrzDetector.recognizeByBuffer(
+      List<List<OcrLine>>? results = await detector.recognizeByBuffer(
           byteData.buffer.asUint8List(),
           image.width,
           image.height,
@@ -85,7 +86,7 @@ class _HomePageState extends State<HomePage> {
         openResultPage(information!);
       } else {
         if (results != null && results.isNotEmpty) {
-          showAlert(context, "VIN Result", results[0][0].text);
+          showAlert(context, "OCR Result", results[0][0].text);
         }
       }
     }
@@ -202,6 +203,35 @@ class _HomePageState extends State<HomePage> {
         children: [
           title,
           description,
+          Center(
+            child: ToggleButtons(
+              borderRadius: BorderRadius.circular(10),
+              isSelected: [isMrzSelected, !isMrzSelected],
+              selectedColor: Colors.white,
+              fillColor: Colors.orange,
+              color: Colors.grey,
+              children: const [
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 20),
+                  child: Text('MRZ'),
+                ),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 20),
+                  child: Text('VIN'),
+                ),
+              ],
+              onPressed: (index) {
+                setState(() {
+                  isMrzSelected = (index == 0);
+                  if (isMrzSelected) {
+                    switchModel(ModelType.mrz);
+                  } else {
+                    switchModel(ModelType.vin);
+                  }
+                });
+              },
+            ),
+          ),
           buttons,
           const SizedBox(
             height: 34,
