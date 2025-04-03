@@ -112,64 +112,14 @@ class MethodChannelFlutterOcrSdk extends FlutterOcrSdkPlatform {
   /// Load the whole model by folder.
   @override
   Future<int?> loadModel({ModelType modelType = ModelType.mrz}) async {
-    var directory =
-        'data/flutter_assets/packages/flutter_ocr_sdk/lib/model/mrz/';
-    String modelPath = 'packages/flutter_ocr_sdk/lib/model/mrz/';
-    var fileName = "MRZ";
-    var templateName = 'MRZ.json';
-
-    bool isDesktop = false;
-    if (Platform.isWindows || Platform.isLinux) {
-      isDesktop = true;
-    }
-
-    int? ret = 0;
+    String templateName = "ReadPassportAndId";
 
     if (modelType == ModelType.vin) {
-      fileName = "VIN";
-      modelPath = 'packages/flutter_ocr_sdk/lib/model/vin/';
-      templateName = 'VIN.json';
-      directory =
-          './data/flutter_assets/packages/flutter_ocr_sdk/lib/model/vin/';
+      templateName = "ReadVINText";
     }
 
-    var prototxtName = '$fileName.prototxt';
-    var prototxtBufferPath = join(modelPath, prototxtName);
-    ByteData prototxtBuffer = await loadAssetBytes(prototxtBufferPath);
-
-    var txtBufferName = '$fileName.txt';
-    var txtBufferPath = join(modelPath, txtBufferName);
-    ByteData txtBuffer = await loadAssetBytes(txtBufferPath);
-
-    var characterModelName = '$fileName.caffemodel';
-    var characterModelBufferPath = join(modelPath, characterModelName);
-    ByteData characterModelBuffer =
-        await loadAssetBytes(characterModelBufferPath);
-
-    if (isDesktop) {
-    } else {
-      loadModelFiles(
-          fileName,
-          prototxtBuffer.buffer.asUint8List(),
-          txtBuffer.buffer.asUint8List(),
-          characterModelBuffer.buffer.asUint8List());
-    }
-
-    var templatePath = join(modelPath, templateName);
-    String template = await loadAssetString(templatePath);
-    if (isDesktop) {
-      String exePath = Platform.resolvedExecutable;
-      String exeDir = dirname(exePath);
-      String assetPath = join(exeDir, directory);
-      var templateMap = json.decode(template);
-      templateMap['CharacterModelOptions'][0]['DirectoryPath'] = assetPath;
-
-      await methodChannel
-          .invokeMethod('loadModel', {'template': json.encode(templateMap)});
-    } else {
-      ret = await loadTemplate(template);
-    }
-
+    int ret = await methodChannel
+        .invokeMethod('loadModel', {'template': templateName});
     return ret;
   }
 

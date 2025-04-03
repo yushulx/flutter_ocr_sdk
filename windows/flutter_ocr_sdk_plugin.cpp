@@ -100,7 +100,8 @@ namespace flutter_ocr_sdk
         {
           params = std::get<std::string>(params_it->second);
         }
-        ret = manager->LoadModel(params.c_str());
+
+        ret = manager->LoadModel(params);
       }
 
       result->Success(EncodableValue(ret));

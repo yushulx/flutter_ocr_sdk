@@ -40,10 +40,14 @@ set_target_properties(${PLUGIN_NAME} PROPERTIES
   CXX_VISIBILITY_PRESET hidden)
 target_compile_definitions(${PLUGIN_NAME} PRIVATE FLUTTER_PLUGIN_IMPL)
 
+
 # Source include directories and library dependencies. Add any plugin-specific
 # dependencies here.
 target_include_directories(${PLUGIN_NAME} INTERFACE
   "${CMAKE_CURRENT_SOURCE_DIR}/include")
+
+target_compile_options(${PLUGIN_NAME} PRIVATE /wd4121 /W3 /WX-)
+
 target_link_libraries(${PLUGIN_NAME} PRIVATE flutter flutter_wrapper_plugin "DynamsoftCorex64" "DynamsoftLicensex64" "DynamsoftCaptureVisionRouterx64" "DynamsoftUtilityx64")
 
 # List of absolute paths to libraries that should be bundled with the plugin.
@@ -51,5 +55,10 @@ target_link_libraries(${PLUGIN_NAME} PRIVATE flutter flutter_wrapper_plugin "Dyn
 # external build triggered from this build file.
 set(flutter_ocr_sdk_bundled_libraries
   "${PROJECT_SOURCE_DIR}/bin/"
+  "${PROJECT_SOURCE_DIR}/../resources/Models"
+  "${PROJECT_SOURCE_DIR}/../resources/ParserResources"
+  "${PROJECT_SOURCE_DIR}/../resources/Templates"
+  "${PROJECT_SOURCE_DIR}/../resources/OverlappingChars.data"
+  "${PROJECT_SOURCE_DIR}/../resources/ConfusableChars.data"
   PARENT_SCOPE
 )

@@ -38,7 +38,3 @@ flutter:
       web: 
         pluginClass: FlutterOcrSdkWeb
         fileName: flutter_ocr_sdk_web.dart
-
-  assets:
-    - lib/model/mrz/
-    - lib/model/vin/

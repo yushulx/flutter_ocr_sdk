@@ -192,20 +192,14 @@ public:
         return ret;
     }
 
-    int LoadModel(const char *params)
+    int LoadModel(string &name)
     {
         if (!cvr)
             return -1;
 
-        char errorMessage[256];
+        modelName = name;
 
-        int ret = cvr->InitSettings(params, errorMessage, 256);
-        if (ret)
-        {
-            printf("InitSettings error: %s\n", errorMessage);
-        }
-        printf("InitSettings: %d\n", ret);
-        return ret;
+        return 0;
     }
 
     ImagePixelFormat getPixelFormat(int format)
@@ -260,7 +254,7 @@ public:
     void start()
     {
         char errorMsg[512] = {0};
-        int errorCode = cvr->StartCapturing("", false, errorMsg, 512);
+        int errorCode = cvr->StartCapturing(modelName.c_str(), false, errorMsg, 512);
         if (errorCode != 0)
         {
             printf("StartCapturing: %s\n", errorMsg);
@@ -290,6 +284,7 @@ private:
     CImageSourceStateListener *listener;
     CFileFetcher *fileFetcher;
     CCaptureVisionRouter *cvr;
+    string modelName;
 };
 
 #endif
