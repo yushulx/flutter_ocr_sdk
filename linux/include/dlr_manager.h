@@ -22,10 +22,11 @@ using namespace dynamsoft::basic_structures;
 FlValue *CreateLineResultMap(const CTextLineResultItem *result)
 {
     FlValue *map = fl_value_new_map();
-    fl_value_set_string_take(map, "confidence", fl_value_new_string(result->GetConfidence()));
+    fl_value_set_string_take(map, "confidence", fl_value_new_int(result->GetConfidence()));
     fl_value_set_string_take(map, "text", fl_value_new_string(result->GetText()));
 
-    CPoint *points = result->GetLocation().points;
+    CQuadrilateral location = result->GetLocation();
+    CPoint *points = location.points;
 
     int x1 = points[0][0];
     int y1 = points[0][1];
@@ -51,7 +52,7 @@ FlValue *CreateLineResultMap(const CTextLineResultItem *result)
 class MyCapturedResultReceiver : public CCapturedResultReceiver
 {
 public:
-    std::vector<CDecodedBarcodesResult *> results;
+    std::vector<CRecognizedTextLinesResult *> results;
     std::mutex results_mutex;
 
     void OnRecognizedTextLinesReceived(CRecognizedTextLinesResult *pResult) override
@@ -200,7 +201,7 @@ public:
 
     int LoadModel(const char *params)
     {
-        if (!recognizer)
+        if (!cvr)
             return -1;
 
         memset(modelName, 0, 256);
@@ -268,27 +269,26 @@ public:
         }
     }
 
-    FlValue *RecognizeFile(const char *filename)
+    void RecognizeFile(FlMethodCall *method_call, const char *filename)
     {
         printf("RecognizeFile: %s\n", filename);
-        capturedReceiver->pendingResults.push_back(std::move(pendingResult));
         fileFetcher->SetFile(filename);
+        listener->SetMethodCall(method_call);
         start();
     }
 
-    FlValue *RecognizeBuffer(unsigned char *buffer, int width, int height, int stride, int format, int length)
+    void RecognizeBuffer(FlMethodCall *method_call, unsigned char *buffer, int width, int height, int stride, int format, int length)
     {
-        capturedReceiver->pendingResults.push_back(std::move(pendingResult));
         CImageData *imageData = new CImageData(stride * height, buffer, width, height, stride, getPixelFormat(format));
         fileFetcher->SetFile(imageData);
         delete imageData;
-
+        listener->SetMethodCall(method_call);
         start();
     }
 
 private:
     MyCapturedResultReceiver *capturedReceiver;
-    CImageSourceStateListener *listener;
+    MyImageSourceStateListener *listener;
     CFileFetcher *fileFetcher;
     CCaptureVisionRouter *cvr;
     char modelName[256];

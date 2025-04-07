@@ -281,7 +281,7 @@ public:
 
 private:
     MyCapturedResultReceiver *capturedReceiver;
-    CImageSourceStateListener *listener;
+    MyImageSourceStateListener *listener;
     CFileFetcher *fileFetcher;
     CCaptureVisionRouter *cvr;
     string modelName;

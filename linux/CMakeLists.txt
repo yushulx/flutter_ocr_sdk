@@ -44,11 +44,37 @@ target_link_libraries(${PLUGIN_NAME} PRIVATE PkgConfig::GTK)
 # This list could contain prebuilt libraries, or libraries created by an
 # external build triggered from this build file.
 set(flutter_ocr_sdk_bundled_libraries
-  "${PROJECT_SOURCE_DIR}/lib"
-  "${PROJECT_SOURCE_DIR}/../resources/Models"
-  "${PROJECT_SOURCE_DIR}/../resources/ParserResources"
-  "${PROJECT_SOURCE_DIR}/../resources/Templates"
-  "${PROJECT_SOURCE_DIR}/../resources/OverlappingChars.data"
-  "${PROJECT_SOURCE_DIR}/../resources/ConfusableChars.data"
+  ""
   PARENT_SCOPE
 )
+
+install(DIRECTORY 
+  "${PROJECT_SOURCE_DIR}/../linux/lib/"
+  DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/"
+)
+
+install(DIRECTORY 
+  "${PROJECT_SOURCE_DIR}/../resources/Models"
+  DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/"
+)
+
+install(DIRECTORY 
+  "${PROJECT_SOURCE_DIR}/../resources/ParserResources"
+  DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/"
+)
+
+install(DIRECTORY 
+  "${PROJECT_SOURCE_DIR}/../resources/Templates"
+  DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/"
+)
+
+install(FILES
+  "${PROJECT_SOURCE_DIR}/../resources/OverlappingChars.data"
+  DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/"
+)
+
+install(FILES
+  "${PROJECT_SOURCE_DIR}/../resources/ConfusableChars.data"
+  DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/"
+)
+

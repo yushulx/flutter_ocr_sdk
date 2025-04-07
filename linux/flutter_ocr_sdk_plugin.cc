@@ -25,6 +25,7 @@ static void flutter_ocr_sdk_plugin_handle_method_call(
     FlutterOcrSdkPlugin *self,
     FlMethodCall *method_call)
 {
+  bool isAsync = false;
   g_autoptr(FlMethodResponse) response = nullptr;
 
   const gchar *method = fl_method_call_get_name(method_call);
@@ -76,6 +77,7 @@ static void flutter_ocr_sdk_plugin_handle_method_call(
   }
   else if (strcmp(method, "recognizeByFile") == 0)
   {
+    isAsync = true;
     if (fl_value_get_type(args) != FL_VALUE_TYPE_MAP)
     {
       return;
@@ -88,11 +90,11 @@ static void flutter_ocr_sdk_plugin_handle_method_call(
     }
     const char *filename = fl_value_get_string(value);
 
-    g_autoptr(FlValue) result = self->manager->RecognizeFile(filename);
-    response = FL_METHOD_RESPONSE(fl_method_success_response_new(result));
+    self->manager->RecognizeFile(method_call, filename);
   }
   else if (strcmp(method, "recognizeByBuffer") == 0)
   {
+    isAsync = true;
     if (fl_value_get_type(args) != FL_VALUE_TYPE_MAP)
     {
       return;
@@ -133,15 +135,17 @@ static void flutter_ocr_sdk_plugin_handle_method_call(
     }
     int format = fl_value_get_int(value);
 
-    g_autoptr(FlValue) result = self->manager->RecognizeBuffer(bytes, width, height, stride, format, stride * height);
-    response = FL_METHOD_RESPONSE(fl_method_success_response_new(result));
+    self->manager->RecognizeBuffer(method_call, bytes, width, height, stride, format, stride * height);
   }
   else
   {
     response = FL_METHOD_RESPONSE(fl_method_not_implemented_response_new());
   }
 
-  fl_method_call_respond(method_call, response, nullptr);
+  if (!isAsync)
+  {
+    fl_method_call_respond(method_call, response, nullptr);
+  }
 }
 
 static void flutter_ocr_sdk_plugin_dispose(GObject *object)
