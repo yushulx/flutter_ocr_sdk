@@ -1,28 +1,167 @@
 #ifndef DLR_MANAGER_H_
 #define DLR_MANAGER_H_
 
-#include "DynamsoftCore.h"
-#include "DynamsoftLabelRecognizer.h"
+#include "DynamsoftCaptureVisionRouter.h"
+#include "DynamsoftUtility.h"
 
 #include <vector>
 #include <iostream>
 #include <map>
+#include <mutex>
 
 #include <flutter_linux/flutter_linux.h>
 #include <gtk/gtk.h>
 
 using namespace std;
+using namespace dynamsoft::license;
+using namespace dynamsoft::cvr;
 using namespace dynamsoft::dlr;
+using namespace dynamsoft::utility;
+using namespace dynamsoft::basic_structures;
+
+FlValue *CreateLineResultMap(const CTextLineResultItem *result)
+{
+    FlValue *map = fl_value_new_map();
+    fl_value_set_string_take(map, "confidence", fl_value_new_string(result->GetConfidence()));
+    fl_value_set_string_take(map, "text", fl_value_new_string(result->GetText()));
+
+    CPoint *points = result->GetLocation().points;
+
+    int x1 = points[0][0];
+    int y1 = points[0][1];
+    int x2 = points[1][0];
+    int y2 = points[1][1];
+    int x3 = points[2][0];
+    int y3 = points[2][1];
+    int x4 = points[3][0];
+    int y4 = points[3][1];
+
+    fl_value_set_string_take(map, "x1", fl_value_new_int(x1));
+    fl_value_set_string_take(map, "y1", fl_value_new_int(y1));
+    fl_value_set_string_take(map, "x2", fl_value_new_int(x2));
+    fl_value_set_string_take(map, "y2", fl_value_new_int(y2));
+    fl_value_set_string_take(map, "x3", fl_value_new_int(x3));
+    fl_value_set_string_take(map, "y3", fl_value_new_int(y3));
+    fl_value_set_string_take(map, "x4", fl_value_new_int(x4));
+    fl_value_set_string_take(map, "y4", fl_value_new_int(y4));
+
+    return map;
+}
+
+class MyCapturedResultReceiver : public CCapturedResultReceiver
+{
+public:
+    std::vector<CDecodedBarcodesResult *> results;
+    std::mutex results_mutex;
+
+    void OnRecognizedTextLinesReceived(CRecognizedTextLinesResult *pResult) override
+    {
+        pResult->Retain();
+        std::lock_guard<std::mutex> lock(results_mutex);
+        results.push_back(pResult);
+    }
+};
+
+class MyImageSourceStateListener : public CImageSourceStateListener
+{
+private:
+    CCaptureVisionRouter *m_router;
+    MyCapturedResultReceiver *m_receiver;
+    FlMethodCall *m_method_call;
+
+public:
+    MyImageSourceStateListener(CCaptureVisionRouter *router, MyCapturedResultReceiver *receiver)
+        : m_router(router), m_receiver(receiver), m_method_call(nullptr) {}
+
+    ~MyImageSourceStateListener()
+    {
+        if (m_method_call)
+        {
+            g_object_unref(m_method_call);
+        }
+    }
+
+    void OnImageSourceStateReceived(ImageSourceState state) override
+    {
+        if (state == ISS_EXHAUSTED)
+        {
+            m_router->StopCapturing();
+
+            FlValue *out = fl_value_new_list();
+
+            for (auto *result : m_receiver->results)
+            {
+                if (!result || result->GetItemsCount() == 0)
+                {
+                    continue;
+                }
+
+                int count = result->GetItemsCount();
+                for (int j = 0; j < count; ++j)
+                {
+                    FlValue *area = fl_value_new_list();
+                    const CTextLineResultItem *lineResultItem = result->GetItem(j);
+                    fl_value_append_take(area, CreateLineResultMap(lineResultItem));
+
+                    fl_value_append_take(out, area);
+                }
+
+                result->Release();
+            }
+
+            m_receiver->results.clear();
+
+            g_autoptr(FlMethodResponse) response = FL_METHOD_RESPONSE(fl_method_success_response_new(out));
+            if (m_method_call)
+            {
+                fl_method_call_respond(m_method_call, response, nullptr);
+                g_object_unref(m_method_call); // Release the method call
+                m_method_call = nullptr;
+            }
+        }
+    }
+
+    void SetMethodCall(FlMethodCall *method_call)
+    {
+        if (m_method_call)
+        {
+            g_object_unref(m_method_call);
+        }
+        m_method_call = method_call;
+        if (m_method_call)
+        {
+            g_object_ref(m_method_call); // Retain the method call
+        }
+    }
+};
 
 class DlrManager
 {
 public:
     ~DlrManager()
     {
-        if (recognizer != NULL)
+        if (cvr != NULL)
         {
-            DLR_DestroyInstance(recognizer);
-            recognizer = NULL;
+            delete cvr;
+            cvr = NULL;
+        }
+
+        if (listener)
+        {
+            delete listener;
+            listener = NULL;
+        }
+
+        if (fileFetcher)
+        {
+            delete fileFetcher;
+            fileFetcher = NULL;
+        }
+
+        if (capturedReceiver)
+        {
+            delete capturedReceiver;
+            capturedReceiver = NULL;
         }
     };
 
@@ -30,97 +169,48 @@ public:
     {
         // Click https://www.dynamsoft.com/customer/license/trialLicense/?product=dcv&package=cross-platform to get a trial license.
         char errorMsgBuffer[512];
-        int ret = DLR_InitLicense(license, errorMsgBuffer, 512);
-        printf("DC_InitLicense: %s\n", errorMsgBuffer);
-        recognizer = DLR_CreateInstance();
+        int ret = CLicenseManager::InitLicense(license, errorMsgBuffer, 512);
+        printf("InitLicense: %s\n", errorMsgBuffer);
+
+        cvr = new CCaptureVisionRouter;
+
+        fileFetcher = new CFileFetcher();
+        ret = cvr->SetInput(fileFetcher);
+        if (ret)
+        {
+            printf("SetInput error: %d\n", ret);
+        }
+
+        capturedReceiver = new MyCapturedResultReceiver;
+        ret = cvr->AddResultReceiver(capturedReceiver);
+        if (ret)
+        {
+            printf("AddResultReceiver error: %d\n", ret);
+        }
+
+        listener = new MyImageSourceStateListener(cvr, capturedReceiver);
+        ret = cvr->AddImageSourceStateListener(listener);
+        if (ret)
+        {
+            printf("AddImageSourceStateListener error: %d\n", ret);
+        }
+
         return ret;
     }
 
-    int LoadModel(const char *modelPath, const char *params)
+    int LoadModel(const char *params)
     {
         if (!recognizer)
             return -1;
 
-        char errorMessage[256];
+        memset(modelName, 0, 256);
+        strcpy(modelName, params);
 
-        int ret = DLR_AppendSettingsFromString(recognizer, params, errorMessage, 256);
-
-        return ret;
+        return 0;
     }
 
-    FlValue *RecognizeFile(const char *filename)
+    ImagePixelFormat getPixelFormat(int format)
     {
-        FlValue *out = fl_value_new_list();
-        if (recognizer == NULL)
-            return out;
-
-        int ret = DLR_RecognizeByFile(recognizer, filename, "locr");
-        if (ret)
-        {
-            printf("Detection error: %s\n", DLR_GetErrorString(ret));
-        }
-        return WrapResults();
-    }
-
-    FlValue *WrapResults()
-    {
-        FlValue *out = fl_value_new_list();
-        DLR_ResultArray *pResults = NULL;
-        DLR_GetAllResults(recognizer, &pResults);
-        if (!pResults)
-        {
-            return out;
-        }
-
-        int count = pResults->resultsCount;
-
-        for (int i = 0; i < count; i++)
-        {
-            FlValue *area = fl_value_new_list();
-            DLR_Result *mrzResult = pResults->results[i];
-            int lCount = mrzResult->lineResultsCount;
-            for (int j = 0; j < lCount; j++)
-            {
-                FlValue *lineInfo = fl_value_new_map();
-
-                DM_Point *points = mrzResult->lineResults[j]->location.points;
-                int x1 = points[0].x;
-                int y1 = points[0].y;
-                int x2 = points[1].x;
-                int y2 = points[1].y;
-                int x3 = points[2].x;
-                int y3 = points[2].y;
-                int x4 = points[3].x;
-                int y4 = points[3].y;
-
-                fl_value_set_string_take(lineInfo, "confidence", fl_value_new_int(mrzResult->confidence));
-                fl_value_set_string_take(lineInfo, "text", fl_value_new_string(mrzResult->lineResults[j]->text));
-                fl_value_set_string_take(lineInfo, "x1", fl_value_new_int(x1));
-                fl_value_set_string_take(lineInfo, "y1", fl_value_new_int(y1));
-                fl_value_set_string_take(lineInfo, "x2", fl_value_new_int(x2));
-                fl_value_set_string_take(lineInfo, "y2", fl_value_new_int(y2));
-                fl_value_set_string_take(lineInfo, "x3", fl_value_new_int(x3));
-                fl_value_set_string_take(lineInfo, "y3", fl_value_new_int(y3));
-                fl_value_set_string_take(lineInfo, "x4", fl_value_new_int(x4));
-                fl_value_set_string_take(lineInfo, "y4", fl_value_new_int(y4));
-
-                fl_value_append_take(area, lineInfo);
-            }
-
-            fl_value_append_take(out, area);
-        }
-
-        // Release memory
-        DLR_FreeResults(&pResults);
-        return out;
-    }
-
-    FlValue *RecognizeBuffer(unsigned char *buffer, int width, int height, int stride, int format, int length)
-    {
-        FlValue *out = fl_value_new_list();
-        if (recognizer == NULL)
-            return out;
-
         ImagePixelFormat pixelFormat = IPF_BGR_888;
         switch (format)
         {
@@ -165,25 +255,43 @@ public:
             break;
         }
 
-        ImageData data;
-        data.bytes = buffer;
-        data.width = width;
-        data.height = height;
-        data.stride = stride;
-        data.format = pixelFormat;
-        data.bytesLength = length;
+        return pixelFormat;
+    }
 
-        int ret = DLR_RecognizeByBuffer(recognizer, &data, "locr");
-        if (ret)
+    void start()
+    {
+        char errorMsg[512] = {0};
+        int errorCode = cvr->StartCapturing(modelName, false, errorMsg, 512);
+        if (errorCode != 0)
         {
-            printf("Detection error: %s\n", DLR_GetErrorString(ret));
+            printf("StartCapturing: %s\n", errorMsg);
         }
+    }
 
-        return WrapResults();
+    FlValue *RecognizeFile(const char *filename)
+    {
+        printf("RecognizeFile: %s\n", filename);
+        capturedReceiver->pendingResults.push_back(std::move(pendingResult));
+        fileFetcher->SetFile(filename);
+        start();
+    }
+
+    FlValue *RecognizeBuffer(unsigned char *buffer, int width, int height, int stride, int format, int length)
+    {
+        capturedReceiver->pendingResults.push_back(std::move(pendingResult));
+        CImageData *imageData = new CImageData(stride * height, buffer, width, height, stride, getPixelFormat(format));
+        fileFetcher->SetFile(imageData);
+        delete imageData;
+
+        start();
     }
 
 private:
-    void *recognizer;
+    MyCapturedResultReceiver *capturedReceiver;
+    CImageSourceStateListener *listener;
+    CFileFetcher *fileFetcher;
+    CCaptureVisionRouter *cvr;
+    char modelName[256];
 };
 
 #endif
