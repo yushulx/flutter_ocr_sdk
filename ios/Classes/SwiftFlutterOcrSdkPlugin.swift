@@ -1,45 +1,40 @@
-import Flutter
-import UIKit
+import DynamsoftBarcodeReader
+import DynamsoftCaptureVisionRouter
 import DynamsoftCore
-import DynamsoftLabelRecognizer 
+import DynamsoftLicense
+
+import Flutter
+
+import UIKit
 
 public class SwiftFlutterOcrSdkPlugin: NSObject, FlutterPlugin, LicenseVerificationListener {
-  var completionHandlers: [FlutterResult] = []
-  private var recognizer: DynamsoftLabelRecognizer?
+    var completionHandlers: [FlutterResult] = []
+    let cvr = CaptureVisionRouter()
+    var templateName: String?
 
-  public static func register(with registrar: FlutterPluginRegistrar) {
-    let channel = FlutterMethodChannel(name: "flutter_ocr_sdk", binaryMessenger: registrar.messenger())
-    let instance = SwiftFlutterOcrSdkPlugin()
-    registrar.addMethodCallDelegate(instance, channel: channel)
-  }
+    public static func register(with registrar: FlutterPluginRegistrar) {
+        let channel = FlutterMethodChannel(
+            name: "flutter_ocr_sdk", binaryMessenger: registrar.messenger())
+        let instance = SwiftFlutterOcrSdkPlugin()
+        registrar.addMethodCallDelegate(instance, channel: channel)
+    }
 
-  override init() {
-    recognizer = DynamsoftLabelRecognizer.init()
-  }
+    override init() {
+        recognizer = DynamsoftLabelRecognizer.init()
+    }
 
-  public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
-    let arguments: NSDictionary = call.arguments as! NSDictionary
-    switch call.method {
+    public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
+        let arguments: NSDictionary = call.arguments as! NSDictionary
+        switch call.method {
         case "getPlatformVersion":
             result("iOS " + UIDevice.current.systemVersion)
         case "init":
             completionHandlers.append(result)
             let license: String = arguments.value(forKey: "key") as! String
-        DynamsoftLicenseManager.initLicense(license, verificationDelegate: self)
-        case "loadModelFiles":
-            let name: String = arguments.value(forKey: "name") as! String
-            let prototxtBuffer: FlutterStandardTypedData = arguments.value(forKey: "prototxtBuffer") as! FlutterStandardTypedData
-            let txtBuffer: FlutterStandardTypedData = arguments.value(forKey: "txtBuffer") as! FlutterStandardTypedData
-            let characterModelBuffer: FlutterStandardTypedData = arguments.value(forKey: "characterModelBuffer") as! FlutterStandardTypedData
-            DynamsoftLabelRecognizer.appendCharacterModel(name, prototxtBuffer: prototxtBuffer.data, txtBuffer: txtBuffer.data, characterModelBuffer: characterModelBuffer.data)
-            result(0)
-        case "loadTemplate":
-            if self.recognizer == nil {
-                result(.none)
-                return
-            }
-            let params: String = arguments.value(forKey: "template") as! String
-            try? self.recognizer!.initRuntimeSettings(params)
+            DynamsoftLicenseManager.initLicense(license, verificationDelegate: self)
+        case "loadModel":
+            let name: String = arguments.value(forKey: "template") as! String
+            templateName = name
             result(0)
         case "recognizeByFile":
             if recognizer == nil {
@@ -59,7 +54,8 @@ public class SwiftFlutterOcrSdkPlugin: NSObject, FlutterPlugin, LicenseVerificat
             }
 
             DispatchQueue.global().async {
-                let buffer: FlutterStandardTypedData = arguments.value(forKey: "bytes") as! FlutterStandardTypedData
+                let buffer: FlutterStandardTypedData =
+                    arguments.value(forKey: "bytes") as! FlutterStandardTypedData
                 let width: Int = arguments.value(forKey: "width") as! Int
                 let height: Int = arguments.value(forKey: "height") as! Int
                 let stride: Int = arguments.value(forKey: "stride") as! Int
@@ -77,29 +73,29 @@ public class SwiftFlutterOcrSdkPlugin: NSObject, FlutterPlugin, LicenseVerificat
         default:
             result(.none)
         }
-  }
-
-  public func licenseVerificationCallback(_ isSuccess: Bool, error: Error?) {
-    if isSuccess {
-        completionHandlers.first?(0)
-    } else{
-        completionHandlers.first?(-1)
     }
-  }
-    
-    func wrapResults(results:[iDLRResult]?) -> NSArray {
+
+    public func licenseVerificationCallback(_ isSuccess: Bool, error: Error?) {
+        if isSuccess {
+            completionHandlers.first?(0)
+        } else {
+            completionHandlers.first?(-1)
+        }
+    }
+
+    func wrapResults(results: [iDLRResult]?) -> NSArray {
         let outResults = NSMutableArray()
         if results == nil {
             return outResults
         }
         for item in results! {
             let area = NSMutableArray()
-            
+
             for line in item.lineResults! {
                 let dictionary = NSMutableDictionary()
                 dictionary.setObject(line.confidence, forKey: "confidence" as NSCopying)
                 dictionary.setObject(line.text ?? "", forKey: "text" as NSCopying)
-                
+
                 let points = line.location!.points as! [CGPoint]
                 dictionary.setObject(Int(points[0].x), forKey: "x1" as NSCopying)
                 dictionary.setObject(Int(points[0].y), forKey: "y1" as NSCopying)
@@ -109,7 +105,7 @@ public class SwiftFlutterOcrSdkPlugin: NSObject, FlutterPlugin, LicenseVerificat
                 dictionary.setObject(Int(points[2].y), forKey: "y3" as NSCopying)
                 dictionary.setObject(Int(points[3].x), forKey: "x4" as NSCopying)
                 dictionary.setObject(Int(points[3].y), forKey: "y4" as NSCopying)
-                
+
                 area.add(dictionary)
             }
             outResults.add(area)

@@ -42,5 +42,7 @@ android {
 }
 
 dependencies {
-    implementation "com.dynamsoft:dynamsoftlabelrecognizer:2.2.20"
+    implementation "com.dynamsoft:dynamsoftcapturevisionbundle:2.6.1003"
+    implementation "com.dynamsoft:dynamsoftmrz:3.4.20"
+    implementation "com.dynamsoft:dynamsoftvin:3.4.20"
 }

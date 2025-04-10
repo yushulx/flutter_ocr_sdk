@@ -101,18 +101,9 @@ public class FlutterOcrSdkPlugin implements FlutterPlugin, MethodCallHandler, Ac
         });
       }
       break;
-      case "loadModelFiles": {
-        final String name = call.argument("name");
-        final byte[] prototxtBuffer = call.argument("prototxtBuffer");
-        final byte[] txtBuffer = call.argument("txtBuffer");
-        final byte[] characterModelBuffer = call.argument("characterModelBuffer");
-        mOCRManager.loadModelFiles(name, prototxtBuffer, txtBuffer, characterModelBuffer);
-        result.success(0);
-      }
-      break;
-      case "loadTemplate": {
-        final String template = call.argument("template");
-        mOCRManager.loadTemplate(template);
+      case "loadModel": {
+        final String name = call.argument("template");
+        mOCRManager.loadModel(name);
         result.success(0);
       }
       break;

@@ -90,25 +90,6 @@ class MethodChannelFlutterOcrSdk extends FlutterOcrSdkPlatform {
     return results;
   }
 
-  /// Load custom model files.
-  /// Returns a [String] containing the OCR results.
-  Future<int?> loadModelFiles(String name, Uint8List prototxtBuffer,
-      Uint8List txtBuffer, Uint8List characterModelBuffer) async {
-    return await methodChannel.invokeMethod('loadModelFiles', {
-      'name': name,
-      'prototxtBuffer': prototxtBuffer,
-      'txtBuffer': txtBuffer,
-      'characterModelBuffer': characterModelBuffer,
-    });
-  }
-
-  /// Load s template file.
-  Future<int?> loadTemplate(String template) async {
-    return await methodChannel.invokeMethod('loadTemplate', {
-      'template': template,
-    });
-  }
-
   /// Load the whole model by folder.
   @override
   Future<int?> loadModel({ModelType modelType = ModelType.mrz}) async {

@@ -87,6 +87,8 @@ class _HomePageState extends State<HomePage> {
       } else {
         if (results != null && results.isNotEmpty) {
           showAlert(context, "OCR Result", results[0][0].text);
+        } else {
+          showAlert(context, "OCR Result", "");
         }
       }
     }
