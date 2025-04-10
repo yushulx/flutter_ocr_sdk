@@ -14,10 +14,10 @@ class FlutterOcrSdk {
     return FlutterOcrSdkPlatform.instance.init(key);
   }
 
-  Future<List<List<OcrLine>>?> recognizeByBuffer(
-      Uint8List bytes, int width, int height, int stride, int format) {
+  Future<List<List<OcrLine>>?> recognizeByBuffer(Uint8List bytes, int width,
+      int height, int stride, int format, int rotation) {
     return FlutterOcrSdkPlatform.instance
-        .recognizeByBuffer(bytes, width, height, stride, format);
+        .recognizeByBuffer(bytes, width, height, stride, format, rotation);
   }
 
   Future<List<List<OcrLine>>?> recognizeByFile(String filename) {

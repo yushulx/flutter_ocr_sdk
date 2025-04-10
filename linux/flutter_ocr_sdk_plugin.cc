@@ -135,7 +135,14 @@ static void flutter_ocr_sdk_plugin_handle_method_call(
     }
     int format = fl_value_get_int(value);
 
-    self->manager->RecognizeBuffer(method_call, bytes, width, height, stride, format, stride * height);
+    value = fl_value_lookup_string(args, "rotation");
+    if (value == nullptr)
+    {
+      return;
+    }
+    int rotation = fl_value_get_int(value);
+
+    self->manager->RecognizeBuffer(method_call, bytes, width, height, stride, format, stride * height, rotation);
   }
   else
   {

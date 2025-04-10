@@ -127,7 +127,7 @@ namespace flutter_ocr_sdk
       EncodableList results;
 
       std::vector<unsigned char> bytes;
-      int width = 0, height = 0, stride = 0, format = 0;
+      int width = 0, height = 0, stride = 0, format = 0, rotation = 0;
 
       if (arguments)
       {
@@ -160,7 +160,13 @@ namespace flutter_ocr_sdk
         {
           format = std::get<int>(format_it->second);
         }
-        manager->RecognizeBuffer(result, reinterpret_cast<unsigned char *>(bytes.data()), width, height, stride, format);
+
+        auto rotation_it = arguments->find(EncodableValue("rotation"));
+        if (rotation_it != arguments->end())
+        {
+          rotation = std::get<int>(rotation_it->second);
+        }
+        manager->RecognizeBuffer(result, reinterpret_cast<unsigned char *>(bytes.data()), width, height, stride, format, rotation);
       }
     }
     else

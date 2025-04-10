@@ -85,11 +85,12 @@ public class FlutterOcrSdkPlugin implements FlutterPlugin, MethodCallHandler, Ac
         final int height = call.argument("height");
         final int stride = call.argument("stride");
         final int format = call.argument("format");
+        final int rotation = call.argument("rotation");
         final Result r = result;
         mExecutor.execute(new Runnable() {
           @Override
           public void run() {
-            final ArrayList<ArrayList<HashMap<String, Object>>> results = mOCRManager.recognizeByBuffer(bytes, width, height, stride, format);
+            final ArrayList<ArrayList<HashMap<String, Object>>> results = mOCRManager.recognizeByBuffer(bytes, width, height, stride, format, rotation);
             mHandler.post(new Runnable() {
               @Override
               public void run() {

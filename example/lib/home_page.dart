@@ -61,7 +61,8 @@ class _HomePageState extends State<HomePage> {
           image.width,
           image.height,
           byteData.lengthInBytes ~/ image.height,
-          ImagePixelFormat.IPF_ARGB_8888.index);
+          ImagePixelFormat.IPF_ARGB_8888.index,
+          0);
 
       List<OcrLine>? finalArea;
       MrzResult? information;

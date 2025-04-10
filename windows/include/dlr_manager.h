@@ -269,10 +269,10 @@ public:
         start();
     }
 
-    void RecognizeBuffer(std::unique_ptr<flutter::MethodResult<flutter::EncodableValue>> &pendingResult, const unsigned char *buffer, int width, int height, int stride, int format)
+    void RecognizeBuffer(std::unique_ptr<flutter::MethodResult<flutter::EncodableValue>> &pendingResult, const unsigned char *buffer, int width, int height, int stride, int format, int rotation)
     {
         capturedReceiver->pendingResults.push_back(std::move(pendingResult));
-        CImageData *imageData = new CImageData(stride * height, buffer, width, height, stride, getPixelFormat(format));
+        CImageData *imageData = new CImageData(stride * height, buffer, width, height, stride, getPixelFormat(format), rotation);
         fileFetcher->SetFile(imageData);
         delete imageData;
 

@@ -43,9 +43,10 @@ class FlutterOcrSdkWeb extends FlutterOcrSdkPlatform {
   /// [format] is the format of the image
   /// Returns a list of MRZ lines
   @override
-  Future<List<List<OcrLine>>?> recognizeByBuffer(
-      Uint8List bytes, int width, int height, int stride, int format) async {
-    return _dlrManager.recognizeByBuffer(bytes, width, height, stride, format);
+  Future<List<List<OcrLine>>?> recognizeByBuffer(Uint8List bytes, int width,
+      int height, int stride, int format, int rotation) async {
+    return _dlrManager.recognizeByBuffer(
+        bytes, width, height, stride, format, rotation);
   }
 
   /// Recognize MRZ from a file

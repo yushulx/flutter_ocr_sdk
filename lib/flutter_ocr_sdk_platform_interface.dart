@@ -76,8 +76,8 @@ abstract class FlutterOcrSdkPlatform extends PlatformInterface {
     throw UnimplementedError('init() has not been implemented.');
   }
 
-  Future<List<List<OcrLine>>?> recognizeByBuffer(
-      Uint8List bytes, int width, int height, int stride, int format) {
+  Future<List<List<OcrLine>>?> recognizeByBuffer(Uint8List bytes, int width,
+      int height, int stride, int format, int rotation) {
     throw UnimplementedError('recognizeByBuffer() has not been implemented.');
   }
 

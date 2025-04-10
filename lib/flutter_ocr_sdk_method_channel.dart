@@ -32,8 +32,8 @@ class MethodChannelFlutterOcrSdk extends FlutterOcrSdkPlatform {
   /// Do OCR by image buffer.
   /// Returns a [List<List<OcrLine>>] containing the OCR results.
   @override
-  Future<List<List<OcrLine>>?> recognizeByBuffer(
-      Uint8List bytes, int width, int height, int stride, int format) async {
+  Future<List<List<OcrLine>>?> recognizeByBuffer(Uint8List bytes, int width,
+      int height, int stride, int format, int rotation) async {
     List<dynamic>? results =
         await methodChannel.invokeMethod('recognizeByBuffer', {
       'bytes': bytes,
@@ -41,6 +41,7 @@ class MethodChannelFlutterOcrSdk extends FlutterOcrSdkPlatform {
       'height': height,
       'stride': stride,
       'format': format,
+      'rotation': rotation
     });
 
     if (results == null || results.isEmpty) return [];

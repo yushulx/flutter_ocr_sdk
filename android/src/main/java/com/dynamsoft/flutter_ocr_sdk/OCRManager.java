@@ -53,7 +53,7 @@ public class OCRManager {
         return ret;
     }
 
-    public ArrayList<ArrayList<HashMap<String, Object>>> recognizeByBuffer(byte[] bytes, int width, int height, int stride, int format) {
+    public ArrayList<ArrayList<HashMap<String, Object>>> recognizeByBuffer(byte[] bytes, int width, int height, int stride, int format, int rotation) {
         ArrayList<ArrayList<HashMap<String, Object>>> ret = new ArrayList<ArrayList<HashMap<String, Object>>>();
         CapturedResult results = null;
         ImageData imageData = new ImageData();
@@ -62,6 +62,7 @@ public class OCRManager {
         imageData.height = height;
         imageData.stride = stride;
         imageData.format = format;
+        imageData.orientation = rotation;
         try {
             results = mRouter.capture(imageData, templateName);
             ret = wrapResults(results);

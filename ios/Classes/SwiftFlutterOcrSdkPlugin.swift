@@ -1,6 +1,9 @@
 import DynamsoftBarcodeReader
+
 import DynamsoftCaptureVisionRouter
+
 import DynamsoftCore
+
 import DynamsoftLicense
 
 import Flutter
@@ -60,6 +63,7 @@ public class SwiftFlutterOcrSdkPlugin: NSObject, FlutterPlugin, LicenseVerificat
                 let height: Int = arguments.value(forKey: "height") as! Int
                 let stride: Int = arguments.value(forKey: "stride") as! Int
                 let format: Int = arguments.value(forKey: "format") as! Int
+                let rotation: Int = arguments.value(forKey: "rotation") as! Int
                 let enumImagePixelFormat = EnumImagePixelFormat(rawValue: format)
                 let imageData = iImageData.init()
                 imageData.bytes = buffer.data

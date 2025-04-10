@@ -277,9 +277,9 @@ public:
         start();
     }
 
-    void RecognizeBuffer(FlMethodCall *method_call, unsigned char *buffer, int width, int height, int stride, int format, int length)
+    void RecognizeBuffer(FlMethodCall *method_call, unsigned char *buffer, int width, int height, int stride, int format, int length, int rotation)
     {
-        CImageData *imageData = new CImageData(stride * height, buffer, width, height, stride, getPixelFormat(format));
+        CImageData *imageData = new CImageData(stride * height, buffer, width, height, stride, getPixelFormat(format), rotation);
         fileFetcher->SetFile(imageData);
         delete imageData;
         listener->SetMethodCall(method_call);
