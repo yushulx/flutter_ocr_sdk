@@ -83,7 +83,7 @@ class MyTab extends StatelessWidget {
           Image.asset(
             isSelected ? tab.selectedIcon : tab.icon,
             width: 48,
-            height: 32,
+            height: 30,
           ),
           Text(tab.text,
               overflow: TextOverflow.ellipsis,
