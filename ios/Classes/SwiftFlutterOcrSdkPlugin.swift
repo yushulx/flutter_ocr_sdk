@@ -29,8 +29,6 @@ public class SwiftFlutterOcrSdkPlugin: NSObject, FlutterPlugin, LicenseVerificat
     public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
         let arguments: NSDictionary = call.arguments as! NSDictionary
         switch call.method {
-        case "getPlatformVersion":
-            result("iOS " + UIDevice.current.systemVersion)
         case "init":
             completionHandlers.append(result)
             let license: String = arguments.value(forKey: "key") as! String

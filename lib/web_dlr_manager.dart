@@ -6,6 +6,7 @@ import 'dart:typed_data';
 
 import 'package:js/js.dart';
 
+import 'model_type.dart';
 import 'ocr_line.dart';
 import 'utils.dart';
 
@@ -69,7 +70,7 @@ class DLRManager {
     return [];
   }
 
-  Future<int?> loadModel() async {
+  Future<int?> loadModel(ModelType modelType) async {
     if (_recognizer != null) {
       await handleThenable(_recognizer!.updateRuntimeSettingsFromString("MRZ"));
     }

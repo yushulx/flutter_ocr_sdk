@@ -10,27 +10,36 @@ import 'package:path_provider/path_provider.dart';
 import 'flutter_ocr_sdk_platform_interface.dart';
 import 'model_type.dart';
 
-/// An implementation of [FlutterOcrSdkPlatform] that uses method channels.
+/// A [FlutterOcrSdkPlatform] implementation that communicates with
+/// the native platform using a [MethodChannel].
+///
+/// This class provides methods for initializing the OCR SDK, performing OCR
+/// from image buffers or file paths, and loading OCR models based on type.
 class MethodChannelFlutterOcrSdk extends FlutterOcrSdkPlatform {
   /// The method channel used to interact with the native platform.
   @visibleForTesting
   final methodChannel = const MethodChannel('flutter_ocr_sdk');
 
-  @override
-  Future<String?> getPlatformVersion() async {
-    final version =
-        await methodChannel.invokeMethod<String>('getPlatformVersion');
-    return version;
-  }
-
-  /// Initialize the SDK
+  /// Initializes the OCR SDK using the provided [key].
+  ///
+  /// Returns `0` on success, or a non-zero error code if initialization fails.
   @override
   Future<int?> init(String key) async {
     return await methodChannel.invokeMethod<int>('init', {'key': key});
   }
 
-  /// Do OCR by image buffer.
-  /// Returns a [List<List<OcrLine>>] containing the OCR results.
+  /// Performs OCR on an image buffer.
+  ///
+  /// Parameters:
+  /// - [bytes]: Raw image data (RGBA).
+  /// - [width]: Image width in pixels.
+  /// - [height]: Image height in pixels.
+  /// - [stride]: Number of bytes per row.
+  /// - [format]: Pixel format index (e.g., [ImagePixelFormat.IPF_ARGB_8888.index]).
+  /// - [rotation]: Rotation angle in degrees (0, 90, 180, 270).
+  ///
+  /// Returns a list of OCR results, where each item is a list of [OcrLine]
+  /// representing one text region (like MRZ or VIN blocks).
   @override
   Future<List<List<OcrLine>>?> recognizeByBuffer(Uint8List bytes, int width,
       int height, int stride, int format, int rotation) async {
@@ -49,8 +58,10 @@ class MethodChannelFlutterOcrSdk extends FlutterOcrSdkPlatform {
     return _resultWrapper(results);
   }
 
-  /// Do OCR by file.
-  /// Returns a [List<List<OcrLine>>] containing the OCR results.
+  /// Performs OCR on an image file specified by [filename].
+  ///
+  /// Returns a list of OCR results, each represented as a list of [OcrLine]
+  /// for text regions found in the image.
   @override
   Future<List<List<OcrLine>>?> recognizeByFile(String filename) async {
     List<dynamic>? results =
@@ -63,7 +74,10 @@ class MethodChannelFlutterOcrSdk extends FlutterOcrSdkPlatform {
     return _resultWrapper(results);
   }
 
-  /// Convert JSON string to List<OcrLine>
+  /// Converts a decoded JSON result from the native platform into
+  /// a structured [List<List<OcrLine>>] format.
+  ///
+  /// Each inner list represents one text block containing one or more lines.
   List<List<OcrLine>> _resultWrapper(List<dynamic> data) {
     List<List<OcrLine>> results = [];
 
@@ -91,7 +105,11 @@ class MethodChannelFlutterOcrSdk extends FlutterOcrSdkPlatform {
     return results;
   }
 
-  /// Load the whole model by folder.
+  /// Loads the OCR model for the specified [modelType].
+  ///
+  /// Supported types are [ModelType.mrz] (default) and [ModelType.vin].
+  ///
+  /// Returns `0` on success, or an error code on failure.
   @override
   Future<int?> loadModel({ModelType modelType = ModelType.mrz}) async {
     String templateName = "ReadPassportAndId";
@@ -103,15 +121,5 @@ class MethodChannelFlutterOcrSdk extends FlutterOcrSdkPlatform {
     int ret = await methodChannel
         .invokeMethod('loadModel', {'template': templateName});
     return ret;
-  }
-
-  /// Retrieve a string from the asset bundle.
-  Future<String> loadAssetString(String path) async {
-    return await rootBundle.loadString(path);
-  }
-
-  /// Retrieve a binary resource from the asset bundle as a data stream.
-  Future<ByteData> loadAssetBytes(String path) async {
-    return await rootBundle.load(path);
   }
 }

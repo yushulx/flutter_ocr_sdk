@@ -3,7 +3,6 @@
 // This must be included before many other Windows headers.
 #include <windows.h>
 
-// For getPlatformVersion; remove unless needed for your plugin implementation.
 #include <VersionHelpers.h>
 
 #include <flutter/method_channel.h>
@@ -53,25 +52,7 @@ namespace flutter_ocr_sdk
 
     const auto *arguments = std::get_if<EncodableMap>(method_call.arguments());
 
-    if (method_call.method_name().compare("getPlatformVersion") == 0)
-    {
-      std::ostringstream version_stream;
-      version_stream << "Windows ";
-      if (IsWindows10OrGreater())
-      {
-        version_stream << "10+";
-      }
-      else if (IsWindows8OrGreater())
-      {
-        version_stream << "8";
-      }
-      else if (IsWindows7OrGreater())
-      {
-        version_stream << "7";
-      }
-      result->Success(flutter::EncodableValue(version_stream.str()));
-    }
-    else if (method_call.method_name().compare("init") == 0)
+    if (method_call.method_name().compare("init") == 0)
     {
       std::string license;
       int ret = 0;

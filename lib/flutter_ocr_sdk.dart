@@ -5,10 +5,6 @@ import 'model_type.dart';
 import 'ocr_line.dart';
 
 class FlutterOcrSdk {
-  Future<String?> getPlatformVersion() {
-    return FlutterOcrSdkPlatform.instance.getPlatformVersion();
-  }
-
   /// Initialize the SDK: https://www.dynamsoft.com/customer/license/trialLicense/?product=dcv&package=cross-platform
   Future<int?> init(String key) {
     return FlutterOcrSdkPlatform.instance.init(key);

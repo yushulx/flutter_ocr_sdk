@@ -31,15 +31,7 @@ static void flutter_ocr_sdk_plugin_handle_method_call(
   const gchar *method = fl_method_call_get_name(method_call);
   FlValue *args = fl_method_call_get_args(method_call);
 
-  if (strcmp(method, "getPlatformVersion") == 0)
-  {
-    struct utsname uname_data = {};
-    uname(&uname_data);
-    g_autofree gchar *version = g_strdup_printf("Linux %s", uname_data.version);
-    g_autoptr(FlValue) result = fl_value_new_string(version);
-    response = FL_METHOD_RESPONSE(fl_method_success_response_new(result));
-  }
-  else if (strcmp(method, "init") == 0)
+  if (strcmp(method, "init") == 0)
   {
     if (fl_value_get_type(args) != FL_VALUE_TYPE_MAP)
     {

@@ -68,10 +68,6 @@ abstract class FlutterOcrSdkPlatform extends PlatformInterface {
     _instance = instance;
   }
 
-  Future<String?> getPlatformVersion() {
-    throw UnimplementedError('platformVersion() has not been implemented.');
-  }
-
   Future<int?> init(String key) {
     throw UnimplementedError('init() has not been implemented.');
   }
