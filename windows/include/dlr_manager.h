@@ -75,21 +75,26 @@ public:
 
     void WrapResults(CCapturedResult *result)
     {
-
+        EncodableList area;
         if (!result)
         {
+            out.push_back(area);
             return;
         }
 
         CParsedResult *dcpResult = result->GetParsedResult();
+        if (dcpResult == NULL || dcpResult->GetItemsCount() == 0)
+        {
+            out.push_back(area);
+            return;
+        }
+
         CRecognizedTextLinesResult *pResults = result->GetRecognizedTextLinesResult();
 
         int count = pResults->GetItemsCount();
 
         for (int i = 0; i < count; i++)
         {
-            EncodableList area;
-
             const CTextLineResultItem *result = pResults->GetItem(i);
             CPoint *points = result->GetLocation().points;
 
