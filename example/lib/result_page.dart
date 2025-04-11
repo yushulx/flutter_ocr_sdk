@@ -66,7 +66,7 @@ class _ResultPageState extends State<ResultPage> {
                 const SizedBox(
                   height: 3,
                 ),
-                Text(widget.information.passportNumber!, style: valueStyle),
+                Text(widget.information.docNumber!, style: valueStyle),
                 const SizedBox(
                   height: 6,
                 ),

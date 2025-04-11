@@ -50,10 +50,10 @@ class MRZ {
     givenName = givenName.trim();
     mrzInfo.givenName = givenName;
     // Get passport number information
-    String passportNumber = '';
-    passportNumber = line2.substring(0, 9);
-    passportNumber = passportNumber.replaceAll('<', ' ');
-    mrzInfo.passportNumber = passportNumber;
+    String docNumber = '';
+    docNumber = line2.substring(0, 9);
+    docNumber = docNumber.replaceAll('<', ' ');
+    mrzInfo.docNumber = docNumber;
     // Get Nationality information
     String issueCountry = line2.substring(10, 13);
     exp = RegExp(r'[0-9]');
@@ -135,10 +135,10 @@ class MRZ {
     givenName = givenName.trim();
     mrzInfo.givenName = givenName;
     // Get passport number information
-    String passportNumber = '';
-    passportNumber = line1.substring(5, 14);
-    passportNumber = passportNumber.replaceAll('<', ' ');
-    mrzInfo.passportNumber = passportNumber;
+    String docNumber = '';
+    docNumber = line1.substring(5, 14);
+    docNumber = docNumber.replaceAll('<', ' ');
+    mrzInfo.docNumber = docNumber;
     // Get issuing country or organization information
     String issueCountry = line1.substring(2, 5);
     exp = RegExp(r'[0-9]');

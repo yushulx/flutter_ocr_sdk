@@ -4,11 +4,13 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_ocr_sdk/ocr_line.dart';
+import 'package:flutter_ocr_sdk/vin_result.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 
 import 'flutter_ocr_sdk_platform_interface.dart';
 import 'model_type.dart';
+import 'mrz_result.dart';
 
 /// A [FlutterOcrSdkPlatform] implementation that communicates with
 /// the native platform using a [MethodChannel].
@@ -96,6 +98,55 @@ class MethodChannelFlutterOcrSdk extends FlutterOcrSdkPlatform {
         line.y3 = map['y3'];
         line.x4 = map['x4'];
         line.y4 = map['y4'];
+
+        print('map type: ${map['type']}');
+        if (map['type'] == 'MRZ') {
+          String mrzString = map['mrzString'];
+          String docType = map["docType"];
+          String nationality = map["nationality"];
+          String surname = map["surname"];
+          String givenName = map["givenName"];
+          String docNumber = map["docNumber"];
+          String issuingCountry = map["issuingCountry"];
+          String birthDate = map["birthDate"];
+          String gender = map["gender"];
+          String expiration = map["expiration"];
+
+          MrzResult mrzResult = MrzResult(
+              type: docType,
+              nationality: nationality,
+              surname: surname,
+              givenName: givenName,
+              docNumber: docNumber,
+              issuingCountry: issuingCountry,
+              birthDate: birthDate,
+              gender: gender,
+              expiration: expiration,
+              lines: mrzString);
+          line.mrzResult = mrzResult;
+        } else if (map['type'] == 'VIN') {
+          String vinString = map['vinString'];
+          String wmi = map['wmi'];
+          String region = map['region'];
+          String vds = map['vds'];
+          String checkDigit = map['checkDigit'];
+          String modelYear = map['modelYear'];
+          String plantCode = map['plantCode'];
+          String serialNumber = map['serialNumber'];
+
+          VinResult vinResult = VinResult(
+              vinString: vinString,
+              wmi: wmi,
+              region: region,
+              vds: vds,
+              checkDigit: checkDigit,
+              modelYear: modelYear,
+              plantCode: plantCode,
+              serialNumber: serialNumber);
+
+          line.vinResult = vinResult;
+        }
+
         lines.add(line);
       }
 

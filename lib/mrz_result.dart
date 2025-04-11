@@ -12,8 +12,8 @@ class MrzResult {
   /// Given name.
   String? givenName;
 
-  /// Passport number.
-  String? passportNumber;
+  /// Document number.
+  String? docNumber;
 
   /// Issuing country.
   String? issuingCountry;
@@ -35,7 +35,7 @@ class MrzResult {
       String? nationality,
       String? surname,
       String? givenName,
-      String? passportNumber,
+      String? docNumber,
       String? issuingCountry,
       String? birthDate,
       String? gender,
@@ -45,7 +45,7 @@ class MrzResult {
         this.nationality = nationality ?? 'N/A',
         this.surname = surname ?? 'N/A',
         this.givenName = givenName ?? 'N/A',
-        this.passportNumber = passportNumber ?? 'N/A',
+        this.docNumber = docNumber ?? 'N/A',
         this.issuingCountry = issuingCountry ?? 'N/A',
         this.birthDate = birthDate ?? 'N/A',
         this.gender = gender ?? 'N/A',
@@ -62,7 +62,7 @@ class MrzResult {
     result += 'Nationality: $nationality\n\n';
     result += 'Surname: $surname\n\n';
     result += 'Given name: $givenName\n\n';
-    result += 'Passport Number: $passportNumber\n\n';
+    result += 'Passport Number: $docNumber\n\n';
     result += 'Issue Country: $issuingCountry\n\n';
     result += 'Date of birth: $birthDate\n\n';
     result += 'Gender: $gender\n\n';
@@ -76,7 +76,7 @@ class MrzResult {
         'nationality': nationality ?? '',
         'surname': surname ?? '',
         'givenName': givenName ?? '',
-        'passportNumber': passportNumber ?? '',
+        'docNumber': docNumber ?? '',
         'issuingCountry': issuingCountry ?? '',
         'birthDate': birthDate ?? '',
         'gender': gender ?? '',
@@ -90,7 +90,7 @@ class MrzResult {
       nationality: json['nationality'],
       surname: json['surname'],
       givenName: json['givenName'],
-      passportNumber: json['passportNumber'],
+      docNumber: json['docNumber'],
       issuingCountry: json['issuingCountry'],
       birthDate: json['birthDate'],
       gender: json['gender'],

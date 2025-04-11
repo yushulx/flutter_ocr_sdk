@@ -136,7 +136,7 @@ class MyCustomWidget extends StatelessWidget {
                       style: const TextStyle(color: Colors.white),
                     ),
                     Text(
-                      result.passportNumber!,
+                      result.docNumber!,
                       style: TextStyle(color: colorSubtitle),
                     ),
                   ],
