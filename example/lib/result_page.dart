@@ -89,7 +89,7 @@ class _ResultPageState extends State<ResultPage> {
                   const SizedBox(
                     height: 6,
                   ),
-                  Text("Date of Birth (YYYY-MM-DD)", style: keyStyle),
+                  Text("Date of Birth", style: keyStyle),
                   const SizedBox(
                     height: 3,
                   ),
@@ -105,7 +105,7 @@ class _ResultPageState extends State<ResultPage> {
                   const SizedBox(
                     height: 6,
                   ),
-                  Text("Date of Expiry(YYYY-MM-DD)", style: keyStyle),
+                  Text("Date of Expiry", style: keyStyle),
                   const SizedBox(
                     height: 3,
                   ),

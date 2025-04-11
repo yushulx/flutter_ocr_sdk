@@ -27,7 +27,6 @@ public class OCRManager {
     private static String TAG = "OCR";
     private CaptureVisionRouter mRouter;
     private String templateName;
-    private int mBirthYear;
 
     public void init(String license, Context context, final Result result) {
         if (mRouter == null) {
@@ -134,21 +133,9 @@ public class OCRManager {
                         String mrzText = "";
                         String givenName = entry.get("secondaryIdentifier") == null ? "" : entry.get("secondaryIdentifier");
                         String surname = entry.get("primaryIdentifier") == null ? "" : " " + entry.get("primaryIdentifier");
-
-                        int expiryYear = 0;
-                        int age;
-                        try {
-                            int year = Integer.parseInt(entry.get("birthYear"));
-                            int month = Integer.parseInt(entry.get("birthMonth"));
-                            int day = Integer.parseInt(entry.get("birthDay"));
-                            expiryYear = Integer.parseInt(entry.get("expiryYear")) + 2000;
-                            age = calculateAge(year, month, day);
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
                         String sex = entry.get("sex");
-                        String dateOfBirth = mBirthYear + "-" + entry.get("birthMonth") + "-" + entry.get("birthDay");
-                        String dateOfExpire = expiryYear + "-" + entry.get("expiryMonth") + "-" + entry.get("expiryDay");
+                        String dateOfBirth = entry.get("dateOfBirth") == null? "" : entry.get("dateOfBirth");
+                        String dateOfExpire = entry.get("dateOfExpiry") == null? "" : entry.get("dateOfExpiry");
                         String line1 = entry.get("line1");
                         String line2 = entry.get("line2");
                         String line3 = entry.get("line3");
@@ -190,37 +177,4 @@ public class OCRManager {
     public void loadModel(String name) {
         templateName = name;
     }
-
-    private int calculateAge(int year, int month, int day) {
-		Calendar calendar = Calendar.getInstance();
-		int cYear = calendar.get(Calendar.YEAR);
-		int cMonth = calendar.get(Calendar.MONTH) + 1;
-		int cDay = calendar.get(Calendar.DAY_OF_MONTH);
-		mBirthYear = 1900 + year;
-		int diffYear = cYear - mBirthYear;
-		int diffMonth = cMonth - month;
-		int diffDay = cDay - day;
-		int age = minusYear(diffYear, diffMonth, diffDay);
-		if (age > 100) {
-			mBirthYear = 2000 + year;
-			diffYear = cYear - mBirthYear;
-			age = minusYear(diffYear, diffMonth, diffDay);
-		} else if (age < 0) {
-			age = 0;
-		}
-		return age;
-	}
-
-	private int minusYear(int diffYear, int diffMonth, int diffDay) {
-		int age = Math.max(diffYear, 0);
-		if (diffMonth < 0) {
-			age = age - 1;
-
-		} else if (diffMonth == 0) {
-			if (diffDay < 0) {
-				age = age - 1;
-			}
-		}
-		return age;
-	}
 }
