@@ -22,6 +22,7 @@ using namespace dynamsoft::cvr;
 using namespace dynamsoft::dlr;
 using namespace dynamsoft::utility;
 using namespace dynamsoft::basic_structures;
+using namespace dynamsoft::dcp;
 
 using flutter::EncodableList;
 using flutter::EncodableMap;
@@ -47,11 +48,21 @@ public:
     vector<CRecognizedTextLinesResult *> results;
     vector<std::unique_ptr<flutter::MethodResult<flutter::EncodableValue>>> pendingResults = {};
     EncodableList out;
+    string modelName;
 
 public:
-    void OnRecognizedTextLinesReceived(CRecognizedTextLinesResult *pResult) override
+    void SetModelName(string &name)
+    {
+        modelName = name;
+    }
+
+    void OnCapturedResultReceived(CCapturedResult *pResult) override
     {
         WrapResults(pResult);
+    }
+    void OnRecognizedTextLinesReceived(CRecognizedTextLinesResult *pResult) override
+    {
+        // WrapResults(pResult);
     }
 
     void sendResult()
@@ -62,13 +73,16 @@ public:
         out.clear();
     }
 
-    void WrapResults(CRecognizedTextLinesResult *pResults)
+    void WrapResults(CCapturedResult *result)
     {
 
-        if (!pResults)
+        if (!result)
         {
             return;
         }
+
+        CParsedResult *dcpResult = result->GetParsedResult();
+        CRecognizedTextLinesResult *pResults = result->GetRecognizedTextLinesResult();
 
         int count = pResults->GetItemsCount();
 
@@ -99,6 +113,196 @@ public:
             map[EncodableValue("y3")] = EncodableValue(y3);
             map[EncodableValue("x4")] = EncodableValue(x4);
             map[EncodableValue("y4")] = EncodableValue(y4);
+
+            const CParsedResultItem *item = dcpResult->GetItem(i);
+            if (modelName == "ReadVINText")
+            {
+                map[EncodableValue("type")] = EncodableValue("VIN");
+
+                string vinstring;
+                string wmi;
+                string region;
+                string vds;
+                string checkDigit;
+                string modelYear;
+                string plantCode;
+                string serialNumber;
+
+                if (item->GetFieldValidationStatus("vinString") != VS_FAILED && item->GetFieldValue("vinString") != NULL)
+                {
+                    vinstring = item->GetFieldValue("vinString");
+                }
+
+                if (item->GetFieldValidationStatus("WMI") != VS_FAILED && item->GetFieldValue("WMI") != NULL)
+                {
+                    wmi = item->GetFieldValue("WMI");
+                }
+
+                if (item->GetFieldValidationStatus("region") != VS_FAILED && item->GetFieldValue("region") != NULL)
+                {
+                    region = item->GetFieldValue("region");
+                }
+
+                if (item->GetFieldValidationStatus("VDS") != VS_FAILED && item->GetFieldValue("VDS") != NULL)
+                {
+                    vds = item->GetFieldValue("VDS");
+                }
+
+                if (item->GetFieldValidationStatus("checkDigit") != VS_FAILED && item->GetFieldValue("checkDigit") != NULL)
+                {
+                    checkDigit = item->GetFieldValue("checkDigit");
+                }
+
+                if (item->GetFieldValidationStatus("modelYear") != VS_FAILED && item->GetFieldValue("modelYear") != NULL)
+                {
+                    modelYear = item->GetFieldValue("modelYear");
+                }
+
+                if (item->GetFieldValidationStatus("plantCode") != VS_FAILED && item->GetFieldValue("plantCode") != NULL)
+                {
+                    plantCode = item->GetFieldValue("plantCode");
+                }
+
+                if (item->GetFieldValidationStatus("serialNumber") != VS_FAILED && item->GetFieldValue("serialNumber") != NULL)
+                {
+                    serialNumber = item->GetFieldValue("serialNumber");
+                }
+
+                map[EncodableValue("vinString")] = EncodableValue(vinstring);
+                map[EncodableValue("wmi")] = EncodableValue(wmi);
+                map[EncodableValue("region")] = EncodableValue(region);
+                map[EncodableValue("vds")] = EncodableValue(vds);
+                map[EncodableValue("checkDigit")] = EncodableValue(checkDigit);
+                map[EncodableValue("modelYear")] = EncodableValue(modelYear);
+                map[EncodableValue("plantCode")] = EncodableValue(plantCode);
+                map[EncodableValue("serialNumber")] = EncodableValue(serialNumber);
+            }
+            else
+            {
+                map[EncodableValue("type")] = EncodableValue("MRZ");
+
+                string docId;
+                string docType;
+                string nationality;
+                string issuer;
+                string dateOfBirth;
+                string dateOfExpiry;
+                string gender;
+                string surname;
+                string givenname;
+                string rawText;
+
+                docType = item->GetCodeType();
+
+                if (docType == "MRTD_TD3_PASSPORT")
+                {
+                    if (item->GetFieldValidationStatus("passportNumber") != VS_FAILED && item->GetFieldValue("passportNumber") != NULL)
+                    {
+                        docId = item->GetFieldValue("passportNumber");
+                    }
+                }
+                else if (item->GetFieldValidationStatus("documentNumber") != VS_FAILED && item->GetFieldValue("documentNumber") != NULL)
+                {
+                    docId = item->GetFieldValue("documentNumber");
+                }
+
+                string line;
+                if (docType == "MRTD_TD1_ID")
+                {
+                    if (item->GetFieldValue("line1") != NULL)
+                    {
+                        line = item->GetFieldValue("line1");
+                        if (item->GetFieldValidationStatus("line1") == VS_FAILED)
+                        {
+                            line += ", Validation Failed";
+                        }
+                        rawText += line + "\n";
+                    }
+
+                    if (item->GetFieldValue("line2") != NULL)
+                    {
+                        line = item->GetFieldValue("line2");
+                        if (item->GetFieldValidationStatus("line2") == VS_FAILED)
+                        {
+                            line += ", Validation Failed";
+                        }
+                        rawText += line + "\n";
+                    }
+
+                    if (item->GetFieldValue("line3") != NULL)
+                    {
+                        line = item->GetFieldValue("line3");
+                        if (item->GetFieldValidationStatus("line3") == VS_FAILED)
+                        {
+                            line += ", Validation Failed";
+                        }
+                        rawText += line + "\n";
+                    }
+                }
+                else
+                {
+                    if (item->GetFieldValue("line1") != NULL)
+                    {
+                        line = item->GetFieldValue("line1");
+                        if (item->GetFieldValidationStatus("line1") == VS_FAILED)
+                        {
+                            line += ", Validation Failed";
+                        }
+                        rawText += line + "\n";
+                    }
+
+                    if (item->GetFieldValue("line2") != NULL)
+                    {
+                        line = item->GetFieldValue("line2");
+                        if (item->GetFieldValidationStatus("line2") == VS_FAILED)
+                        {
+                            line += ", Validation Failed";
+                        }
+                        rawText += line + "\n";
+                    }
+                }
+
+                if (item->GetFieldValidationStatus("nationality") != VS_FAILED && item->GetFieldValue("nationality") != NULL)
+                {
+                    nationality = item->GetFieldValue("nationality");
+                }
+                if (item->GetFieldValidationStatus("issuingState") != VS_FAILED && item->GetFieldValue("issuingState") != NULL)
+                {
+                    issuer = item->GetFieldValue("issuingState");
+                }
+                if (item->GetFieldValidationStatus("dateOfBirth") != VS_FAILED && item->GetFieldValue("dateOfBirth") != NULL)
+                {
+                    dateOfBirth = item->GetFieldValue("dateOfBirth");
+                }
+                if (item->GetFieldValidationStatus("dateOfExpiry") != VS_FAILED && item->GetFieldValue("dateOfExpiry") != NULL)
+                {
+                    dateOfExpiry = item->GetFieldValue("dateOfExpiry");
+                }
+                if (item->GetFieldValidationStatus("sex") != VS_FAILED && item->GetFieldValue("sex") != NULL)
+                {
+                    gender = item->GetFieldValue("sex");
+                }
+                if (item->GetFieldValidationStatus("primaryIdentifier") != VS_FAILED && item->GetFieldValue("primaryIdentifier") != NULL)
+                {
+                    surname = item->GetFieldValue("primaryIdentifier");
+                }
+                if (item->GetFieldValidationStatus("secondaryIdentifier") != VS_FAILED && item->GetFieldValue("secondaryIdentifier") != NULL)
+                {
+                    givenname = item->GetFieldValue("secondaryIdentifier");
+                }
+
+                map[EncodableValue("docType")] = EncodableValue(docType);
+                map[EncodableValue("nationality")] = EncodableValue(nationality);
+                map[EncodableValue("surname")] = EncodableValue(surname);
+                map[EncodableValue("givenName")] = EncodableValue(givenname);
+                map[EncodableValue("docNumber")] = EncodableValue(docId);
+                map[EncodableValue("issuingCountry")] = EncodableValue(issuer);
+                map[EncodableValue("birthDate")] = EncodableValue(dateOfBirth);
+                map[EncodableValue("gender")] = EncodableValue(gender);
+                map[EncodableValue("expiration")] = EncodableValue(dateOfExpiry);
+                map[EncodableValue("mrzString")] = EncodableValue(rawText);
+            }
+
             area.push_back(map);
 
             out.push_back(area);
@@ -198,6 +402,11 @@ public:
             return -1;
 
         modelName = name;
+
+        if (capturedReceiver)
+        {
+            capturedReceiver->SetModelName(modelName);
+        }
 
         return 0;
     }

@@ -100,7 +100,6 @@ class MethodChannelFlutterOcrSdk extends FlutterOcrSdkPlatform {
         line.x4 = map['x4'];
         line.y4 = map['y4'];
 
-        print('map type: ${map['type']}');
         if (map['type'] == 'MRZ') {
           String mrzString = map['mrzString'];
           String docType = map["docType"];

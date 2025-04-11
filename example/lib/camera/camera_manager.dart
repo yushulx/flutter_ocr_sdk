@@ -4,7 +4,6 @@ import 'package:camera_windows/camera_windows.dart';
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
 import 'package:flutter_ocr_sdk/flutter_ocr_sdk_platform_interface.dart';
-import 'package:flutter_ocr_sdk/model_type.dart';
 import 'package:flutter_ocr_sdk/ocr_line.dart';
 
 import 'dart:io';
