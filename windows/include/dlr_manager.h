@@ -73,23 +73,23 @@ public:
         out.clear();
     }
 
-    void WrapResults(CCapturedResult *result)
+    void WrapResults(CCapturedResult *capturedResult)
     {
         EncodableList area;
-        if (!result)
+        if (!capturedResult)
         {
             out.push_back(area);
             return;
         }
 
-        CParsedResult *dcpResult = result->GetParsedResult();
+        CParsedResult *dcpResult = capturedResult->GetParsedResult();
         if (dcpResult == NULL || dcpResult->GetItemsCount() == 0)
         {
             out.push_back(area);
             return;
         }
 
-        CRecognizedTextLinesResult *pResults = result->GetRecognizedTextLinesResult();
+        CRecognizedTextLinesResult *pResults = capturedResult->GetRecognizedTextLinesResult();
 
         int count = pResults->GetItemsCount();
 

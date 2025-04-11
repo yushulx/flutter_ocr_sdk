@@ -63,7 +63,9 @@ static void flutter_ocr_sdk_plugin_handle_method_call(
     }
     const char *params = fl_value_get_string(value);
 
-    int ret = self->manager->LoadModel(params);
+    std::string str(params);
+    int ret = self->manager->LoadModel(str);
+
     g_autoptr(FlValue) result = fl_value_new_int(ret);
     response = FL_METHOD_RESPONSE(fl_method_success_response_new(result));
   }
