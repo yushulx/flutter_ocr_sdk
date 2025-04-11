@@ -88,6 +88,7 @@ class MethodChannelFlutterOcrSdk extends FlutterOcrSdkPlatform {
       for (int i = 0; i < area.length; i++) {
         OcrLine line = OcrLine();
         Map<dynamic, dynamic> map = area[i];
+        if (map.isEmpty) continue;
         line.confidence = map['confidence'];
         line.text = map['text'];
         line.x1 = map['x1'];

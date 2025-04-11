@@ -28,7 +28,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final picker = ImagePicker();
   bool isMrzSelected = true;
-  void openResultPage(MrzResult information) {
+  void openResultPage(OcrLine information) {
     Navigator.push(
         context,
         MaterialPageRoute(
@@ -64,33 +64,10 @@ class _HomePageState extends State<HomePage> {
           ImagePixelFormat.IPF_ARGB_8888.index,
           0);
 
-      List<OcrLine>? finalArea;
-      MrzResult? information;
-      if (results != null && results.isNotEmpty) {
-        for (List<OcrLine> area in results) {
-          if (area.length == 2) {
-            finalArea = area;
-            information = MRZ.parseTwoLines(area[0].text, area[1].text);
-            information.lines = '${area[0].text}\n${area[1].text}';
-            break;
-          } else if (area.length == 3) {
-            finalArea = area;
-            information =
-                MRZ.parseThreeLines(area[0].text, area[1].text, area[2].text);
-            information.lines =
-                '${area[0].text}\n${area[1].text}\n${area[2].text}';
-            break;
-          }
-        }
-      }
-      if (finalArea != null) {
-        openResultPage(information!);
+      if (results != null && results[0].isNotEmpty) {
+        openResultPage(results[0][0]);
       } else {
-        if (results != null && results.isNotEmpty) {
-          showAlert(context, "OCR Result", results[0][0].text);
-        } else {
-          showAlert(context, "OCR Result", "");
-        }
+        showAlert(context, "OCR Result", "Recognition Failed!");
       }
     }
   }

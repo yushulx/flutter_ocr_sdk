@@ -101,45 +101,14 @@ class CameraManager {
 
       ocrLines = results;
       cbRefreshUi();
-      handleMrz(results);
+      handleOcr(results);
     }
     _isWebFrameStarted = false;
   }
 
-  void handleMrz(List<List<OcrLine>> results) {
-    if (results.isNotEmpty) {
-      List<OcrLine>? finalArea;
-
-      try {
-        for (List<OcrLine> area in results) {
-          if (area.length == 2) {
-            if (area[0].confidence >= 70 && area[1].confidence >= 70) {
-              finalArea = area;
-              break;
-            }
-          } else if (area.length == 3) {
-            if (area[0].confidence >= 70 &&
-                area[1].confidence >= 70 &&
-                area[2].confidence >= 70) {
-              finalArea = area;
-              break;
-            }
-          } else {
-            finalArea = area;
-          }
-        }
-      } catch (e) {
-        print(e);
-      }
-
-      if (!isFinished &&
-          finalArea != null &&
-          model == ModelType.mrz &&
-          (finalArea.length == 2 || finalArea.length == 3)) {
-        isFinished = true;
-        cbNavigation(finalArea);
-      }
-    }
+  void handleOcr(List<List<OcrLine>> results) {
+    if (isFinished || !cbIsMounted()) return;
+    cbNavigation(results[0]);
   }
 
   void processId(
@@ -158,16 +127,9 @@ class CameraManager {
         .then((results) {
       if (results == null || !cbIsMounted()) return;
 
-      // if (MediaQuery.of(context).size.width <
-      //     MediaQuery.of(context).size.height) {
-      //   if (Platform.isAndroid && results.isNotEmpty) {
-      //     results = rotate90mrz(results, previewSize!.height.toInt());
-      //   }
-      // }
-
       ocrLines = results;
       cbRefreshUi();
-      handleMrz(results);
+      handleOcr(results);
 
       _isScanAvailable = true;
     });

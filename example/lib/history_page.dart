@@ -2,6 +2,8 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_ocr_sdk/mrz_result.dart';
+import 'package:flutter_ocr_sdk/ocr_line.dart';
+import 'package:flutter_ocr_sdk/vin_result.dart';
 import 'global.dart';
 import 'result_page.dart';
 import 'package:share_plus/share_plus.dart';
@@ -16,7 +18,7 @@ class HistoryPage extends StatefulWidget {
 
 class _HistoryPageState extends State<HistoryPage> {
   bool _isLoaded = false;
-  final List<MrzResult> _mrzHistory = List<MrzResult>.empty(growable: true);
+  final List<OcrLine> _ocrHistory = List<OcrLine>.empty(growable: true);
   @override
   void initState() {
     super.initState();
@@ -24,15 +26,28 @@ class _HistoryPageState extends State<HistoryPage> {
   }
 
   Future<void> loadHistory() async {
+    _ocrHistory.clear();
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     var data = prefs.getStringList('mrz_data');
     if (data != null) {
-      _mrzHistory.clear();
       for (String json in data) {
         MrzResult mrzResult = MrzResult.fromJson(jsonDecode(json));
-        _mrzHistory.add(mrzResult);
+        OcrLine ocrLine = OcrLine();
+        ocrLine.mrzResult = mrzResult;
+        _ocrHistory.add(ocrLine);
       }
     }
+
+    data = prefs.getStringList('vin_data');
+    if (data != null) {
+      for (String json in data) {
+        VinResult vinResult = VinResult.fromJson(jsonDecode(json));
+        OcrLine ocrLine = OcrLine();
+        ocrLine.vinResult = vinResult;
+        _ocrHistory.add(ocrLine);
+      }
+    }
+
     setState(() {
       _isLoaded = true;
     });
@@ -42,12 +57,12 @@ class _HistoryPageState extends State<HistoryPage> {
   Widget build(BuildContext context) {
     var listView = Expanded(
         child: ListView.builder(
-            itemCount: _mrzHistory.length,
+            itemCount: _ocrHistory.length,
             itemBuilder: (context, index) {
               return MyCustomWidget(
-                  result: _mrzHistory[index],
+                  result: _ocrHistory[index],
                   cbDeleted: () async {
-                    _mrzHistory.removeAt(index);
+                    _ocrHistory.removeAt(index);
                     final SharedPreferences prefs =
                         await SharedPreferences.getInstance();
                     List<String> data =
@@ -61,7 +76,7 @@ class _HistoryPageState extends State<HistoryPage> {
                         context,
                         MaterialPageRoute(
                           builder: (context) => ResultPage(
-                            information: _mrzHistory[index],
+                            information: _ocrHistory[index],
                             isViewOnly: true,
                           ),
                         ));
@@ -85,7 +100,7 @@ class _HistoryPageState extends State<HistoryPage> {
                       await SharedPreferences.getInstance();
                   await prefs.remove('mrz_data');
                   setState(() {
-                    _mrzHistory.clear();
+                    _ocrHistory.clear();
                   });
                 },
                 icon: Image.asset(
@@ -109,7 +124,7 @@ class _HistoryPageState extends State<HistoryPage> {
 }
 
 class MyCustomWidget extends StatelessWidget {
-  final MrzResult result;
+  final OcrLine result;
   final Function cbDeleted;
   final Function cbOpenResultPage;
 
@@ -132,12 +147,8 @@ class MyCustomWidget extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      result.surname!,
+                      result.text,
                       style: const TextStyle(color: Colors.white),
-                    ),
-                    Text(
-                      result.docNumber!,
-                      style: TextStyle(color: colorSubtitle),
                     ),
                   ],
                 ),
@@ -190,7 +201,12 @@ class MyCustomWidget extends StatelessWidget {
                           cbDeleted();
                         } else if (selected == 1) {
                           // share
-                          Map<String, dynamic> jsonObject = result.toJson();
+                          Map<String, dynamic> jsonObject =
+                              result.mrzResult == null
+                                  ? result.vinResult == null
+                                      ? {}
+                                      : result.vinResult!.toJson()
+                                  : result.mrzResult!.toJson();
                           String jsonString = jsonEncode(jsonObject);
                           Share.share(jsonString);
                         } else {

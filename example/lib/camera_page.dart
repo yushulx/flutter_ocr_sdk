@@ -22,7 +22,7 @@ class CameraPage extends StatefulWidget {
 
 class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
   late CameraManager _cameraManager;
-
+  bool _enableCapture = false;
   @override
   void initState() {
     super.initState();
@@ -38,19 +38,13 @@ class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
 
   void navigation(dynamic order) {
     List<OcrLine> area = order;
-    MrzResult? information;
-    if (area.length == 2) {
-      information = MRZ.parseTwoLines(area[0].text, area[1].text);
-      information.lines = '${area[0].text}\n${area[1].text}';
-    } else if (area.length == 3) {
-      information =
-          MRZ.parseThreeLines(area[0].text, area[1].text, area[2].text);
-      information.lines = '${area[0].text}\n${area[1].text}\n${area[2].text}';
-    }
+
+    if (!_enableCapture || area.isEmpty) return;
+    _cameraManager.isFinished = true;
     Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (context) => ResultPage(information: information!),
+          builder: (context) => ResultPage(information: area[0]),
         ));
   }
 
@@ -158,47 +152,16 @@ class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
                     ),
                   ),
                 ),
-              const Positioned(
-                left: 122,
-                right: 122,
-                bottom: 28,
-                child: Text('Powered by Dynamsoft',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: Colors.white,
-                    )),
+              Positioned(
+                bottom: 30.0,
+                left: MediaQuery.of(context).size.width / 2 - 30,
+                child: FloatingActionButton(
+                  onPressed: () {
+                    _enableCapture = true;
+                  },
+                  child: Icon(Icons.camera),
+                ),
               ),
-              // Positioned(
-              //   top: 100,
-              //   left: MediaQuery.of(context).size.width / 4,
-              //   right: MediaQuery.of(context).size.width / 4,
-              //   bottom: 100,
-              //   child: Container(
-              //     width: MediaQuery.of(context).size.width,
-              //     height: MediaQuery.of(context).size.height,
-              //     decoration: BoxDecoration(
-              //       border: Border.all(
-              //         color: Colors.white,
-              //         width: 3.0,
-              //       ),
-              //       borderRadius: BorderRadius.circular(10.0),
-              //       color: Colors.transparent,
-              //     ),
-              //   ),
-              // ),
-              // Positioned(
-              //   bottom: (MediaQuery.of(context).size.height - 41 * 3) / 2,
-              //   left: !kIsWeb && (Platform.isAndroid)
-              //       ? 0
-              //       : (MediaQuery.of(context).size.width - 41 * 9) / 2,
-              //   child: !kIsWeb && (Platform.isAndroid)
-              //       ? Transform.rotate(
-              //           angle: pi / 2,
-              //           child: hint,
-              //         )
-              //       : hint,
-              // ),
             ],
           ),
           floatingActionButton: Opacity(
