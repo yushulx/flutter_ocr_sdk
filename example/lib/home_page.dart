@@ -240,7 +240,7 @@ class _HomePageState extends State<HomePage> {
                               Icon(Icons.warning_amber_rounded,
                                   color: Colors.white, size: 20),
                               Text(
-                                "  License expired! Renew your license ->",
+                                "  License expired! Renew your license",
                                 style: TextStyle(
                                     fontSize: 14,
                                     color: Colors.white,
