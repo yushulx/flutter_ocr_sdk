@@ -39,9 +39,9 @@ class FlutterOcrSdkWeb extends FlutterOcrSdkPlatform {
   /// Returns a list of OCR results, where each item is a list of [OcrLine]
   /// representing one text region (like MRZ or VIN blocks).
   @override
-  Future<List<List<OcrLine>>?> recognizeByBuffer(Uint8List bytes, int width,
+  Future<List<List<OcrLine>>?> recognizeBuffer(Uint8List bytes, int width,
       int height, int stride, int format, int rotation) async {
-    return _dlrManager.recognizeByBuffer(
+    return _dlrManager.recognizeBuffer(
         bytes, width, height, stride, format, rotation);
   }
 

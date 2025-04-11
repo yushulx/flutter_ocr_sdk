@@ -103,7 +103,7 @@ namespace flutter_ocr_sdk
         manager->RecognizeFile(result, filename.c_str());
       }
     }
-    else if (method_call.method_name().compare("recognizeByBuffer") == 0)
+    else if (method_call.method_name().compare("recognizeBuffer") == 0)
     {
       EncodableList results;
 

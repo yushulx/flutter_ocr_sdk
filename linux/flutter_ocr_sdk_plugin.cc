@@ -86,7 +86,7 @@ static void flutter_ocr_sdk_plugin_handle_method_call(
 
     self->manager->RecognizeFile(method_call, filename);
   }
-  else if (strcmp(method, "recognizeByBuffer") == 0)
+  else if (strcmp(method, "recognizeBuffer") == 0)
   {
     isAsync = true;
     if (fl_value_get_type(args) != FL_VALUE_TYPE_MAP)

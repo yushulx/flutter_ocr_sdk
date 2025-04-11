@@ -48,7 +48,7 @@ public class SwiftFlutterOcrSdkPlugin: NSObject, FlutterPlugin, LicenseVerificat
                 let res = try? self.recognizer!.recognizeFile(filename)
                 result(self.wrapResults(results: res))
             }
-        case "recognizeByBuffer":
+        case "recognizeBuffer":
             if self.recognizer == nil {
                 result(.none)
                 return

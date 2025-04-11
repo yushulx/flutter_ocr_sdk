@@ -56,13 +56,13 @@ class _HomePageState extends State<HomePage> {
     ByteData? byteData =
         await image.toByteData(format: ui.ImageByteFormat.rawRgba);
     if (byteData != null) {
-      List<List<OcrLine>>? results = await detector.recognizeByBuffer(
+      List<List<OcrLine>>? results = await detector.recognizeBuffer(
           byteData.buffer.asUint8List(),
           image.width,
           image.height,
           byteData.lengthInBytes ~/ image.height,
           ImagePixelFormat.IPF_ARGB_8888.index,
-          0);
+          ImageRotation.rotation0.value);
 
       if (results != null && results[0].isNotEmpty) {
         openResultPage(results[0][0]);

@@ -55,7 +55,7 @@ public class OCRManager {
         return ret;
     }
 
-    public ArrayList<ArrayList<HashMap<String, Object>>> recognizeByBuffer(byte[] bytes, int width, int height, int stride, int format, int rotation) {
+    public ArrayList<ArrayList<HashMap<String, Object>>> recognizeBuffer(byte[] bytes, int width, int height, int stride, int format, int rotation) {
         ArrayList<ArrayList<HashMap<String, Object>>> ret = new ArrayList<ArrayList<HashMap<String, Object>>>();
         CapturedResult results = null;
         ImageData imageData = new ImageData();

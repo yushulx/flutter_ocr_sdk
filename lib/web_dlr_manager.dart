@@ -59,7 +59,7 @@ class DLRManager {
   /// MRZ detection.
   /// [bytes] - image buffer.
   /// Returns a [List] of [List<OcrLine>].
-  Future<List<List<OcrLine>>?> recognizeByBuffer(Uint8List bytes, int width,
+  Future<List<List<OcrLine>>?> recognizeBuffer(Uint8List bytes, int width,
       int height, int stride, int format, int rotation) async {
     if (_recognizer != null) {
       List<dynamic> results = await handleThenable(

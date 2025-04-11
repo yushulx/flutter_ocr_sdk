@@ -1,3 +1,6 @@
+## 2.0.0
+- Refactored the whole project with Dynamsoft Capture Vision SDK.
+
 ## 1.2.0
 - Support AGP 8 for Android.
 - Update example code. 

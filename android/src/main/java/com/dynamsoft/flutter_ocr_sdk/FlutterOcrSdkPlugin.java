@@ -76,7 +76,7 @@ public class FlutterOcrSdkPlugin implements FlutterPlugin, MethodCallHandler, Ac
         });
       }
       break;
-      case "recognizeByBuffer": {
+      case "recognizeBuffer": {
         final byte[] bytes = call.argument("bytes");
         final int width = call.argument("width");
         final int height = call.argument("height");
@@ -87,7 +87,7 @@ public class FlutterOcrSdkPlugin implements FlutterPlugin, MethodCallHandler, Ac
         mExecutor.execute(new Runnable() {
           @Override
           public void run() {
-            final ArrayList<ArrayList<HashMap<String, Object>>> results = mOCRManager.recognizeByBuffer(bytes, width, height, stride, format, rotation);
+            final ArrayList<ArrayList<HashMap<String, Object>>> results = mOCRManager.recognizeBuffer(bytes, width, height, stride, format, rotation);
             mHandler.post(new Runnable() {
               @Override
               public void run() {

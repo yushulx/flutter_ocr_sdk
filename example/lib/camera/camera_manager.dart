@@ -122,7 +122,7 @@ class CameraManager {
     }
 
     detector
-        .recognizeByBuffer(bytes, width, height, stride, format, rotation)
+        .recognizeBuffer(bytes, width, height, stride, format, rotation)
         .then((results) {
       if (results == null || !cbIsMounted()) return;
 

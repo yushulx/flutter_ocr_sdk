@@ -47,6 +47,16 @@ enum ImagePixelFormat {
   IPF_BGR_888
 }
 
+enum ImageRotation {
+  rotation0(0),
+  rotation90(90),
+  rotation180(180),
+  rotation270(270);
+
+  final int value;
+  const ImageRotation(this.value);
+}
+
 abstract class FlutterOcrSdkPlatform extends PlatformInterface {
   /// Constructs a FlutterOcrSdkPlatform.
   FlutterOcrSdkPlatform() : super(token: _token);
@@ -72,9 +82,9 @@ abstract class FlutterOcrSdkPlatform extends PlatformInterface {
     throw UnimplementedError('init() has not been implemented.');
   }
 
-  Future<List<List<OcrLine>>?> recognizeByBuffer(Uint8List bytes, int width,
+  Future<List<List<OcrLine>>?> recognizeBuffer(Uint8List bytes, int width,
       int height, int stride, int format, int rotation) {
-    throw UnimplementedError('recognizeByBuffer() has not been implemented.');
+    throw UnimplementedError('recognizeBuffer() has not been implemented.');
   }
 
   Future<List<List<OcrLine>>?> recognizeByFile(String filename) {
