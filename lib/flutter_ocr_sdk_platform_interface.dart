@@ -87,8 +87,8 @@ abstract class FlutterOcrSdkPlatform extends PlatformInterface {
     throw UnimplementedError('recognizeBuffer() has not been implemented.');
   }
 
-  Future<List<List<OcrLine>>?> recognizeByFile(String filename) {
-    throw UnimplementedError('recognizeByFile() has not been implemented.');
+  Future<List<List<OcrLine>>?> recognizeFile(String filename) {
+    throw UnimplementedError('recognizeFile() has not been implemented.');
   }
 
   Future<int?> loadModel({ModelType modelType = ModelType.mrz}) async {

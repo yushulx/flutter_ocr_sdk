@@ -37,7 +37,7 @@ public class SwiftFlutterOcrSdkPlugin: NSObject, FlutterPlugin, LicenseVerificat
             let name: String = arguments.value(forKey: "template") as! String
             templateName = name
             result(0)
-        case "recognizeByFile":
+        case "recognizeFile":
             if recognizer == nil {
                 result(.none)
                 return

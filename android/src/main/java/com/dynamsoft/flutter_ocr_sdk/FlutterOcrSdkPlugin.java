@@ -58,13 +58,13 @@ public class FlutterOcrSdkPlugin implements FlutterPlugin, MethodCallHandler, Ac
         mOCRManager.init(license, activity, result);
         break;
       }
-      case "recognizeByFile": {
+      case "recognizeFile": {
         final String filename = call.argument("filename");
         final Result r = result;
         mExecutor.execute(new Runnable() {
           @Override
           public void run() {
-            final ArrayList<ArrayList<HashMap<String, Object>>> results = mOCRManager.recognizeByFile(filename);
+            final ArrayList<ArrayList<HashMap<String, Object>>> results = mOCRManager.recognizeFile(filename);
             mHandler.post(new Runnable() {
               @Override
               public void run() {

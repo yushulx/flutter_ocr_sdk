@@ -16,8 +16,8 @@ class FlutterOcrSdk {
         .recognizeBuffer(bytes, width, height, stride, format, rotation);
   }
 
-  Future<List<List<OcrLine>>?> recognizeByFile(String filename) {
-    return FlutterOcrSdkPlatform.instance.recognizeByFile(filename);
+  Future<List<List<OcrLine>>?> recognizeFile(String filename) {
+    return FlutterOcrSdkPlatform.instance.recognizeFile(filename);
   }
 
   Future<int?> loadModel({ModelType modelType = ModelType.mrz}) async {

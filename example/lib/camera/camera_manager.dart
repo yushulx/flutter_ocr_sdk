@@ -95,7 +95,7 @@ class CameraManager {
     _isWebFrameStarted = true;
     while (!(controller == null || isFinished || cbIsMounted() == false)) {
       XFile file = await controller!.takePicture();
-      var results = await detector.recognizeByFile(file.path);
+      var results = await detector.recognizeFile(file.path);
       if (results == null || !cbIsMounted()) return;
 
       ocrLines = results;

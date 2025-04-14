@@ -65,9 +65,8 @@ class MethodChannelFlutterOcrSdk extends FlutterOcrSdkPlatform {
   /// Returns a list of OCR results, each represented as a list of [OcrLine]
   /// for text regions found in the image.
   @override
-  Future<List<List<OcrLine>>?> recognizeByFile(String filename) async {
-    List<dynamic>? results =
-        await methodChannel.invokeMethod('recognizeByFile', {
+  Future<List<List<OcrLine>>?> recognizeFile(String filename) async {
+    List<dynamic>? results = await methodChannel.invokeMethod('recognizeFile', {
       'filename': filename,
     });
 

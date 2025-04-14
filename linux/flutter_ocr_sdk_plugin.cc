@@ -69,7 +69,7 @@ static void flutter_ocr_sdk_plugin_handle_method_call(
     g_autoptr(FlValue) result = fl_value_new_int(ret);
     response = FL_METHOD_RESPONSE(fl_method_success_response_new(result));
   }
-  else if (strcmp(method, "recognizeByFile") == 0)
+  else if (strcmp(method, "recognizeFile") == 0)
   {
     isAsync = true;
     if (fl_value_get_type(args) != FL_VALUE_TYPE_MAP)

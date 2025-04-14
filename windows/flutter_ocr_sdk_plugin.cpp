@@ -87,7 +87,7 @@ namespace flutter_ocr_sdk
 
       result->Success(EncodableValue(ret));
     }
-    else if (method_call.method_name().compare("recognizeByFile") == 0)
+    else if (method_call.method_name().compare("recognizeFile") == 0)
     {
       std::string filename;
       EncodableList results;

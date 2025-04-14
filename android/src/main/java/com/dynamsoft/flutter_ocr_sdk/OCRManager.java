@@ -43,7 +43,7 @@ public class OCRManager {
         });
     }
 
-    public ArrayList<ArrayList<HashMap<String, Object>>> recognizeByFile(String fileName) {
+    public ArrayList<ArrayList<HashMap<String, Object>>> recognizeFile(String fileName) {
         ArrayList<ArrayList<HashMap<String, Object>>> ret = new ArrayList<ArrayList<HashMap<String, Object>>>();
         CapturedResult results = null;
         try {

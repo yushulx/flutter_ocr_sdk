@@ -46,7 +46,7 @@ class DLRManager {
   /// MRZ detection.
   /// [file] - path to the file.
   /// Returns a [List] of [List<OcrLine>].
-  Future<List<List<OcrLine>>?> recognizeByFile(String file) async {
+  Future<List<List<OcrLine>>?> recognizeFile(String file) async {
     if (_recognizer != null) {
       List<dynamic> results =
           await handleThenable(_recognizer!.recognize(file));

@@ -50,8 +50,8 @@ class FlutterOcrSdkWeb extends FlutterOcrSdkPlatform {
   /// Returns a list of OCR results, each represented as a list of [OcrLine]
   /// for text regions found in the image.
   @override
-  Future<List<List<OcrLine>>?> recognizeByFile(String filename) async {
-    return _dlrManager.recognizeByFile(filename);
+  Future<List<List<OcrLine>>?> recognizeFile(String filename) async {
+    return _dlrManager.recognizeFile(filename);
   }
 
   /// Loads the OCR model for the specified [modelType].
