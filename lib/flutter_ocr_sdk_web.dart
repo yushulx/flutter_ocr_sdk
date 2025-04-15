@@ -9,7 +9,7 @@ import 'ocr_line.dart';
 
 /// A web implementation of the FlutterOcrSdkPlatform of the FlutterOcrSdk plugin.
 class FlutterOcrSdkWeb extends FlutterOcrSdkPlatform {
-  final DLRManager _dlrManager = DLRManager();
+  final CaptureVisionManager _cvm = CaptureVisionManager();
 
   /// Constructs a FlutterOcrSdkWeb
   FlutterOcrSdkWeb();
@@ -23,7 +23,7 @@ class FlutterOcrSdkWeb extends FlutterOcrSdkPlatform {
   /// Returns `0` on success, or a non-zero error code if initialization fails.
   @override
   Future<int?> init(String key) {
-    return _dlrManager.init(key);
+    return _cvm.init(key);
   }
 
   /// Performs OCR on an image buffer.
@@ -41,8 +41,7 @@ class FlutterOcrSdkWeb extends FlutterOcrSdkPlatform {
   @override
   Future<List<List<OcrLine>>?> recognizeBuffer(Uint8List bytes, int width,
       int height, int stride, int format, int rotation) async {
-    return _dlrManager.recognizeBuffer(
-        bytes, width, height, stride, format, rotation);
+    return _cvm.recognizeBuffer(bytes, width, height, stride, format, rotation);
   }
 
   /// Performs OCR on an image file specified by [filename].
@@ -51,7 +50,7 @@ class FlutterOcrSdkWeb extends FlutterOcrSdkPlatform {
   /// for text regions found in the image.
   @override
   Future<List<List<OcrLine>>?> recognizeFile(String filename) async {
-    return _dlrManager.recognizeFile(filename);
+    return _cvm.recognizeFile(filename);
   }
 
   /// Loads the OCR model for the specified [modelType].
@@ -61,6 +60,6 @@ class FlutterOcrSdkWeb extends FlutterOcrSdkPlatform {
   /// Returns `0` on success, or an error code on failure.
   @override
   Future<int?> loadModel({ModelType modelType = ModelType.mrz}) async {
-    return _dlrManager.loadModel(modelType);
+    return _cvm.loadModel(modelType);
   }
 }

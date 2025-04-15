@@ -15,7 +15,7 @@
 struct _FlutterOcrSdkPlugin
 {
   GObject parent_instance;
-  DlrManager *manager;
+  CaptureVisionManager *manager;
 };
 
 G_DEFINE_TYPE(FlutterOcrSdkPlugin, flutter_ocr_sdk_plugin, g_object_get_type())
@@ -163,7 +163,7 @@ static void flutter_ocr_sdk_plugin_class_init(FlutterOcrSdkPluginClass *klass)
 
 static void flutter_ocr_sdk_plugin_init(FlutterOcrSdkPlugin *self)
 {
-  self->manager = new DlrManager();
+  self->manager = new CaptureVisionManager();
 }
 
 static void method_call_cb(FlMethodChannel *channel, FlMethodCall *method_call,

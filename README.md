@@ -10,10 +10,16 @@ https://github.com/user-attachments/assets/7e84b0c8-c492-4262-97c7-851651d9327e
 - ✅ Windows
 - ✅ Linux
 - ✅ Android
+- ✅ Web
+        
+    In `index.html`, include:
+
+    ```html
+    <script src="https://cdn.jsdelivr.net/npm/dynamsoft-capture-vision-bundle@2.6.1000/dist/dcv.bundle.min.js"></script>
+    ```
 
 ## Coming Soon
 - 🚧 iOS
-- 🚧 Web
 
 
 ## Prerequisites

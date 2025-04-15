@@ -1,59 +1,143 @@
 @JS('Dynamsoft')
 library dynamsoft;
 
-import 'dart:convert';
-import 'dart:typed_data';
+import 'package:flutter_ocr_sdk/template.dart';
 
-import 'package:js/js.dart';
-
+import 'vin_result.dart';
 import 'model_type.dart';
+import 'mrz_result.dart';
 import 'ocr_line.dart';
+import 'dart:async';
+import 'dart:typed_data';
+import 'package:js/js.dart';
 import 'utils.dart';
+import 'dart:js_util';
 
-/// DocumentNormalizer class.
-@JS('DLR.LabelRecognizer')
-class LabelRecognizer {
-  external static set license(String license);
-  external static set engineResourcePath(String resourcePath);
-  external static PromiseJsImpl<LabelRecognizer> createInstance();
-  external PromiseJsImpl<void> updateRuntimeSettingsFromString(String settings);
-  external PromiseJsImpl<List<dynamic>> recognize(dynamic source);
-  external PromiseJsImpl<List<dynamic>> recognizeBuffer(
-      Uint8List buffer, int width, int height, int stride, int format);
+@JS()
+@anonymous
+class RecognitionResult {
+  external String get codeType;
+  external String get jsonString;
+  external String getFieldValue(String field);
 }
 
-/// DLRManager class.
-class DLRManager {
-  LabelRecognizer? _recognizer;
+@JS()
+@anonymous
+class CapturedResult {
+  external List<CapturedItem> get items;
+}
 
-  /// Configure Dynamsoft Label Recognizer.
+@JS()
+@anonymous
+class CapturedItem {
+  external int get type;
+  external String get text;
+  external String get formatString;
+  external Location get location;
+  external int get angle;
+  external Uint8List get bytes;
+  external int get confidence;
+}
+
+@JS()
+@anonymous
+class Location {
+  external List<Point> get points;
+}
+
+@JS()
+@anonymous
+class Point {
+  external num get x;
+  external num get y;
+}
+
+@JS('License.LicenseManager')
+class LicenseManager {
+  external static PromiseJsImpl<void> initLicense(
+      String license, bool executeNow);
+}
+
+@JS('Core.CoreModule')
+class CoreModule {
+  external static PromiseJsImpl<void> loadWasm(List<String> modules);
+}
+
+@JS('DCP.CodeParserModule')
+class CodeParserModule {
+  external static PromiseJsImpl<void> loadSpec(String resource);
+}
+
+@JS('DLR.LabelRecognizerModule')
+class LabelRecognizerModule {
+  external static PromiseJsImpl<void> loadRecognitionData(String resource);
+}
+
+@JS('DCP.CodeParser')
+class CodeParser {
+  external static PromiseJsImpl<CodeParser> createInstance();
+  external PromiseJsImpl<RecognitionResult> parse(String text);
+}
+
+@JS('CVR.CaptureVisionRouter')
+class CaptureVisionRouter {
+  /// Creates a new instance of [CaptureVisionRouter].
+  ///
+  /// This method returns a `PromiseJsImpl` that must be handled asynchronously.
+  external static PromiseJsImpl<CaptureVisionRouter> createInstance();
+
+  /// Recognize MRZ/VIN from a source.
+  ///
+  /// The [data] parameter can be a file object or a DSImageData object.
+  external PromiseJsImpl<CapturedResult> capture(dynamic data, String template);
+
+  /// Initializes runtime settings from a JSON string.
+  external PromiseJsImpl<void> initSettings(String settings);
+}
+
+/// CaptureVisionManager class.
+class CaptureVisionManager {
+  CaptureVisionRouter? _cvr;
+  CodeParser? _parser;
+  String modelName = '';
+
   /// Returns 0 if successful.
   Future<int> init(String key) async {
-    int ret = 0;
-
     try {
-      LabelRecognizer.license = key;
+      await handleThenable(LicenseManager.initLicense(key, true));
+      await handleThenable(CoreModule.loadWasm(["DLR"]));
+      _parser = await handleThenable(CodeParser.createInstance());
+
+      await handleThenable(CodeParserModule.loadSpec("VIN"));
+      await handleThenable(LabelRecognizerModule.loadRecognitionData("VIN"));
+
+      await handleThenable(CodeParserModule.loadSpec("MRTD_TD1_ID"));
+      await handleThenable(CodeParserModule.loadSpec("MRTD_TD2_FRENCH_ID"));
+      await handleThenable(CodeParserModule.loadSpec("MRTD_TD2_ID"));
+      await handleThenable(CodeParserModule.loadSpec("MRTD_TD2_VISA"));
+      await handleThenable(CodeParserModule.loadSpec("MRTD_TD3_PASSPORT"));
+      await handleThenable(CodeParserModule.loadSpec("MRTD_TD3_VISA"));
+      await handleThenable(LabelRecognizerModule.loadRecognitionData("MRZ"));
+
+      _cvr = await handleThenable(CaptureVisionRouter.createInstance());
+
+      await handleThenable(_cvr!.initSettings(template));
     } catch (e) {
       print(e);
-      ret = -1;
+      return -1;
     }
 
-    _recognizer = await handleThenable(LabelRecognizer.createInstance());
-
-    return ret;
+    return 0;
   }
 
   /// MRZ detection.
   /// [file] - path to the file.
   /// Returns a [List] of [List<OcrLine>].
   Future<List<List<OcrLine>>?> recognizeFile(String file) async {
-    if (_recognizer != null) {
-      List<dynamic> results =
-          await handleThenable(_recognizer!.recognize(file));
-      return _resultWrapper(results);
-    }
+    CapturedResult capturedResult =
+        await handleThenable(_cvr!.capture(file, modelName));
 
-    return [];
+    return await _resultWrapper(capturedResult.items);
   }
 
   /// MRZ detection.
@@ -61,50 +145,104 @@ class DLRManager {
   /// Returns a [List] of [List<OcrLine>].
   Future<List<List<OcrLine>>?> recognizeBuffer(Uint8List bytes, int width,
       int height, int stride, int format, int rotation) async {
-    if (_recognizer != null) {
-      List<dynamic> results = await handleThenable(
-          _recognizer!.recognizeBuffer(bytes, width, height, stride, format));
-      return _resultWrapper(results);
-    }
+    final dsImage = jsify({
+      'bytes': bytes,
+      'width': width,
+      'height': height,
+      'stride': stride,
+      'format': format,
+      'orientation': rotation
+    });
 
-    return [];
+    CapturedResult capturedResult =
+        await handleThenable(_cvr!.capture(dsImage, modelName));
+
+    return await _resultWrapper(capturedResult.items);
   }
 
   Future<int?> loadModel(ModelType modelType) async {
-    if (_recognizer != null) {
-      await handleThenable(_recognizer!.updateRuntimeSettingsFromString("MRZ"));
+    if (modelType == ModelType.mrz) {
+      modelName = "ReadMRZ";
+    } else {
+      modelName = "ReadVINText";
     }
     return 0;
   }
 
   /// Convert List<dynamic> to List<List<OcrLine>>.
-  List<List<OcrLine>> _resultWrapper(List<dynamic> results) {
+  Future<List<List<OcrLine>>> _resultWrapper(List<dynamic> results) async {
     List<List<OcrLine>> output = [];
+    List<OcrLine> lines = [];
+    for (CapturedItem result in results) {
+      if (result.type != 4) continue;
+      OcrLine line = OcrLine();
+      line.confidence = result.confidence;
+      line.text = result.text;
+      line.x1 = result.location.points[0].x.toInt();
+      line.y1 = result.location.points[0].y.toInt();
+      line.x2 = result.location.points[1].x.toInt();
+      line.y2 = result.location.points[1].y.toInt();
+      line.x3 = result.location.points[2].x.toInt();
+      line.y3 = result.location.points[2].y.toInt();
+      line.x4 = result.location.points[3].x.toInt();
+      line.y4 = result.location.points[3].y.toInt();
 
-    for (dynamic result in results) {
-      Map value = json.decode(stringify(result));
+      RecognitionResult data =
+          await handleThenable(_parser!.parse(result.text));
 
-      List<dynamic> area = value['lineResults'];
-      List<OcrLine> lines = [];
-      if (area.length == 2 || area.length == 3) {
-        for (int i = 0; i < area.length; i++) {
-          OcrLine line = OcrLine();
-          line.text = area[i]['text'];
-          line.confidence = area[i]['confidence'];
-          line.x1 = area[i]['location']['points'][0]['x'];
-          line.y1 = area[i]['location']['points'][0]['y'];
-          line.x2 = area[i]['location']['points'][1]['x'];
-          line.y2 = area[i]['location']['points'][1]['y'];
-          line.x3 = area[i]['location']['points'][2]['x'];
-          line.y3 = area[i]['location']['points'][2]['y'];
-          line.x4 = area[i]['location']['points'][3]['x'];
-          line.y4 = area[i]['location']['points'][3]['y'];
-          lines.add(line);
-        }
+      if (modelName == "ReadMRZ") {
+        String type = data.getFieldValue("documentCode");
+        String mrzString = line.text;
+        String docType = data.codeType;
+        String nationality = data.getFieldValue("nationality");
+        String surname = data.getFieldValue("primaryIdentifier");
+        String givenName = data.getFieldValue("secondaryIdentifier");
+        String docNumber = type == "P"
+            ? data.getFieldValue("passportNumber")
+            : data.getFieldValue("documentNumber");
+        String issuingCountry = data.getFieldValue("issuingState");
+        String birthDate = data.getFieldValue("dateOfBirth");
+        String gender = data.getFieldValue("sex");
+        String expiration = data.getFieldValue("dateOfExpiry");
+
+        MrzResult mrzResult = MrzResult(
+            type: docType,
+            nationality: nationality,
+            surname: surname,
+            givenName: givenName,
+            docNumber: docNumber,
+            issuingCountry: issuingCountry,
+            birthDate: birthDate,
+            gender: gender,
+            expiration: expiration,
+            lines: mrzString);
+        line.mrzResult = mrzResult;
+      } else if (modelName == "ReadVINText") {
+        String vinString = line.text;
+        String wmi = data.getFieldValue('WMI');
+        String region = data.getFieldValue('region');
+        String vds = data.getFieldValue('VDS');
+        String checkDigit = data.getFieldValue('checkDigit');
+        String modelYear = data.getFieldValue('modelYear');
+        String plantCode = data.getFieldValue('plantCode');
+        String serialNumber = data.getFieldValue('serialNumber');
+
+        VinResult vinResult = VinResult(
+            vinString: vinString,
+            wmi: wmi,
+            region: region,
+            vds: vds,
+            checkDigit: checkDigit,
+            modelYear: modelYear,
+            plantCode: plantCode,
+            serialNumber: serialNumber);
+
+        line.vinResult = vinResult;
       }
-      output.add(lines);
-    }
 
+      lines.add(line);
+    }
+    output.add(lines);
     return output;
   }
 }

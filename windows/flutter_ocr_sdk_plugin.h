@@ -8,28 +8,30 @@
 
 #include "include/dlr_manager.h"
 
-namespace flutter_ocr_sdk {
+namespace flutter_ocr_sdk
+{
 
-class FlutterOcrSdkPlugin : public flutter::Plugin {
- public:
-  static void RegisterWithRegistrar(flutter::PluginRegistrarWindows *registrar);
+  class FlutterOcrSdkPlugin : public flutter::Plugin
+  {
+  public:
+    static void RegisterWithRegistrar(flutter::PluginRegistrarWindows *registrar);
 
-  FlutterOcrSdkPlugin();
+    FlutterOcrSdkPlugin();
 
-  virtual ~FlutterOcrSdkPlugin();
+    virtual ~FlutterOcrSdkPlugin();
 
-  // Disallow copy and assign.
-  FlutterOcrSdkPlugin(const FlutterOcrSdkPlugin&) = delete;
-  FlutterOcrSdkPlugin& operator=(const FlutterOcrSdkPlugin&) = delete;
+    // Disallow copy and assign.
+    FlutterOcrSdkPlugin(const FlutterOcrSdkPlugin &) = delete;
+    FlutterOcrSdkPlugin &operator=(const FlutterOcrSdkPlugin &) = delete;
 
- private:
-    DlrManager *manager;
-  // Called when a method is called on this plugin's channel from Dart.
-  void HandleMethodCall(
-      const flutter::MethodCall<flutter::EncodableValue> &method_call,
-      std::unique_ptr<flutter::MethodResult<flutter::EncodableValue>> result);
-};
+  private:
+    CaptureVisionManager *manager;
+    // Called when a method is called on this plugin's channel from Dart.
+    void HandleMethodCall(
+        const flutter::MethodCall<flutter::EncodableValue> &method_call,
+        std::unique_ptr<flutter::MethodResult<flutter::EncodableValue>> result);
+  };
 
-}  // namespace flutter_ocr_sdk
+} // namespace flutter_ocr_sdk
 
-#endif  // FLUTTER_PLUGIN_FLUTTER_OCR_SDK_PLUGIN_H_
+#endif // FLUTTER_PLUGIN_FLUTTER_OCR_SDK_PLUGIN_H_

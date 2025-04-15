@@ -345,10 +345,10 @@ public:
     }
 };
 
-class DlrManager
+class CaptureVisionManager
 {
 public:
-    ~DlrManager()
+    ~CaptureVisionManager()
     {
         if (cvr != NULL)
         {

@@ -37,7 +37,7 @@ namespace flutter_ocr_sdk
 
   FlutterOcrSdkPlugin::FlutterOcrSdkPlugin()
   {
-    manager = new DlrManager();
+    manager = new CaptureVisionManager();
   }
 
   FlutterOcrSdkPlugin::~FlutterOcrSdkPlugin()
