@@ -39,6 +39,7 @@ https://github.com/user-attachments/assets/7e84b0c8-c492-4262-97c7-851651d9327e
 
     ```bash
     cd example
+    flutter run -d chrome    # Run on Web
     flutter run -d linux     # Run on Linux
     flutter run -d windows   # Run on Windows
     flutter run              # Run on default connected device (e.g., Android)
