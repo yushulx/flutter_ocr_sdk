@@ -58,28 +58,28 @@ install(DIRECTORY
   DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/"
 )
 
-install(DIRECTORY 
-  "${PROJECT_SOURCE_DIR}/../resources/Models"
-  DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/"
-)
+# install(DIRECTORY 
+#   "${PROJECT_SOURCE_DIR}/../resources/Models"
+#   DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/"
+# )
 
-install(DIRECTORY 
-  "${PROJECT_SOURCE_DIR}/../resources/ParserResources"
-  DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/"
-)
+# install(DIRECTORY 
+#   "${PROJECT_SOURCE_DIR}/../resources/ParserResources"
+#   DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/"
+# )
 
-install(DIRECTORY 
-  "${PROJECT_SOURCE_DIR}/../resources/Templates"
-  DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/"
-)
+# install(DIRECTORY 
+#   "${PROJECT_SOURCE_DIR}/../resources/Templates"
+#   DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/"
+# )
 
-install(FILES
-  "${PROJECT_SOURCE_DIR}/../resources/OverlappingChars.data"
-  DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/"
-)
+# install(FILES
+#   "${PROJECT_SOURCE_DIR}/../resources/OverlappingChars.data"
+#   DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/"
+# )
 
-install(FILES
-  "${PROJECT_SOURCE_DIR}/../resources/ConfusableChars.data"
-  DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/"
-)
+# install(FILES
+#   "${PROJECT_SOURCE_DIR}/../resources/ConfusableChars.data"
+#   DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/"
+# )
 

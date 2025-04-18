@@ -55,10 +55,10 @@ target_link_libraries(${PLUGIN_NAME} PRIVATE flutter flutter_wrapper_plugin "Dyn
 # external build triggered from this build file.
 set(flutter_ocr_sdk_bundled_libraries
   "${PROJECT_SOURCE_DIR}/bin/"
-  "${PROJECT_SOURCE_DIR}/../resources/Models"
-  "${PROJECT_SOURCE_DIR}/../resources/ParserResources"
-  "${PROJECT_SOURCE_DIR}/../resources/Templates"
-  "${PROJECT_SOURCE_DIR}/../resources/OverlappingChars.data"
-  "${PROJECT_SOURCE_DIR}/../resources/ConfusableChars.data"
+  # "${PROJECT_SOURCE_DIR}/../resources/Models"
+  # "${PROJECT_SOURCE_DIR}/../resources/ParserResources"
+  # "${PROJECT_SOURCE_DIR}/../resources/Templates"
+  # "${PROJECT_SOURCE_DIR}/../resources/OverlappingChars.data"
+  # "${PROJECT_SOURCE_DIR}/../resources/ConfusableChars.data"
   PARENT_SCOPE
 )
