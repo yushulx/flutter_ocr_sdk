@@ -10,6 +10,17 @@ https://github.com/user-attachments/assets/7e84b0c8-c492-4262-97c7-851651d9327e
 - ✅ Windows
 - ✅ Linux
 - ✅ Android
+- ✅ iOS
+    
+    Add camera and microphone usage descriptions to `ios/Runner/Info.plist`:
+    
+    ```xml
+    <key>NSCameraUsageDescription</key>
+    <string>Can I use the camera please?</string>
+    <key>NSMicrophoneUsageDescription</key>
+    <string>Can I use the mic please?</string>
+    ```
+
 - ✅ Web
         
     In `index.html`, include:
@@ -17,9 +28,6 @@ https://github.com/user-attachments/assets/7e84b0c8-c492-4262-97c7-851651d9327e
     ```html
     <script src="https://cdn.jsdelivr.net/npm/dynamsoft-capture-vision-bundle@2.6.1000/dist/dcv.bundle.min.js"></script>
     ```
-
-## Coming Soon
-- 🚧 iOS
 
 
 ## Prerequisites

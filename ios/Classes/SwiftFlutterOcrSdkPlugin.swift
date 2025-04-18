@@ -1,19 +1,15 @@
-import DynamsoftBarcodeReader
-
 import DynamsoftCaptureVisionRouter
-
+import DynamsoftCodeParser
 import DynamsoftCore
-
+import DynamsoftLabelRecognizer
 import DynamsoftLicense
-
 import Flutter
-
 import UIKit
 
 public class SwiftFlutterOcrSdkPlugin: NSObject, FlutterPlugin, LicenseVerificationListener {
     var completionHandlers: [FlutterResult] = []
     let cvr = CaptureVisionRouter()
-    var templateName: String?
+    var templateName: String = ""
 
     public static func register(with registrar: FlutterPluginRegistrar) {
         let channel = FlutterMethodChannel(
@@ -23,7 +19,6 @@ public class SwiftFlutterOcrSdkPlugin: NSObject, FlutterPlugin, LicenseVerificat
     }
 
     override init() {
-        recognizer = DynamsoftLabelRecognizer.init()
     }
 
     public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
@@ -32,28 +27,18 @@ public class SwiftFlutterOcrSdkPlugin: NSObject, FlutterPlugin, LicenseVerificat
         case "init":
             completionHandlers.append(result)
             let license: String = arguments.value(forKey: "key") as! String
-            DynamsoftLicenseManager.initLicense(license, verificationDelegate: self)
+            LicenseManager.initLicense(license, verificationDelegate: self)
         case "loadModel":
             let name: String = arguments.value(forKey: "template") as! String
             templateName = name
             result(0)
         case "recognizeFile":
-            if recognizer == nil {
-                result(.none)
-                return
-            }
-
             DispatchQueue.global().async {
                 let filename: String = arguments.value(forKey: "filename") as! String
-                let res = try? self.recognizer!.recognizeFile(filename)
-                result(self.wrapResults(results: res))
+                let res = self.cvr.captureFromFile(filename, templateName: self.templateName)
+                result(self.wrapResults(result: res))
             }
         case "recognizeBuffer":
-            if self.recognizer == nil {
-                result(.none)
-                return
-            }
-
             DispatchQueue.global().async {
                 let buffer: FlutterStandardTypedData =
                     arguments.value(forKey: "bytes") as! FlutterStandardTypedData
@@ -62,22 +47,23 @@ public class SwiftFlutterOcrSdkPlugin: NSObject, FlutterPlugin, LicenseVerificat
                 let stride: Int = arguments.value(forKey: "stride") as! Int
                 let format: Int = arguments.value(forKey: "format") as! Int
                 let rotation: Int = arguments.value(forKey: "rotation") as! Int
-                let enumImagePixelFormat = EnumImagePixelFormat(rawValue: format)
-                let imageData = iImageData.init()
+                let enumImagePixelFormat = ImagePixelFormat(rawValue: format)
+                let imageData = ImageData.init()
                 imageData.bytes = buffer.data
-                imageData.width = width
-                imageData.height = height
-                imageData.stride = stride
+                imageData.width = UInt(width)
+                imageData.height = UInt(height)
+                imageData.stride = UInt(stride)
                 imageData.format = enumImagePixelFormat!
-                let res = try? self.recognizer!.recognizeBuffer(imageData)
-                result(self.wrapResults(results: res))
+                imageData.orientation = rotation
+                let res = self.cvr.captureFromBuffer(imageData, templateName: self.templateName)
+                result(self.wrapResults(result: res))
             }
         default:
             result(.none)
         }
     }
 
-    public func licenseVerificationCallback(_ isSuccess: Bool, error: Error?) {
+    public func onLicenseVerified(_ isSuccess: Bool, error: Error?) {
         if isSuccess {
             completionHandlers.first?(0)
         } else {
@@ -85,33 +71,104 @@ public class SwiftFlutterOcrSdkPlugin: NSObject, FlutterPlugin, LicenseVerificat
         }
     }
 
-    func wrapResults(results: [iDLRResult]?) -> NSArray {
+    func wrapResults(result: CapturedResult) -> NSArray {
         let outResults = NSMutableArray()
-        if results == nil {
-            return outResults
-        }
-        for item in results! {
-            let area = NSMutableArray()
+        let tmp = NSMutableArray()
+        let items = result.items
 
-            for line in item.lineResults! {
-                let dictionary = NSMutableDictionary()
-                dictionary.setObject(line.confidence, forKey: "confidence" as NSCopying)
-                dictionary.setObject(line.text ?? "", forKey: "text" as NSCopying)
+        if items != nil && items!.count > 0 {
+            let subDic = NSMutableDictionary()
+            for item in items! {
+                if item.type == .textLine {
+                    guard let lineItem = item as? TextLineResultItem,
+                          let points = lineItem.location.points as? [CGPoint], points.count >= 4 else {
+                        continue
+                    }
 
-                let points = line.location!.points as! [CGPoint]
-                dictionary.setObject(Int(points[0].x), forKey: "x1" as NSCopying)
-                dictionary.setObject(Int(points[0].y), forKey: "y1" as NSCopying)
-                dictionary.setObject(Int(points[1].x), forKey: "x2" as NSCopying)
-                dictionary.setObject(Int(points[1].y), forKey: "y2" as NSCopying)
-                dictionary.setObject(Int(points[2].x), forKey: "x3" as NSCopying)
-                dictionary.setObject(Int(points[2].y), forKey: "y3" as NSCopying)
-                dictionary.setObject(Int(points[3].x), forKey: "x4" as NSCopying)
-                dictionary.setObject(Int(points[3].y), forKey: "y4" as NSCopying)
+                    subDic["confidence"] = lineItem.confidence
+                    subDic["text"] = lineItem.text
 
-                area.add(dictionary)
+                    for (i, point) in points.prefix(4).enumerated() {
+                        subDic["x\(i + 1)"] = Int(point.x)
+                        subDic["y\(i + 1)"] = Int(point.y)
+                    }
+
+                } else if item.type == .parsedResult {
+                    let parsedItem: ParsedResultItem = item as! ParsedResultItem
+                    let parsedFields = parsedItem.parsedFields
+
+                    if templateName == "ReadVINText" {
+                        subDic["type"] = "VIN"
+
+                        let vinString = parsedFields["vinString"] ?? "N/A"
+                        let wmi = parsedFields["WMI"] ?? "N/A"
+                        let region = parsedFields["region"] ?? "N/A"
+                        let vds = parsedFields["VDS"] ?? "N/A"
+                        let checkDigit = parsedFields["checkDigit"] ?? "N/A"
+                        let modelYear = parsedFields["modelYear"] ?? "N/A"
+                        let plantCode = parsedFields["plantCode"] ?? "N/A"
+                        let serialNumber = parsedFields["serialNumber"] ?? "N/A"
+
+                        subDic["vinString"] = vinString
+                        subDic["wmi"] = wmi
+                        subDic["region"] = region
+                        subDic["vds"] = vds
+                        subDic["checkDigit"] = checkDigit
+                        subDic["modelYear"] = modelYear
+                        subDic["plantCode"] = plantCode
+                        subDic["serialNumber"] = serialNumber
+
+                    } else {
+                        subDic["type"] = "MRZ"
+
+                        let docType = parsedItem.codeType
+                        let docNumber: String = {
+                            switch docType {
+                            case "MRTD_TD1_ID":
+                                return parsedFields["documentNumber"] ?? parsedFields[
+                                    "longDocumentNumber"] ?? "N/A"
+                            case "MRTD_TD2_ID", "MRTD_TD2_FRENCH_ID":
+                                return parsedFields["documentNumber"] ?? "N/A"
+                            case "MRTD_TD3_PASSPORT":
+                                return parsedFields["passportNumber"] ?? "N/A"
+                            default:
+                                return "N/A"
+                            }
+                        }()
+
+                        let nationality = parsedFields["nationality"] ?? "N/A"
+                        let issuingCountry = parsedFields["issuingState"] ?? "N/A"
+                        let givenName = parsedFields["secondaryIdentifier"] ?? "N/A"
+                        let surname = parsedFields["primaryIdentifier"].map { " \($0)" } ?? "N/A"
+                        let sex = parsedFields["sex"] ?? "N/A"
+                        let dateOfBirth = parsedFields["dateOfBirth"] ?? "N/A"
+                        let dateOfExpire = parsedFields["dateOfExpiry"] ?? "N/A"
+
+                        let mrzText = [
+                            parsedFields["line1"], parsedFields["line2"], parsedFields["line3"],
+                        ]
+                        .compactMap { $0 }
+                        .joined(separator: "\n")
+
+                        subDic["docType"] = docType
+                        subDic["nationality"] = nationality
+                        subDic["surname"] = surname
+                        subDic["givenName"] = givenName
+                        subDic["docNumber"] = docNumber
+                        subDic["issuingCountry"] = issuingCountry
+                        subDic["birthDate"] = dateOfBirth
+                        subDic["gender"] = sex
+                        subDic["expiration"] = dateOfExpire
+                        subDic["mrzString"] = mrzText
+                    }
+                } else {
+                    subDic["type"] = "unknown"
+                }
             }
-            outResults.add(area)
+            tmp.add(subDic)
         }
+
+        outResults.add(tmp)
 
         return outResults
     }
