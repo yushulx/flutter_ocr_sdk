@@ -1,12 +1,7 @@
-import 'dart:convert';
-import 'dart:io';
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_ocr_sdk/ocr_line.dart';
 import 'package:flutter_ocr_sdk/vin_result.dart';
-import 'package:path/path.dart';
-import 'package:path_provider/path_provider.dart';
 
 import 'flutter_ocr_sdk_platform_interface.dart';
 import 'model_type.dart';
