@@ -1,3 +1,6 @@
+## 2.0.1
+- Reduced the package size.
+
 ## 2.0.0
 - Refactored the whole project with Dynamsoft Capture Vision SDK.
 
