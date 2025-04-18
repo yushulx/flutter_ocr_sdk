@@ -11,24 +11,36 @@ const _zipUrl =
 const _zipName = 'resources.zip';
 
 Future<void> download() async {
-  // Find the folder where the running executable lives:
-  final execDir = p.dirname(Platform.resolvedExecutable);
-  final targetDir = Directory(execDir);
+  // 1. Locate executable folder
+  final execDir = Directory(p.dirname(Platform.resolvedExecutable));
 
-  // Ensure we have a local copy of the zip:
-  final zipFile = File(p.join(targetDir.path, _zipName));
-  if (!zipFile.existsSync()) {
-    stdout.writeln('🚧 Downloading resources.zip …');
+  // 2. Choose where to extract
+  final targetDir =
+      Platform.isWindows ? execDir : Directory(p.join(execDir.path, 'lib'));
+  targetDir.createSync(recursive: true);
+
+  // 3. Prepare cache in system temp
+  final cacheDir =
+      Directory(p.join(Directory.systemTemp.path, 'flutter_ocr_sdk'));
+  cacheDir.createSync(recursive: true);
+  final zipCacheFile = File(p.join(cacheDir.path, _zipName));
+
+  // 4. Download if missing
+  if (!zipCacheFile.existsSync()) {
+    stdout.writeln('Downloading resources.zip to ${zipCacheFile.path} …');
     final resp = await http.get(Uri.parse(_zipUrl));
     if (resp.statusCode != 200) {
       stderr.writeln('Failed to download ($_zipUrl): HTTP ${resp.statusCode}');
       exit(1);
     }
-    zipFile.writeAsBytesSync(resp.bodyBytes);
+    zipCacheFile.writeAsBytesSync(resp.bodyBytes);
+    stdout.writeln('✅ Cached zip in temp.');
+  } else {
+    stdout.writeln('✅ Using cached zip: ${zipCacheFile.path}');
   }
 
-  // Decode & extract:
-  final bytes = zipFile.readAsBytesSync();
+  // 5. Extract into targetDir
+  final bytes = zipCacheFile.readAsBytesSync();
   final archive = ZipDecoder().decodeBytes(bytes);
   for (final file in archive) {
     final outPath = p.join(targetDir.path, file.name);
@@ -39,14 +51,6 @@ Future<void> download() async {
     } else {
       Directory(outPath).createSync(recursive: true);
     }
-  }
-
-  // Delete the ZIP after successful extraction:
-  try {
-    zipFile.deleteSync();
-    stdout.writeln('🗑️ Deleted ${zipFile.path}');
-  } catch (e) {
-    stderr.writeln('⚠️ Could not delete ${zipFile.path}: $e');
   }
 
   stdout.writeln('✅ Resources unpacked to: ${targetDir.path}');
