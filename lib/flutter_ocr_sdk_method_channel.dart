@@ -7,6 +7,9 @@ import 'flutter_ocr_sdk_platform_interface.dart';
 import 'model_type.dart';
 import 'mrz_result.dart';
 
+import 'dart:io';
+import 'tool/extract_resources.dart';
+
 /// A [FlutterOcrSdkPlatform] implementation that communicates with
 /// the native platform using a [MethodChannel].
 ///
@@ -22,6 +25,9 @@ class MethodChannelFlutterOcrSdk extends FlutterOcrSdkPlatform {
   /// Returns `0` on success, or a non-zero error code if initialization fails.
   @override
   Future<int?> init(String key) async {
+    if (Platform.isLinux || Platform.isWindows) {
+      await download();
+    }
     return await methodChannel.invokeMethod<int>('init', {'key': key});
   }
 
