@@ -2,6 +2,8 @@
 
 A Flutter wrapper for the **Dynamsoft Capture Vision SDK**, featuring built-in **MRZ (Machine Readable Zone)** and **VIN (Vehicle Identification Number)** detection models.
 
+![Flutter Windows MRZ and VIN Scanner](https://www.dynamsoft.com/codepool/img/2025/04/flutter-windows-mrz-vin-scanner.png)
+
 ## Demo Video
 
 - **Android**
