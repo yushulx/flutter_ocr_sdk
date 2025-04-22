@@ -382,6 +382,8 @@ public:
         int ret = CLicenseManager::InitLicense(license, errorMsgBuffer, 512);
         printf("InitLicense: %s\n", errorMsgBuffer);
 
+        if (ret) return ret;
+
         cvr = new CCaptureVisionRouter;
 
         fileFetcher = new CFileFetcher();
@@ -473,6 +475,9 @@ public:
 
     void start()
     {
+        if (!cvr)
+            return;
+
         char errorMsg[512] = {0};
         int errorCode = cvr->StartCapturing(modelName.c_str(), false, errorMsg, 512);
         if (errorCode != 0)
@@ -483,6 +488,14 @@ public:
 
     void RecognizeFile(FlMethodCall *method_call, const char *filename)
     {
+        if (!cvr) {
+            FlValue *out = fl_value_new_list();
+            FlValue *area = fl_value_new_list();
+            fl_value_append_take(out, area);
+            g_autoptr(FlMethodResponse) response = FL_METHOD_RESPONSE(fl_method_success_response_new(out));
+            fl_method_call_respond(method_call, response, nullptr);
+            return;
+        }
         printf("RecognizeFile: %s\n", filename);
         fileFetcher->SetFile(filename);
         listener->SetMethodCall(method_call);
@@ -491,6 +504,15 @@ public:
 
     void RecognizeBuffer(FlMethodCall *method_call, unsigned char *buffer, int width, int height, int stride, int format, int length, int rotation)
     {
+        if (!cvr) {
+            FlValue *out = fl_value_new_list();
+            FlValue *area = fl_value_new_list();
+            fl_value_append_take(out, area);
+            g_autoptr(FlMethodResponse) response = FL_METHOD_RESPONSE(fl_method_success_response_new(out));
+            fl_method_call_respond(method_call, response, nullptr);
+            return;
+        }
+
         CImageData *imageData = new CImageData(stride * height, buffer, width, height, stride, getPixelFormat(format), rotation);
         fileFetcher->SetFile(imageData);
         delete imageData;

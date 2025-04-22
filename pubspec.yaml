@@ -1,6 +1,6 @@
 name: flutter_ocr_sdk
 description: A wrapper for Dynamsoft Capture Vision SDK, capable of recognizing MRZ (Machine Readable Zone) and VIN (Vehicle Identification Number).
-version: 2.0.1
+version: 2.0.2
 homepage: https://github.com/yushulx/flutter_ocr_sdk
 repository: https://github.com/yushulx/flutter_ocr_sdk
 
