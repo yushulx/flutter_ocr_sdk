@@ -375,6 +375,8 @@ public:
         int ret = CLicenseManager::InitLicense(license, errorMsgBuffer, 512);
         printf("InitLicense: %s\n", errorMsgBuffer);
 
+        if (ret) return ret;
+
         cvr = new CCaptureVisionRouter;
 
         fileFetcher = new CFileFetcher();
@@ -467,6 +469,9 @@ public:
 
     void start()
     {
+        if (!cvr)
+            return;
+
         char errorMsg[512] = {0};
         int errorCode = cvr->StartCapturing(modelName.c_str(), false, errorMsg, 512);
         if (errorCode != 0)
@@ -477,6 +482,14 @@ public:
 
     void RecognizeFile(std::unique_ptr<flutter::MethodResult<flutter::EncodableValue>> &pendingResult, const char *filename)
     {
+        if (!cvr) {
+            EncodableList out;
+            EncodableList area;
+            out.push_back(area);
+            pendingResult->Success(out);
+            return;
+        } 
+
         printf("RecognizeFile: %s\n", filename);
         capturedReceiver->pendingResults.push_back(std::move(pendingResult));
         fileFetcher->SetFile(filename);
@@ -485,6 +498,14 @@ public:
 
     void RecognizeBuffer(std::unique_ptr<flutter::MethodResult<flutter::EncodableValue>> &pendingResult, const unsigned char *buffer, int width, int height, int stride, int format, int rotation)
     {
+        if (!cvr) {
+            EncodableList out;
+            EncodableList area;
+            out.push_back(area);
+            pendingResult->Success(out);
+            return;
+        } 
+
         capturedReceiver->pendingResults.push_back(std::move(pendingResult));
         CImageData *imageData = new CImageData(stride * height, buffer, width, height, stride, getPixelFormat(format), rotation);
         fileFetcher->SetFile(imageData);
