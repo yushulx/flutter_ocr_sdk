@@ -22,7 +22,7 @@ class CameraPage extends StatefulWidget {
 
 class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
   late CameraManager _cameraManager;
-  bool _enableCapture = false;
+
   @override
   void initState() {
     super.initState();
@@ -39,8 +39,6 @@ class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
   void navigation(dynamic order) {
     List<OcrLine> area = order;
 
-    if (!_enableCapture || area.isEmpty) return;
-    _cameraManager.isFinished = true;
     Navigator.pushReplacement(
         context,
         MaterialPageRoute(
@@ -78,21 +76,10 @@ class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
   }
 
   List<Widget> createCameraPreview() {
-    if (_cameraManager.controller != null &&
-        _cameraManager.previewSize != null) {
-      double width = _cameraManager.previewSize!.width;
-      double height = _cameraManager.previewSize!.height;
-      if (!kIsWeb && (Platform.isAndroid || Platform.isIOS)) {
-        if (MediaQuery.of(context).size.width <
-            MediaQuery.of(context).size.height) {
-          width = _cameraManager.previewSize!.height;
-          height = _cameraManager.previewSize!.width;
-        }
-      }
-
+    if (!kIsWeb &&
+        (Platform.isWindows || Platform.isLinux || Platform.isMacOS)) {
       return [
-        SizedBox(
-            width: width, height: height, child: _cameraManager.getPreview()),
+        SizedBox(width: 640, height: 480, child: _cameraManager.getPreview()),
         Positioned(
           top: 0.0,
           right: 0.0,
@@ -104,21 +91,45 @@ class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
         ),
       ];
     } else {
-      return [const CircularProgressIndicator()];
+      if (_cameraManager.controller != null &&
+          _cameraManager.previewSize != null) {
+        double width = _cameraManager.previewSize!.width;
+        double height = _cameraManager.previewSize!.height;
+        if (!kIsWeb && (Platform.isAndroid || Platform.isIOS)) {
+          if (MediaQuery.of(context).size.width <
+              MediaQuery.of(context).size.height) {
+            width = _cameraManager.previewSize!.height;
+            height = _cameraManager.previewSize!.width;
+          }
+        }
+
+        return [
+          SizedBox(
+              width: width, height: height, child: _cameraManager.getPreview()),
+          Positioned(
+            top: 0.0,
+            right: 0.0,
+            bottom: 0,
+            left: 0.0,
+            child: createOverlay(
+              _cameraManager.ocrLines,
+            ),
+          ),
+        ];
+      } else {
+        return [const CircularProgressIndicator()];
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    const hint = Text(
-        'P<CANAMAN<<RITA<TANIA<<<<<<<<<<<<<<<<<<<<<<<\nERE82721<9CAN8412070M2405252<<<<<<<<<<<<<<08',
-        maxLines: 2,
-        overflow: TextOverflow.ellipsis,
-        textAlign: TextAlign.start,
-        style: TextStyle(
-          fontSize: 12,
-          color: Colors.white,
-        ));
+    var captureButton = InkWell(
+      onTap: () {
+        _cameraManager.isReadyToGo = true;
+      },
+      child: Image.asset('images/icon-capture.png', width: 80, height: 80),
+    );
 
     return WillPopScope(
         onWillPop: () async {
@@ -138,29 +149,23 @@ class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
           ),
           body: Stack(
             children: <Widget>[
-              if (_cameraManager.controller != null &&
-                  _cameraManager.previewSize != null)
-                Positioned(
-                  top: 0,
-                  right: 0,
-                  left: 0,
-                  bottom: 0,
-                  child: FittedBox(
-                    fit: BoxFit.cover,
-                    child: Stack(
-                      children: createCameraPreview(),
-                    ),
+              Positioned(
+                top: 0,
+                right: 0,
+                left: 0,
+                bottom: 0,
+                child: FittedBox(
+                  fit: BoxFit.cover,
+                  child: Stack(
+                    children: createCameraPreview(),
                   ),
                 ),
+              ),
               Positioned(
-                bottom: 30.0,
-                left: MediaQuery.of(context).size.width / 2 - 30,
-                child: FloatingActionButton(
-                  onPressed: () {
-                    _enableCapture = true;
-                  },
-                  child: Icon(Icons.camera),
-                ),
+                bottom: 80,
+                left: 155,
+                right: 155,
+                child: captureButton,
               ),
             ],
           ),

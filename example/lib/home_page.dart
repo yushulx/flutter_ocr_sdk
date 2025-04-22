@@ -110,12 +110,6 @@ class _HomePageState extends State<HomePage> {
       children: [
         GestureDetector(
             onTap: () {
-              if (!kIsWeb && Platform.isLinux) {
-                showAlert(context, "Warning",
-                    "${Platform.operatingSystem} is not supported");
-                return;
-              }
-
               Navigator.push(context, MaterialPageRoute(builder: (context) {
                 return const CameraPage();
               }));

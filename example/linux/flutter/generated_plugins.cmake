@@ -4,6 +4,7 @@
 
 list(APPEND FLUTTER_PLUGIN_LIST
   file_selector_linux
+  flutter_lite_camera
   flutter_ocr_sdk
   url_launcher_linux
 )

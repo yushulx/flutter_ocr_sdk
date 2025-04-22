@@ -46,6 +46,7 @@ dependencies:
   share_plus: ^10.0.2
   url_launcher: ^6.1.11
   flutter_exif_rotation: ^0.5.1
+  flutter_lite_camera:
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -82,3 +83,5 @@ flutter:
     - images/icon-image.png
     - images/image-mrz.png
     - images/logo-dlr.png
+    - images/default.png
+    - images/icon-capture.png
