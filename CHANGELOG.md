@@ -1,3 +1,6 @@
+## 2.0.2
+- Fixed license return value for Windows and Linux.
+
 ## 2.0.1
 - Reduced the package size.
 
