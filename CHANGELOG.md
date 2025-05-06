@@ -1,3 +1,6 @@
+## 2.0.3
+- Updated dependent packages.
+
 ## 2.0.2
 - Fixed license return value for Windows and Linux.
 
