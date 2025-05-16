@@ -1,12 +1,4 @@
-import DynamsoftCaptureVisionRouter
-
-import DynamsoftCodeParser
-
-import DynamsoftCore
-
-import DynamsoftLabelRecognizer
-
-import DynamsoftLicense
+import DynamsoftMRZScannerBundle
 
 import Flutter
 

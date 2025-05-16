@@ -33,14 +33,15 @@ A Flutter wrapper for the **Dynamsoft Capture Vision SDK**, featuring built-in *
 - ✅ Android
 - ✅ iOS
     
-    Add camera and microphone usage descriptions to `ios/Runner/Info.plist`:
+    - Add camera and microphone usage descriptions to `ios/Runner/Info.plist`:
     
-    ```xml
-    <key>NSCameraUsageDescription</key>
-    <string>Can I use the camera please?</string>
-    <key>NSMicrophoneUsageDescription</key>
-    <string>Can I use the mic please?</string>
-    ```
+        ```xml
+        <key>NSCameraUsageDescription</key>
+        <string>Can I use the camera please?</string>
+        <key>NSMicrophoneUsageDescription</key>
+        <string>Can I use the mic please?</string>
+        ```
+    - Minimum deployment target: iOS 13.0 or later
 
 - ✅ Web
         

@@ -1,40 +1,16 @@
 PODS:
   - camera_avfoundation (0.0.1):
     - Flutter
-  - DynamsoftBarcodeReader (10.4.30)
-  - DynamsoftCameraEnhancer (4.2.24)
-  - DynamsoftCaptureVisionBundle (2.6.1004):
-    - DynamsoftBarcodeReader (= 10.4.30)
-    - DynamsoftCameraEnhancer (= 4.2.24)
-    - DynamsoftCaptureVisionRouter (= 2.4.30)
-    - DynamsoftCodeParser (= 2.4.30)
-    - DynamsoftCodeParserDedicator (= 1.2.30)
-    - DynamsoftCore (= 3.4.30)
-    - DynamsoftDocumentNormalizer (= 2.6.10)
-    - DynamsoftImageProcessing (= 2.4.30)
-    - DynamsoftLabelRecognizer (= 3.4.30)
-    - DynamsoftLicense (= 3.4.40)
-    - DynamsoftNeuralNetwork (= 1.0.20)
-    - DynamsoftUtility (= 1.4.30)
-  - DynamsoftCaptureVisionRouter (2.4.30)
-  - DynamsoftCodeParser (2.4.30)
-  - DynamsoftCodeParserDedicator (1.2.30)
-  - DynamsoftCore (3.4.30)
-  - DynamsoftDocumentNormalizer (2.6.10)
-  - DynamsoftImageProcessing (2.4.30)
-  - DynamsoftLabelRecognizer (3.4.30)
-  - DynamsoftLicense (3.4.40)
-  - DynamsoftMRZ (3.4.20)
-  - DynamsoftNeuralNetwork (1.0.20)
-  - DynamsoftUtility (1.4.30)
-  - DynamsoftVIN (3.4.20)
+  - DynamsoftCaptureVisionBundle (3.0.3000)
+  - DynamsoftMRZScannerBundle (3.0.0):
+    - DynamsoftCaptureVisionBundle (= 3.0.3000)
+  - DynamsoftVINModel (1.0.0)
   - Flutter (1.0.0)
   - flutter_exif_rotation (0.3.0):
     - Flutter
   - flutter_ocr_sdk (1.0.0):
-    - DynamsoftCaptureVisionBundle (= 2.6.1004)
-    - DynamsoftMRZ (= 3.4.20)
-    - DynamsoftVIN (= 3.4.20)
+    - DynamsoftMRZScannerBundle (= 3.0.0)
+    - DynamsoftVINModel (= 1.0.0)
     - Flutter
   - image_picker_ios (0.0.1):
     - Flutter
@@ -62,21 +38,9 @@ DEPENDENCIES:
 
 SPEC REPOS:
   trunk:
-    - DynamsoftBarcodeReader
-    - DynamsoftCameraEnhancer
     - DynamsoftCaptureVisionBundle
-    - DynamsoftCaptureVisionRouter
-    - DynamsoftCodeParser
-    - DynamsoftCodeParserDedicator
-    - DynamsoftCore
-    - DynamsoftDocumentNormalizer
-    - DynamsoftImageProcessing
-    - DynamsoftLabelRecognizer
-    - DynamsoftLicense
-    - DynamsoftMRZ
-    - DynamsoftNeuralNetwork
-    - DynamsoftUtility
-    - DynamsoftVIN
+    - DynamsoftMRZScannerBundle
+    - DynamsoftVINModel
 
 EXTERNAL SOURCES:
   camera_avfoundation:
@@ -100,24 +64,12 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   camera_avfoundation: 04b44aeb14070126c6529e5ab82cc7c9fca107cf
-  DynamsoftBarcodeReader: b1925cf91cea404444c8eccf9045f5bd78a65d51
-  DynamsoftCameraEnhancer: 18628b6cd6169d35b5579424cdfab37e1b8ca7a4
-  DynamsoftCaptureVisionBundle: bb5d6c044784ce56b8b3615eed6cb88db695aa67
-  DynamsoftCaptureVisionRouter: 4e2fb20b7f0aae3b8709b6ff56713decb599e4ea
-  DynamsoftCodeParser: 7a8118c0bcd21bc849aaf7427f4088c2ea15d9a6
-  DynamsoftCodeParserDedicator: baa514940d7f5310e4a5f5d04eb59bb8282c1c8a
-  DynamsoftCore: 7b4ba6658f14d99aab9cc8e6ff2bc847909103ff
-  DynamsoftDocumentNormalizer: 5aa9f3c0465face2159862398970142a8b451b29
-  DynamsoftImageProcessing: 9c8e8deae9165693ec4ba4499a835a5609659fbb
-  DynamsoftLabelRecognizer: e05eed966b67d99dc8189ef74383a7454de37377
-  DynamsoftLicense: 4eabe8e077a64b38c8fdcf6177236bc018bac9a0
-  DynamsoftMRZ: 2f1983c9eb81d23bedbe80e56d6ff44136c3f43c
-  DynamsoftNeuralNetwork: 281373d04b236f4616f2f607b6266f0393d906e5
-  DynamsoftUtility: 0cea6058495725a9bdfff664f952785d81ab274e
-  DynamsoftVIN: 7b7366379a8ccc85c3a590c316a161f28f88ec1d
+  DynamsoftCaptureVisionBundle: 1935e3efc70db1b7c6cab19dfe420c3e43dbe1a0
+  DynamsoftMRZScannerBundle: 451826e16b0348703d56e8c761af84701656e760
+  DynamsoftVINModel: 35db5c790a0032dcfae374975b0bad7d7b53a4d6
   Flutter: e0871f40cf51350855a761d2e70bf5af5b9b5de7
   flutter_exif_rotation: 5406455759acacf1f7b1b83e85dbb545340d6e9c
-  flutter_ocr_sdk: 5d7b18eb2c49227fefd60eb33cc62dc5cab7cf02
+  flutter_ocr_sdk: 6fa5aa7061fe2933f16861b813c37bf5b042e3df
   image_picker_ios: 7fe1ff8e34c1790d6fff70a32484959f563a928a
   path_provider_foundation: 080d55be775b7414fd5a5ef3ac137b97b097e564
   share_plus: 011d6fb4f9d2576b83179a3a5c5e323202cdabcf
