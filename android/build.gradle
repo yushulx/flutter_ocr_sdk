@@ -42,7 +42,6 @@ android {
 }
 
 dependencies {
-    implementation "com.dynamsoft:dynamsoftcapturevisionbundle:2.6.1003"
-    implementation "com.dynamsoft:dynamsoftmrz:3.4.20"
-    implementation "com.dynamsoft:dynamsoftvin:3.4.20"
+    implementation 'com.dynamsoft:mrzscannerbundle:3.0.0'
+    implementation 'com.dynamsoft:vinmodel:1.0.0'
 }

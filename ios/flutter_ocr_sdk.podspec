@@ -16,9 +16,8 @@ A wrapper for Dynamsoft OCR SDK, detecting MRZ in passports, travel documents, a
   s.source_files = 'Classes/**/*'
   s.dependency 'Flutter'
   s.platform = :ios, '9.0'
-  s.dependency 'DynamsoftVIN', '3.4.20'
-  s.dependency 'DynamsoftMRZ', '3.4.20'
-  s.dependency 'DynamsoftCaptureVisionBundle', '2.6.1004'
+  s.dependency 'DynamsoftVINModel', '1.0.0'
+  s.dependency 'DynamsoftMRZScannerBundle', '3.0.0'
   # Flutter.framework does not contain a i386 slice.
   s.pod_target_xcconfig = { 'DEFINES_MODULE' => 'YES', 'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'i386' }
   s.swift_version = '5.0'

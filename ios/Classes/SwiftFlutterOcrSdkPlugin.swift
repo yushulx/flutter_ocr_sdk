@@ -1,9 +1,15 @@
 import DynamsoftCaptureVisionRouter
+
 import DynamsoftCodeParser
+
 import DynamsoftCore
+
 import DynamsoftLabelRecognizer
+
 import DynamsoftLicense
+
 import Flutter
+
 import UIKit
 
 public class SwiftFlutterOcrSdkPlugin: NSObject, FlutterPlugin, LicenseVerificationListener {
@@ -81,7 +87,8 @@ public class SwiftFlutterOcrSdkPlugin: NSObject, FlutterPlugin, LicenseVerificat
             for item in items! {
                 if item.type == .textLine {
                     guard let lineItem = item as? TextLineResultItem,
-                          let points = lineItem.location.points as? [CGPoint], points.count >= 4 else {
+                        let points = lineItem.location.points as? [CGPoint], points.count >= 4
+                    else {
                         continue
                     }
 

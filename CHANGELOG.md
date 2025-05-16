@@ -1,3 +1,6 @@
+## 2.0.4
+- Updated SDKs for Android and iOS.
+
 ## 2.0.3
 - Updated dependent packages.
 
