@@ -1,3 +1,6 @@
+## 2.0.5
+- Updated the JavaScript MRZ SDK.
+
 ## 2.0.4
 - Updated SDKs for Android and iOS.
 

@@ -68,11 +68,6 @@ class CodeParserModule {
   external static PromiseJsImpl<void> loadSpec(String resource);
 }
 
-@JS('DLR.LabelRecognizerModule')
-class LabelRecognizerModule {
-  external static PromiseJsImpl<void> loadRecognitionData(String resource);
-}
-
 @JS('DCP.CodeParser')
 class CodeParser {
   external static PromiseJsImpl<CodeParser> createInstance();
@@ -93,6 +88,9 @@ class CaptureVisionRouter {
 
   /// Initializes runtime settings from a JSON string.
   external PromiseJsImpl<void> initSettings(String settings);
+
+  external static PromiseJsImpl<void> appendModelBuffer(String dataName,
+      [String? dataPath]);
 }
 
 /// CaptureVisionManager class.
@@ -109,7 +107,8 @@ class CaptureVisionManager {
       _parser = await handleThenable(CodeParser.createInstance());
 
       await handleThenable(CodeParserModule.loadSpec("VIN"));
-      await handleThenable(LabelRecognizerModule.loadRecognitionData("VIN"));
+      await handleThenable(
+          CaptureVisionRouter.appendModelBuffer("VINCharRecognition"));
 
       await handleThenable(CodeParserModule.loadSpec("MRTD_TD1_ID"));
       await handleThenable(CodeParserModule.loadSpec("MRTD_TD2_FRENCH_ID"));
@@ -117,7 +116,10 @@ class CaptureVisionManager {
       await handleThenable(CodeParserModule.loadSpec("MRTD_TD2_VISA"));
       await handleThenable(CodeParserModule.loadSpec("MRTD_TD3_PASSPORT"));
       await handleThenable(CodeParserModule.loadSpec("MRTD_TD3_VISA"));
-      await handleThenable(LabelRecognizerModule.loadRecognitionData("MRZ"));
+      await handleThenable(
+          CaptureVisionRouter.appendModelBuffer("MRZCharRecognition"));
+      await handleThenable(
+          CaptureVisionRouter.appendModelBuffer("MRZTextLineRecognition"));
 
       _cvr = await handleThenable(CaptureVisionRouter.createInstance());
 

@@ -48,7 +48,7 @@ A Flutter wrapper for the **Dynamsoft Capture Vision SDK**, featuring built-in *
     In `index.html`, include:
 
     ```html
-    <script src="https://cdn.jsdelivr.net/npm/dynamsoft-capture-vision-bundle@2.6.1000/dist/dcv.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/dynamsoft-capture-vision-bundle@3.0.3001/dist/dcv.bundle.min.js"></script>
     ```
 
 
